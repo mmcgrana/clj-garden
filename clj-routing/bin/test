@@ -2,10 +2,10 @@
 
 cd `dirname $0`/..
 
-cp=$cp:/Users/mmcgrana/Desktop/remote/clojure/clojure.jar
-cp=$cp:/Users/mmcgrana/Desktop/remote/clojure-contrib/clojure-contrib.jar
-cp=$cp:/Users/mmcgrana/Desktop/raw/clj-unit/src
-cp=$cp:/Users/mmcgrana/Desktop/raw/clj-routing/src
-cp=$cp:/Users/mmcgrana/Desktop/raw/clj-routing/test
+cp=$cp:/Users/mmcgrana/Desktop/remote/clojure/trunk/clojure.jar
+cp=$cp:/Users/mmcgrana/Desktop/remote/clojure-contrib/trunk/clojure-contrib.jar
+cp=$cp:/Users/mmcgrana/Desktop/git/clj-garden/clj-unit/src
+cp=$cp:/Users/mmcgrana/Desktop/git/clj-garden/clj-routing/src
+cp=$cp:/Users/mmcgrana/Desktop/git/clj-garden/clj-routing/test
 
-java -cp $cp clojure.lang.Script test/run.clj
+java -cp $cp clojure.main test/run.clj
