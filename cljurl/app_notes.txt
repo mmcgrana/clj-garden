@@ -1,0 +1,27 @@
+cljurl.app
+  cljurl.routing
+    [clj-routing.core]
+    cljurl.app.controllers
+      [ring.controller]
+      [ring.request]
+      cljurl.routing
+      cljurl.app.views
+        cljurl.app.controllers
+        cljurl.routing
+        [clj-html]
+        [clj-html-helpers]
+      cljurl.app.models
+        cljurl.sql
+          [cljurl.config]
+    cljurl.config
+  [ring.app]
+  
+  
+
+= Current
+gen: [action-fn params] => [method path unused-params]
+rec: [method path] => [action-fn params]
+
+= Perhaps
+gen [keyword?? params] => [method path unused-params]
+rec [method path] => [?keyword? params]

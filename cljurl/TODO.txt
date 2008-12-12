@@ -1,0 +1,27 @@
+catch not found error on find-shortening-by-slugs
+
+create and catch invalid error 
+public files
+
+error handling, in framework, controller, and model/view code
+
+implement api
+
+ddl
+  create rename drop table
+  add rename change-limit drop column
+  add drop index
+  
+validation - models, views, controllers, normalizing by e.g. removing whitespace
+
+locking / concurrency
+
+production / dev / testing environments
+
+might want to move a bunch of routes.clj into ring, bundle clj-routing with ring
+
+need to implement all of the tests to be satisfied with de-coupling
+
+move utils somewhere else
+
+more and better testing, with helpers

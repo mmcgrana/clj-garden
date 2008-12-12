@@ -1,0 +1,11 @@
+csgi
+cwsgi
+cwagi
+wagi
+wag
+jet-web
+maji
+
+may want broader than gateway to be able to include web app utils
+
+

@@ -1,0 +1,6 @@
+summary stats
+multiple ns
+better handling of file names and line numbers
+better handling under failure - printing together etc.
+single global test-out 
+System.exit(0/1)

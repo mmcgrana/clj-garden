@@ -1,0 +1,1 @@
+// Only .uxs is used, use StringEscapeUtils.escapeXml instead.
