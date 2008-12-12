@@ -6,6 +6,11 @@
   (assert-is
     (v/layout {} "content")))
 
+(deftest "multi test"
+  (let [b (v/index)]
+    (assert-selector b "foo > #bar")
+    (assert-selector b "biz > .bat")))
+
 (deftest "index works"
   (assert-is
     (v/index {})))
