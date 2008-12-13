@@ -41,7 +41,7 @@
 ; of 3 fails. note that escaped exception works as desired.
 
 (ns clj-unit.core
-  (:use (clj-unit failure-exception console-reporter) clojure.contrib.except))
+  (:use (clj-unit console-reporter) clojure.contrib.except))
 
 (defstruct +test-info+ :doc :test-fn)
 
@@ -72,10 +72,13 @@
             (try
               (test-fn)
               ((*reporter* :pass) doc)
-              (catch clj-unit.FailureException e
-                ((*reporter* :failure) doc (.getMessage e)))
               (catch Exception e
-                ((*reporter* :error) doc e)))
+                (let [top-elem  (aget (.getStackTrace e) 0)
+                      top-cname (.getClassName top-elem)
+                      top-fail? (.startsWith top-cname "clj_unit.core$failure")]
+                  (if top-fail?
+                    ((*reporter* :failure) doc (.getMessage e))
+                    ((*reporter* :error)   doc e)))))
             ((*reporter* :pending) doc)))
       ((*reporter* :end))))
     ((*reporter* :no-tests) ns-sym)))
@@ -88,6 +91,6 @@
 (defn failure
   "Report a failed assertion, with a message indicating the reason."
   [message]
-  (throwf clj-unit.FailureException message))
+  (throwf Exception message))
 
 (load "core_assertions")

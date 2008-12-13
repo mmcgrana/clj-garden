@@ -1,12 +1,17 @@
 <project name="clj-unit" default="jar">
-  <description>Pack all class files into a JAR.</description>
+  <description>Pack all sources into a JAR.</description>
 
   <property name="jarfile" location="clj-unit.jar"/>
-  
+
+  <target name="clean"
+          description="Remove generated files and directories.">
+    <delete file="${jarfile}"/>
+  </target>
+
   <target name="jar"
           description="Create jar file.">
     <jar jarfile="${jarfile}">
-      <fileset dir="./classes" includes="**/*.class"/>
+      <fileset dir="./src" includes="clj_unit/**/*.clj"/>
     </jar>
   </target>
 </project>
