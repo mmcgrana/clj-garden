@@ -1,34 +1,8 @@
 <project name="clj-unit" default="jar">
   <description>Pack all class files into a JAR.</description>
 
-  <property name="build" location="classes"/>
   <property name="jarfile" location="clj-unit.jar"/>
-
-  <target name="init">
-    <tstamp/>
-    <mkdir dir="${build}"/>
-  </target>
   
-  <target name="compile" depends="init"
-          description="Compile Clojure sources.">
-    <java classname="clojure.lang.Compile"
-          classpath="${build}:${cljsrc}">
-      <sysproperty key="clojure.compile.path" value="${build}"/>
-      <arg value="clojure.core"/>
-      <arg value="clojure.main"/>
-      <arg value="clojure.set"/>
-      <arg value="clojure.xml"/>
-      <arg value="clojure.zip"/>
-      <arg value="clojure.inspector"/>
-    </java>
-  </target>
-  
-  <target name="clean"
-          description="Remove generated files and directories.">
-    <delete dir="${build}"/>
-    <delete file="${jarfile}"/>
-  </target>
-
   <target name="jar"
           description="Create jar file.">
     <jar jarfile="${jarfile}">

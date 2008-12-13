@@ -33,6 +33,7 @@
     (gen :index-bars {:extra "stuff"})))
 
 (deftest "Returns static route when no params given"
+  (throw (Exception. "o noes!!"))
   (assert= [:get "foo/bars" nil]
     (gen :index-bars)))
 

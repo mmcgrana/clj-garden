@@ -71,8 +71,9 @@
           (if test-fn
             (try
               (test-fn)
+              ((*reporter* :pass) doc)
               (catch clj-unit.FailureException e
-                ((*reporter* :failure) doc))
+                ((*reporter* :failure) doc (.getMessage e)))
               (catch Exception e
                 ((*reporter* :error) doc e)))
             ((*reporter* :pending) doc)))

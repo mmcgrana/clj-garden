@@ -18,6 +18,18 @@
 (def *error-count*   (atom 0))
 (def *pending-count* (atom 0))
 
+(defn print-stack-trace
+  "A sort of modified .printStackTrace. Prints to *out* as apposed to *err* and
+  only prints those stack elements above the test invocation code."
+  [#^Exception e]
+  (let [elems      (seq (.getStackTrace e))
+        ours?      (fn [#^StackTraceElement m]
+                     (.startsWith (.getClassName m) "clj_unit.core$run_test"))
+        user-elems (take-while #(not (ours? %)) elems)]
+    (println (str e))
+    (doseq [user-elem user-elems]
+      (println (str "  " user-elem)))))
+
 (def +console-reporter+
   {:start
      (fn [ns-sym]
@@ -31,21 +43,20 @@
        (print ".") (flush))
    :pass
     (fn [doc]
-      (swap! *pass-count* inc)
-      (printf "PASS: %s\n" doc))
+      (swap! *pass-count* inc))
    :failure
     (fn [doc message]
       (swap! *failure-count* inc)
-      (printf "FAIL: %s\n  %s\n" doc message))
+      (printf "\nFAIL: %s\n  %s\n" doc message))
    :error
     (fn [doc #^Exception e]
       (swap! *error-count* inc)
-      (printf "EXCP: %s\n" doc)
-      (.printStackTrace e))
+      (printf "\nEXCP: %s\n" doc)
+      (print-stack-trace e))
    :pending
      (fn [doc]
        (swap! *pending-count* inc)
-       (printf "PEND: %s\n" doc))
+       (printf "\nPEND: %s\n" doc))
    :end
      (fn []
        (println)
