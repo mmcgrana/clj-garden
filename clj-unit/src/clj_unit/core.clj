@@ -41,13 +41,13 @@
 ; of 3 fails. note that escaped exception works as desired.
 
 (ns clj-unit.core
-  (:use clj-unit.console-reporter))
+  (:use (clj-unit failure-exception console-reporter) clojure.contrib.except))
 
 (defstruct +test-info+ :doc :test-fn)
 
 (def *tests-info* (atom {}))
 
-(declare *reporter* *test-doc*)
+(declare *reporter*)
 
 (defmacro deftest
   "Define a unit test."
@@ -69,14 +69,24 @@
         (doseq [{:keys [doc test-fn]} ns-tests-info]
           ((*reporter* :test))
           (if test-fn
-            (binding [*test-doc* doc]
-              (try
-                (test-fn)
-                ((*reporter* :pass) doc)
-                (catch Exception e
-                  ((*reporter* :error) doc e))))
+            (try
+              (test-fn)
+              (catch clj-unit.FailureException e
+                ((*reporter* :failure) doc))
+              (catch Exception e
+                ((*reporter* :error) doc e)))
             ((*reporter* :pending) doc)))
-        ((*reporter* :end))))
+      ((*reporter* :end))))
     ((*reporter* :no-tests) ns-sym)))
+
+(defn success
+  "Report a successfull assertion."
+  []
+  ((*reporter* :success)))
+
+(defn failure
+  "Report a failed assertion, with a message indicating the reason."
+  [message]
+  (throwf clj-unit.FailureException message))
 
 (load "core_assertions")

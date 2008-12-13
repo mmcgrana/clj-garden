@@ -38,7 +38,7 @@
       (swap! *failure-count* inc)
       (printf "FAIL: %s\n  %s\n" doc message))
    :error
-    (fn [doc #^ Exception e]
+    (fn [doc #^Exception e]
       (swap! *error-count* inc)
       (printf "EXCP: %s\n" doc)
       (.printStackTrace e))

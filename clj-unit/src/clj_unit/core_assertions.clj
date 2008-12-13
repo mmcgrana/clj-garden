@@ -1,15 +1,5 @@
 (in-ns 'clj-unit.core)
 
-(defn success
-  "Report a successfull assertion."
-  []
-  ((*reporter* :success)))
-
-(defn failure
-  "Report a failed assertion, with a message indicating the reason."
-  [message]
-  ((*reporter* :failure) *test-doc* message))
-
 (defmacro assert-that
   "Encapsulates the common pattern of reporting success if some value is
   logically true or reporting failure with a message otherwise."
