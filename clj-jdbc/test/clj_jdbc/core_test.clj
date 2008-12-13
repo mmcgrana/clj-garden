@@ -1,15 +1,14 @@
 (ns clj-jdbc.core-test
   (:use clj-unit.core
-        clj-jdbc.core
-        [clojure.contrib.def :only (defvar- defmacro-)]))
+        clj-jdbc.core))
 
-(defvar- test-data-source
+(def test-data-source
   (doto (org.postgresql.ds.PGPoolingDataSource.)
     (.setDatabaseName "clj-jdbc-test")
     (.setUser         "mmcgrana")
     (.setPassword     "")))
 
-(defmacro- with-test-connection
+(defmacro with-test-connection
   [conn-sym & body]
   `(with-connection [~conn-sym ~'test-data-source]
      (modify ~conn-sym "DELETE FROM fruits")
@@ -17,7 +16,7 @@
                         (1, 'apple'), (2, 'pear'), (3, 'grape')")
      ~@body))
 
-(defmacro- defconntest [doc conn-sym & body]
+(defmacro defconntest [doc conn-sym & body]
   "Define a unit test that uses a connection."
   `(deftest ~doc
      (with-test-connection ~conn-sym

@@ -1,6 +1,6 @@
 <project name="clj-jdbc" default="jar">
   <description>
-    Pack all clj-jdbc sources into a JAR.
+    Pack all sources into a JAR.
   </description>
 
   <property name="jarfile" location="clj-jdbc.jar"/>

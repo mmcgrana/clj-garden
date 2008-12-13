@@ -60,7 +60,7 @@
   "Returns a lazy seq of maps corresponding to the column names and values in
   the resultset's rows."
   [#^java.sql.ResultSet rs]
-  (let [rsmeta (.getMetaDat rs)
+  (let [rsmeta (.getMetaData rs)
         idxs   (range 1 (inc (.getColumnCount rsmeta)))
         keys   (map
                  (fn [i] (keyword (.toLowerCase (.getColumnName rsmeta i))))
