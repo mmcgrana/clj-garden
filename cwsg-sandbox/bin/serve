@@ -1,9 +1,0 @@
-#!/bin/sh
-
-cd `dirname $0`/..
-
-for file in jars/*.jar; do
-    jars=$jars:$file
-done
-
-java -cp $jars clojure.lang.Script bin/serve.clj

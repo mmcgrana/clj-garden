@@ -51,6 +51,7 @@
       (let [#^InputStream in body]
         (with-open [out (.getOutputStream response)]
           (IOUtils/copy in out)
+          (.close in)
           (.flush out)))
     File
       (let [#^File f body]
