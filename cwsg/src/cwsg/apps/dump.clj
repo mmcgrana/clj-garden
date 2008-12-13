@@ -11,7 +11,8 @@
         [:title "cwsg env dump"]]
       [:body
         [:pre
-          (pr-str env)]]]))
+          (domap-str [[key value] (sort-by key env)]
+            (h (str key "\n  " (prn-str value) "\n")))]]]))
 
 (defn app
   "Returns a response tuple corresponding to an HTML dump of the request
