@@ -26,14 +26,13 @@
 ; (defcontext "Generator"
 (deftest "Returns static route with all params unused"
   (assert= [:get "foo/bars" {:extra "stuff"}]
-    (gen :index-bars {:esxtra "stuff"}))
+    (gen :index-bars {:extra "stuff"}))
   (assert= [:get "foo/bars" {:extra "stuff"}]
     (gen :index-bars {:extra "stuff"}))
   (assert= [:get "foo/bars" {:extra "stuff"}]
     (gen :index-bars {:extra "stuff"})))
 
 (deftest "Returns static route when no params given"
-  (throw (Exception. "o noes!"))
   (assert= [:get "foo/bars" nil]
     (gen :index-bars)))
 

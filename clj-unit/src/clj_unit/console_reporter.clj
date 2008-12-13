@@ -59,7 +59,7 @@
        (printf "\nPEND: %s\n" doc))
    :end
      (fn []
-       (println)
+       (println) (println)
        (printf "%s tests, %s assertions\n"
          @*test-count* (+ @*success-count* @*failure-count*))
        (printf "%s failures, %s erros, %s pending\n"
