@@ -1,0 +1,2 @@
+(ns stash.callbacks)
+

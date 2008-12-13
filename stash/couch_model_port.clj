@@ -7,6 +7,11 @@
 ; serialized columns
 ; around save, update, create, destroy, find, validate
 
+; (defgetters +post+)
+; (defn title [post] (:title post))
+; (let [new-post (title= old-post "new title")] (dosomething new-post))
+
+
 ; src/cljblog/models/post.clj
 (ns cljblog.models.post
   (:use stash.def stash.validators stash.timestamps))
