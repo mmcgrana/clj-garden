@@ -1,9 +1,8 @@
 (ns clj-routing.core-test
   (:use clj-unit.core
-        clj-routing.core
-        clojure.contrib.def))
+        clj-routing.core))
 
-(defvar- routes
+(def routes
   [[:index-bars  :get "foo/bars"                         ]
    [:show-bar    :get "foo/bars/:id"                     ]
    [:create-bat  :put "foo/bars"                         ]
@@ -13,8 +12,8 @@
    [:with-root   :get ":root/foo"                        ]
    [:catch-all   :get "foo/:path"   {:path   ".*"}       ]])
 
-(defvar- gen (compile-generator routes))
-(defvar- rec (compile-recognizer routes))
+(def gen (compile-generator routes))
+(def rec (compile-recognizer routes))
 
 ; Declaration, runner, handlers
 ; Handlers

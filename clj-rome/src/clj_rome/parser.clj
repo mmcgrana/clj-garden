@@ -1,4 +1,4 @@
-(ns clj-http-client.feed-parser
+(ns clj-rome.parser
   (:import
     (com.sun.syndication.io SyndFeedInput XmlReader)
     (java.io InputStream)))
@@ -18,12 +18,13 @@
            (.getDescription   synd-feed)
            (.getLink          synd-feed)
            (.getPublishedDate synd-feed))
-         (map
+         (doall (map
            (fn [synd-feed-entry]
              (struct +feed-entry+
                (.getTitle         synd-feed-entry)
-               (.getValue         (.getDescription synd-feed-entry))
+               (if-let [desc (.getDescription synd-feed-entry)]
+                 (.getValue desc))
                (.getLink          synd-feed-entry)
                (.getPublishedDate synd-feed-entry)
                (.getUri           synd-feed-entry)))
-           (.getEntries synd-feed)))))
+         (.getEntries synd-feed))))))
