@@ -19,6 +19,8 @@ Validations
   context validations
 Form saving
 
+Mutual model dependencies => dynamic resolution (has-one '+post+)
+
 
 Types
   varchar        String

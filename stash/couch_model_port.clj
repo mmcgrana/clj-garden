@@ -26,12 +26,12 @@
 (ns 'app.models.post
   (:use stash.timestamps stash.validators app.config.db))
 
-(declare gen-slug)
+(declare gen-slug word-count)
 
-(def +post+
+(defmodel +post+
   {:data-source +data-source+
    :table-name  :posts
-   :attrs
+   :column
      [[:title      :string   {:width 20}]
       [:body       :string   {:width 5000}
       [:slug       :string   {:width 50}]
@@ -42,42 +42,33 @@
    :validations
      [[:title      presence]
       [:body       presence]
-      [:word-count (min-count 10)]]
+      [:word-count (min-count 10) {:virtual true}]]
    :callbacks
      {:before-validate
         [gen-slug]
       :before-create
         [timestamp-create]
       :before-update
-        [timestamp-update]}})
+        [timestamp-update]}}
+  {:def-accessors true})
 
-
-
-(def +post+
-  {:data-source config/+data-source+
-   :table-name  :posts
-   :attrs
-     [[:title      :string   {:width 20}  ]
-      [:body       :string   {:width 5000}]
-      [:slug       :string   {:width 50}  ]
-      [:posted-at  :datetime              ]
-      [:created-at :datetime              ]
-      [:updated-at :datetime              ]
-      [:num-views  :integer  {:default 0} ]
-      [:special    :custom   {:by cust}   ]]]
-   :validations
-     [[:title      presence]
-      [:body       presence]
-      [:word-count (min-count 10) {:from word-count}]]
-   :callbacks
-     {:before-validate
-        [gen-slug]
-      :before-create
-        [timestamp-create]
-      :before-update
-        [timestamp-update]}})
+(def word-count [post]
+  (str-lib/word-count (body post)))
 
 (redef-by +post+ with-versioning)
+; with-column
+; with-validation
+; with-callback
+
+or
+(defmodel +post+
+  {:data-source +data-source+
+   :table-name :posts
+   :columns
+     []
+   :extensions
+     [is-versioned is-paranoid (is-permalinked {:on :title})]})
+; here extension fns take a model hash and return a new, extended one
 
 (defn slugify-title
   [title]
