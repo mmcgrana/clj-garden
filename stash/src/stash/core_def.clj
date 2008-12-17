@@ -74,9 +74,9 @@
   (let [mapper
           (mash
             (fn [[name type]]
-              [name (quoter-or-caster (type column-mappers))])
+              [name (quoter-or-caster (column-mapper type))])
             column-defs)]
-    (assoc mapper :id (quoter-or-caster (:string column-mappers)))))
+    (assoc mapper :id (quoter-or-caster (column-mapper :string)))))
 
 (defn- compile-quoters-by-name
   [column-defs]

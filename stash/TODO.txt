@@ -1,15 +1,8 @@
-Implement def
+Testing
 
 Transactions
 
-; model
-;   : data-source
-;   : table-name
-;   ; quoters-by-name
-;   : caster-by-name
-; 
-; column
-;   ; name
+danger of quiting uuid with identity
 
 
 Associations
@@ -20,6 +13,8 @@ Validations
 Form saving
 
 Mutual model dependencies => dynamic resolution (has-one '+post+)
+
+Backtrace Awsomeification tool
 
 
 Types
