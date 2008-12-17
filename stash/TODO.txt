@@ -34,6 +34,10 @@ Types
   zoned_time     Time
   date           LocalDate
 
+:columns
+  [[:name      :string]
+   [:title     :string]
+   [:hit-count :integer]]
 
 
 ; before-validation-on-create

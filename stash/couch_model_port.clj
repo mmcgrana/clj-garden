@@ -23,9 +23,13 @@
 
 )
 
+(ns 'app.models.post
+  (:use stash.timestamps stash.validators app.config.db))
+
+(declare gen-slug)
 
 (def +post+
-  {:data-source config/+data-source+
+  {:data-source +data-source+
    :table-name  :posts
    :attrs
      [[:title      :string   {:width 20}]
@@ -38,7 +42,33 @@
    :validations
      [[:title      presence]
       [:body       presence]
-      [:word-count min-count {:of 10 :from word-count}]]
+      [:word-count (min-count 10)]]
+   :callbacks
+     {:before-validate
+        [gen-slug]
+      :before-create
+        [timestamp-create]
+      :before-update
+        [timestamp-update]}})
+
+
+
+(def +post+
+  {:data-source config/+data-source+
+   :table-name  :posts
+   :attrs
+     [[:title      :string   {:width 20}  ]
+      [:body       :string   {:width 5000}]
+      [:slug       :string   {:width 50}  ]
+      [:posted-at  :datetime              ]
+      [:created-at :datetime              ]
+      [:updated-at :datetime              ]
+      [:num-views  :integer  {:default 0} ]
+      [:special    :custom   {:by cust}   ]]]
+   :validations
+     [[:title      presence]
+      [:body       presence]
+      [:word-count (min-count 10) {:from word-count}]]
    :callbacks
      {:before-validate
         [gen-slug]

@@ -32,23 +32,3 @@
   run any validations itself."
   [instance]
   (not (empty (errors instance))))
-
-
-;; Sample validation fns
-
-(defn presence
-  "Returns a presence validator for accessor based on options."
-  [attr-name]
-  (let [error (struct +error+ attr-name :presence)]
-    (fn [instance]
-      (if (nil? (attr-name instance))
-        error))))
-
-(defn min-length
-  "Returns a minimum length validator for accessor based on options"
-  [attr-name length]
-  (let [error (struct +error+ attr-name :min-length length)]
-    (fn [instance]
-      (let [val (attr-name instance)]
-        (if (or (nil? val) (< (.length val) length))
-          error)))))
