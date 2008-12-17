@@ -2,44 +2,34 @@
   (:require [clj-jdbc.core :as jdbc])
   (:use stash.utils))
 
-; model
-;   : data-source
-;   : table-name(-str)
-;   : columns
-; 
-; column
-;   ; str-name
-;   ; name
-
 (defn insert-sql
   "Returns the insert sql for the instance."
   [instance]
-  (let [model   (:model (meta instance))
-        columns (:columns model)]
-    (str "INSERT INTO " (:table-name-str model) " "
-         "(" (str-join ", " (map :name-str columns)) ") "
+  (let [model        (instance-model instance)
+        quoter       (quoter-by-name model)
+        column-names  (column-names model)]
+    (str "INSERT INTO " (table-name-str model) " "
+         "(" (str-join ", " (map #(name %) column-names)) ") "
          "VALUES "
          "(" (str-join ", "
-               (map (fn [column] (sql-quote ((:name column) instance)))
-                    column-names) ")")))
+               (map #(quoter % (% instance)) column-names)) ")")))
 
 (defn update-sql
   "Returns the update sql for the instance."
   [instance]
-  (let [model (:model (meta instance))]
-    (str "UPDATE " (:table-name-str model) " SET "
+  (let [model        (instance-model instance)
+        column-names (column-names model)
+        quoter       (quoter-by-name model)]
+    (str "UPDATE " (table-name-str model) " SET "
          (str-join ","
-           (map (fn [column]
-                  (str (:name-str column) " = "
-                       (sql-quote ((:name column) instance))))
-                (:columns model))) " "
+           (map #(str (name %) " = " (quoter (% instance))) column-names)) " "
          "WHERE id = '" (:id instance) "'")))
 
 (defn delete-sql
   "Returns the delete sql for the instance."
   [instance]
-  (let [model (:model (meta instance))]
-    (str "DELETE FROM " (:table-name-str model) " "
+  (let [model (instance-model instance)]
+    (str "DELETE FROM " (table-name-str model) " "
          "WHERE id = '" (:id instance) "'")))
 
 (defn persist-insert
@@ -47,7 +37,7 @@
   that is no longer marked as new."
   [instance]
   (let [sql (insert-sql instance)]
-    (jdbc/with-connection [conn (:data-source (:model (meta instance)))]
+    (jdbc/with-connection [conn (instance-data-source instance)]
       (jdbc/modify conn sql))
     (with-assoc-meta instance :new false)))
 
@@ -55,7 +45,7 @@
   "Persists all of the instance to the database, returns the instance."
   [instance]
   (let [sql (update-sql instance)]
-    (jdbc/with-connection [conn (:data-source (:model (meta instance)))]
+    (jdbc/with-connection [conn (instance-data-source instance)]
       (jdbc/modify conn sql))
     instance)))
 
@@ -64,20 +54,30 @@
   it has been deleted."
   [instance]
   (let [sql (delete-sql instance)]
-    (jdbc/with-connection [conn (:data-source (:model (meta instance)))]
+    (jdbc/with-connection [conn (instance-data-source instance)]
       (jdbc/modify conn sql)
       (with-assoc-meta instance :deleted true))))
 
 (defn new
   "Returns an instance of the model with the given attrs having new status."
   [model attrs]
-  (with-meta {:model model :new true} (assoc attrs :id (uuid/gen))))
+  (with-meta {:model model :new true} (assoc attrs :id (gen-uuid))))
+
+(defn cast-attrs
+  "Returns a version of the uncast-attrs cast according to the specifactions
+  of the mdoel."
+  [model uncast-attrs]
+  (let [caster (caster-by-name model)]
+    (reduce
+      (fn [[name val] cast-attrs] (assoc cast-attrs name (caster val)))
+      {}
+      uncast-attrs)))
 
 (defn instantiate
-  "Returns an instance of the model with the given attrs having non-new
-  status. "
-  [model attrs]
-  (with-meta {:model model} attrs))
+  "Returns an instance based on cast versions of the given quoted attrs having 
+  non-new status. "
+  [model uncast-attrs]
+  (with-meta {:model model} (cast-attrs model uncast-atrs)))
 
 (defn create
   "Creates an instance of the model with the attrs. Validations and validations

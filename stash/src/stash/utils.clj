@@ -5,24 +5,10 @@
   [obj k v]
   (with-meta obj (assoc (meta obj) k v)))
 
-
-
-
-
-(defn update-meta-by
-  [obj key f]
-  (with-meta obj (update-by (meta obj) key f)))
-
-(defmacro def-)
-
-(defn upcase
-  [string]
-  (.toUpperCase string))
-
-(defn the-str
-  [named]
-  (.name named))
-
+(defmacro def-
+  "Like def, but creates a private var."
+  [sym form]
+  `(def #^{:private true} ~sym form))
 
 ; (defn with-updated-meta
 ;   "Returns a new object corresponding to the given obj but the given new-meta

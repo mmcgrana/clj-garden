@@ -1,7 +1,4 @@
-(ns stash.uuid
-  (:import (java.util UUID)))
-
-(defn gen
-  "Returns a random new UUID instance."
+(defn gen-uuid
+  "Returns a String corresponding to a random new UUID."
   []
-  (UUID/randomUUID))
+  (str (java.util.UUID/randomUUID)))

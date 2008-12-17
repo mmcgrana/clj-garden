@@ -11,13 +11,14 @@
 (defn with-error
   "Returns an instance with the error in the errors metadata."
   [instance error]
-  (with-meta instance (assoc (errors instance) error)))
+  (with-meta instance
+    (assoc (meta instance) :errors (conj (errors instance) error))))
 
 (defn validated
   "Validates the given instance, returning a new instance that has assocatied
   errors metadata."
   [instance]
-  (let [validations (:validations (:model (meta model-meta)))]
+  (let [validations (:validations (:model (meta instance)))]
     (reduce
       (fn [instance validator]
         (if-let [error (validation instance)]

@@ -1,20 +1,80 @@
-Finish callbacks
 Implement def
 Figure out types, quoting, coercion - crud and finders
+instantiate with uncast?
+unquote-named-column-val
+saftey checks throughout, less (foo 0) and (:biz foo)
+
 Transactions
-Form saving
+
+; model
+;   : data-source
+;   : table-name
+;   ; quoter-by-name
+;   : caster-by-name
+; 
+; column
+;   ; name
+
+
 Associations
 Validations
   :if, :if-not
   of virtual attributes
   context validations
+Form saving
+
 
 Types
-  varchar   String
-  boolean   Boolean
-  int       Integer
-  float     Float
-  double    Double
-  uuid      ??? UUID
-  inet      ?? InetAddress
-  timestamp ?? Date
+  varchar        String
+  boolean        Boolean
+  int            Integer
+  float          Float
+  double         Double
+  uuid           String
+  inet           String
+  datetime       LocalDateTime
+  zoned_datetime DateTime
+  time           LocalTime
+  zoned_time     Time
+  date           LocalDate
+
+
+
+; before-validation-on-create
+;   validate-on-create
+; after-validation-on-create
+; before-create
+;   create
+; after-create
+;
+; before-validation-on-update
+;   validate-on-update
+; after-validation-on-update
+; before-update
+;   update
+; after-update
+;
+; before-destroy
+;   destroy
+; after-destroy
+
+; (call-if something conditions)
+; (fn [instance] (if (condition instance) (something instance) instance))
+; 
+; (defn email-admin [instance]
+;   (send-email "hai" (:email instance)))
+; 
+; (defn admin-writer? [instance]
+;   (user/admin? (writer instance)))
+; 
+; (defmacro conditionally [f condition pred]
+;   (case
+;     condition
+;     :if
+;     `(fn [instance] (if (~pred instance) (f instance) instance))))
+; [save-draft (conditionally email-admin :if admin-writer?)]
+; [save-draft #(if (admin-writer? %) (email-admin %))]
+; before- and after- save are pure sugar
+; before- and after- validation are pure sugar
+
+; finders accross models
