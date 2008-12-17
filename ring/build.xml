@@ -1,6 +1,6 @@
 <project name="ring" default="jar">
   <description>
-    Pack all ring sources into a JAR.
+    Pack all sources into a JAR.
   </description>
 
   <property name="jarfile" location="ring.jar"/>

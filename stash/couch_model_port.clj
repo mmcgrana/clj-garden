@@ -17,6 +17,12 @@
   (:use stash.def stash.validators stash.timestamps))
 
 (declare gen-slug)
+(
+[:title      (min-length 10) {:if-not admin?}]]
+[:word-count (min-count 10)  {:from word-count}]]
+
+)
+
 
 (def +post+
   {:data-source config/+data-source+
@@ -30,8 +36,9 @@
       [:updated-at :datetime]
       [:num-views  :integer  {:default 0}]]]
    :validations
-     [[:title presence]
-      [:body  presence]]
+     [[:title      presence]
+      [:body       presence]
+      [:word-count min-count {:of 10 :from word-count}]]
    :callbacks
      {:before-validate
         [gen-slug]

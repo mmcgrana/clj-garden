@@ -1,0 +1,20 @@
+Finish callbacks
+Implement def
+Figure out types, quoting, coercion - crud and finders
+Transactions
+Form saving
+Associations
+Validations
+  :if, :if-not
+  of virtual attributes
+  context validations
+
+Types
+  varchar   String
+  boolean   Boolean
+  int       Integer
+  float     Float
+  double    Double
+  uuid      ??? UUID
+  inet      ?? InetAddress
+  timestamp ?? Date

@@ -11,13 +11,6 @@
     String val
     Number (str val)))
 
-(defn delete-all-by-sql
-  "Deletes model's records from the database according to the sql,
-  returning the number that were deleted."
-  [model sql]
-  (jdbc/with-connection [conn (:data-source model)]
-    (jdbc/modify conn sql)))
-
 (def- +where-conjunction-strings+
   {:and "AND", :or "OR"})
 
@@ -128,6 +121,13 @@
   [model options]
   (find-all-by-sql model
     (find-sql model options)))
+
+(defn delete-all-by-sql
+  "Deletes model's records from the database according to the sql,
+  returning the number that were deleted."
+  [model sql]
+  (jdbc/with-connection [conn (:data-source model)]
+    (jdbc/modify conn sql)))
 
 (defn exists?
   "Returns true iff a record for the model exists that corresponds to the

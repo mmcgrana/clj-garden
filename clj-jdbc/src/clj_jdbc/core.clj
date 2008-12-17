@@ -13,7 +13,7 @@
   `(with-open [~binding-sym (.getConnection ~data-source-form)]
      ~@body))
 
-(defn- prepared-statement
+(defn- prepare-statement
   "Return a PreparedStatement for the given conn corresponding to the given 
   query and query values."
   [#^java.sql.Connection conn query sets]
