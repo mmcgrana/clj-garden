@@ -1,4 +1,4 @@
-(ns stash.validations)
+(in-ns 'stash.core)
 
 (defstruct +error+ :on :cause :expected)
 
@@ -18,10 +18,10 @@
   "Validates the given instance, returning a new instance that has assocatied
   errors metadata."
   [instance]
-  (let [validations (:validations (:model (meta instance)))]
+  (let [validations (validations (instance-model instance))]
     (reduce
       (fn [instance validator]
-        (if-let [error (validation instance)]
+        (if-let [error (validator instance)]
           (with-error instance error)
           instance))
       instance
@@ -37,11 +37,11 @@
 ;; Sample validation fns
 
 (defn presence
-  "Returns a presence validator for accessor based on options"
+  "Returns a presence validator for accessor based on options."
   [attr-name]
   (let [error (struct +error+ attr-name :presence)]
     (fn [instance]
-      (if (blank? (attr-name instance))
+      (if (nil? (attr-name instance))
         error))))
 
 (defn min-length
@@ -50,5 +50,5 @@
   (let [error (struct +error+ attr-name :min-length length)]
     (fn [instance]
       (let [val (attr-name instance)]
-        (if (or (blank? val) (< (.length val) length))
+        (if (or (nil? val) (< (.length val) length))
           error)))))

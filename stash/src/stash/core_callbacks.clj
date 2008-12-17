@@ -1,10 +1,10 @@
-(ns stash.callbacks)
+(in-ns 'stash.core)
 
 (defn named-callbacks
   "Returns the coll of callbacks for the instance associated with the name, or
   raises if the name is unrecognized."
   [callback-name instance]
-  (or (callback-name (:callbacks (instance-model instance)))
+  (or (callback-name (callbacks (instance-model instance)))
       (throwf "Unrecognized callback-name %s", callback-name)))
 
 (defn run-callbacks
@@ -21,5 +21,5 @@
         (let [[c-instance success] (callback instance)]
           (if success
             (recur c-instance (rest callbacks))
-            c-instance)))
+            c-instance))
         instance))))

@@ -70,8 +70,9 @@
     (maps)))
 
 (defn select-values
-  "Returns a seq of values corresponding to the first columns of the rows of the 
-  result of the given sql query, or nil if no results were found."
+  "Returns a fully realized seq of values corresponding to the first columns of 
+  the rows of the  result of the given sql query, or nil if no results were 
+  found."
   [conn sql]
   (with-resultset [rs conn sql]
     (doall (resultset-values rs))))

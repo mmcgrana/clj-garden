@@ -3,6 +3,9 @@ catch not found error on find-shortening-by-slugs
 create and catch invalid error 
 public files
 
+caster and quoter by name to include id
+columns-with-id
+
 error handling, in framework, controller, and model/view code
 
 implement api

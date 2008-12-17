@@ -1,15 +1,11 @@
 Implement def
-Figure out types, quoting, coercion - crud and finders
-instantiate with uncast?
-unquote-named-column-val
-saftey checks throughout, less (foo 0) and (:biz foo)
 
 Transactions
 
 ; model
 ;   : data-source
 ;   : table-name
-;   ; quoter-by-name
+;   ; quoters-by-name
 ;   : caster-by-name
 ; 
 ; column

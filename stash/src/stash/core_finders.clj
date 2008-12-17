@@ -1,7 +1,4 @@
-(ns stash.finders
-  (:use stash.utils clojure.contrib.fcase)
-  (:require [clj-jdbc.core :as jdbc]
-            [stash.crud    :as crud]))
+(in-ns 'stash.core)
 
 (def- +where-conjunction-strings+
   {:and "AND", :or "OR"})
@@ -23,28 +20,28 @@
   [model where-exp]
   (cond
     ; [:not <more>]
-    (= :not (exp 0))
-      (str "(NOT " (where-exp-sql model (exp 1)) ")")
+    (= :not (where-exp 0))
+      (str "(NOT " (where-exp-sql model (where-exp 1)) ")")
 
     ; [:and [<more> <more> <more>]]
-    (coll? (exp 1))
-      (str "(" (str-join (str  " " (where-conjuntion-sql (exp 0)) " ")
-            (map (partial where-exp-sql model) (rest exp)) ")"))
+    (coll? (where-exp 1))
+      (str "(" (str-join (str  " " (where-conjunction-sql (where-exp 0)) " ")
+            (map (partial where-exp-sql model) (rest where-exp)) ")"))
 
     ; [:foo :in '(1 2 3)]
-    (= :in (exp 1)
-      (let [c-quoter (partial (quoter-by-name model) (exp 0))]
-        (str "(" (name (exp 0))
+    (= :in (where-exp 1)
+      (let [c-quoter ((quoters-by-name model) (where-exp 0))]
+        (str "(" (name (where-exp 0))
                " IN ("
-                 (str-join ", " (map #(c-quoter %) (exp 2)))
+                 (str-join ", " (map #(c-quoter %) (where-exp 2)))
                ")")
             ")")
 
     ; [:foo :> 20]
     :else
-      (str "(" (name (exp 0)) " "
-               (where-operator-sql (exp 1)) " "
-               ((quoter-by-name model) (exp 0) (exp 2)) ")")
+      (str "(" (name (where-exp 0)) " "
+               (where-operator-sql (where-exp 1)) " "
+               ((quoters-by-name model) (where-exp 0) (where-exp 2)) ")"))))
 
 (defn- where-sql
   [model where-exp]
@@ -61,15 +58,15 @@
   (if limit (str " LIMIT " limit)))
 
 (defn- offset-sql
-  [limit]
+  [offset]
   (if offset (str " OFFSET " offset)))
 
 (defn- options-sql
   [model options]
-  (str (where-sql  model (:where options))
-       (order-sql  (:order options))
-       (limit-sql  (:limit options))
-       (offset-sql (:offset options))))
+  (str (where-sql  model (get options :where))
+       (order-sql  (get options :order))
+       (limit-sql  (get options :limit))
+       (offset-sql (get options :offset))))
 
 (defn- select-sql
   [selects]
@@ -78,46 +75,46 @@
       (str-join ", " (map name selects))
       (name selects))))
 
-(defn- find-sql
+(defn find-sql
   [model options]
-  (str "SELECT " (or (select-sql (:select options)) "*")
-       " FROM " (name (:table-name model))
+  (str "SELECT " (or (select-sql (get options :select)) "*")
+       " FROM " (table-name-str model)
        (options-sql model options)))
 
-(defn- delete-sql
+(defn delete-sql
   [model options]
-  (str "DELETE FROM " (name (:table-name model)) (options-sql model options)))
+  (str "DELETE FROM " (table-name-str model model) (options-sql model options)))
 
 (defn find-value-by-sql
   "Returns a single String value according to the given sql."
   [model sql]
-  (jdbc/with-connection [conn (:data-source model)]
+  (jdbc/with-connection [conn (data-source model)]
     (jdbc/select-value sql)))
 
 (defn find-one-by-sql
   "Returns an instance of model found by the given sql, or nil if no such
   instances are found. "
   [model sql]
-  (if-let [hash (jdbc/with-connection [conn (:data-source model)]
-                  (jdbc/select-hash conn sql))]
-    (crud/instantiate model hash)))
+  (if-let [uncast-attrs (jdbc/with-connection [conn (data-source model)]
+                          (jdbc/select-map conn sql))]
+    (instantiate model uncast-attrs)))
 
 (defn find-all-by-sql
   "Returns all instances of model found by the given sql."
   [model sql]
-  (let [hashes (jdbc/with-connection [conn (:data-source model)]
-                 (jdbc/select-hashes conn sql))]
-    (map (partial crud/instantiate model) hashes)))
+  (let [uncast-attrs (jdbc/with-connection [conn (data-source model)]
+                       (jdbc/select-maps conn sql))]
+    (map (partial instantiate model) uncast-attrs)))
 
 (defn find-one
   "Returns all instances of model found according to the options."
-  [model options]
+  [model & [options]]
   (find-one-by-sql model
     (find-sql model (merge options {:limit 1}))))
 
 (defn find-all
   "Returns all instances of model found according to the options."
-  [model options]
+  [model & [options]]
   (find-all-by-sql model
     (find-sql model options)))
 
@@ -125,7 +122,7 @@
   "Deletes model's records from the database according to the sql,
   returning the number that were deleted."
   [model sql]
-  (jdbc/with-connection [conn (:data-source model)]
+  (jdbc/with-connection [conn (data-source model)]
     (jdbc/modify conn sql)))
 
 (defn exists?
@@ -135,35 +132,37 @@
   (find-value-by-sql model
     (find-sql model (merge options {:limit 1 :select [:id]}))))
 
-(defn count
+(defn count-all
   "Returns the count of records for the model that correspond to the options."
-  [model options]
+  [model & [options]]
   (Integer.
     (find-value-by-sql model
-      (find-sql model (merge options {:select "count(id)"}))))
+      (find-sql model (merge options {:select "count(id)"})))))
 
 (defn- extremum
   "Helper for minimum and maxium."
-  [model column order options]
-  (unquote-named-column-val model column
-    (find-value-by-sql model
-      (options-sql model
-        (merge options {:select column :order [column order] :limit 1})))))
+  [model attr-name order options]
+  (let [quoter ((quoters-by-name model) attr-name)]
+    (quoter attr-name
+      (find-value-by-sql model
+        (options-sql model
+          (merge options
+            {:select attr-name :order [attr-name order] :limit 1}))))))
 
 (defn minimum
   "Returns the minimum value of the column among records the model that
   correspond to the options"
-  [model column options]
-  (extremum model column :asc options))
+  [model attr-name options]
+  (extremum model attr-name :asc options))
 
 (defn maximum
   "Returns the minimum value of the column among records the model that
   correspond to the options"
-  [model column options]
-  (extremum model column :desc options))
+  [model attr-name options]
+  (extremum model attr-name :desc options))
 
 (defn delete-all
   "Deletes all records for the model corresponding to the options, returning
   the number of such records deleted."
   [model options]
-  (delete-all-by-sql (options-to-delete-sql model options)))
+  (delete-all-by-sql (delete-sql model options)))

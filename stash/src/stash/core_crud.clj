@@ -1,29 +1,27 @@
-(ns stash.crud
-  (:require [clj-jdbc.core :as jdbc])
-  (:use stash.utils))
+(in-ns 'stash.core)
 
 (defn insert-sql
   "Returns the insert sql for the instance."
   [instance]
-  (let [model        (instance-model instance)
-        quoter       (quoter-by-name model)
+  (let [model         (instance-model instance)
+        quoters       (quoters-by-name model)
         column-names  (column-names model)]
     (str "INSERT INTO " (table-name-str model) " "
          "(" (str-join ", " (map #(name %) column-names)) ") "
          "VALUES "
          "(" (str-join ", "
-               (map #(quoter % (% instance)) column-names)) ")")))
+               (map #((quoters %) (instance %)) column-names)) ")")))
 
 (defn update-sql
   "Returns the update sql for the instance."
   [instance]
   (let [model        (instance-model instance)
-        column-names (column-names model)
-        quoter       (quoter-by-name model)]
+        column-names (column-names-sans-id model)
+        quoters      (quoters-by-name model)]
     (str "UPDATE " (table-name-str model) " SET "
          (str-join ","
-           (map #(str (name %) " = " (quoter (% instance))) column-names)) " "
-         "WHERE id = '" (:id instance) "'")))
+           (map #(str (name %) " = " ((quoters %) (instance %))) column-names))
+           " WHERE id = " ((quoters :id) (instance :id)))))
 
 (defn delete-sql
   "Returns the delete sql for the instance."
@@ -47,7 +45,7 @@
   (let [sql (update-sql instance)]
     (jdbc/with-connection [conn (instance-data-source instance)]
       (jdbc/modify conn sql))
-    instance)))
+    instance))
 
 (defn delete
   "Delete the instance from the database. Returns an instance indicating that
@@ -58,18 +56,19 @@
       (jdbc/modify conn sql)
       (with-assoc-meta instance :deleted true))))
 
-(defn new
+(defn init
   "Returns an instance of the model with the given attrs having new status."
   [model attrs]
-  (with-meta {:model model :new true} (assoc attrs :id (gen-uuid))))
+  (with-meta (assoc attrs :id (gen-uuid)) {:model model :new true}))
 
 (defn cast-attrs
   "Returns a version of the uncast-attrs cast according to the specifactions
   of the mdoel."
   [model uncast-attrs]
-  (let [caster (caster-by-name model)]
+  (let [casters (casters-by-name model)]
     (reduce
-      (fn [[name val] cast-attrs] (assoc cast-attrs name (caster val)))
+      (fn [cast-attrs [name val]]
+        (assoc cast-attrs name ((casters name) val)))
       {}
       uncast-attrs)))
 
@@ -77,13 +76,7 @@
   "Returns an instance based on cast versions of the given quoted attrs having 
   non-new status. "
   [model uncast-attrs]
-  (with-meta {:model model} (cast-attrs model uncast-atrs)))
-
-(defn create
-  "Creates an instance of the model with the attrs. Validations and validations
-  and create callbacks."
-  [model attrs]
-  (save (new model attrs)))
+  (with-meta (cast-attrs model uncast-attrs) {:model model} ))
 
 (defn new?
   "Returns true if the instance has not been saved to the database."
@@ -106,15 +99,21 @@
       (if-not bv-success
         bv-instance
         (let [v-instance (validated instance)]
-          (if-not (valid? v-instance)
+          (if (errors? v-instance)
             v-instance
             (let [[av-instance av-success] (run-callbacks av-name instance)
                   [bs-instance bs-success] (run-callbacks bs-name instance)]
               (if-not bs-success
                 bs-instance
-                (let [s-instance (persist instance)
+                (let [s-instance (persist-fn instance)
                       [as-instance as-success] (run-callbacks as-name instance)]
                   as-instance)))))))))
+
+(defn create
+  "Creates an instance of the model with the attrs. Validations and validations
+  and create callbacks."
+  [model attrs]
+  (save (init model attrs)))
 
 (defn destroy
   "Deletes the instance, running before- and after- destroy callbacks.
