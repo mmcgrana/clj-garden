@@ -58,7 +58,7 @@
 
 (defn init
   "Returns an instance of the model with the given attrs having new status."
-  [model attrs]
+  [model & [attrs]]
   (with-meta (assoc attrs :id (gen-uuid)) {:model model :new true}))
 
 (defn cast-attrs
@@ -95,18 +95,18 @@
         bs-name    (if new :before-create :before-update)
         as-name    (if new :after-create  :after-update)
         persist-fn (if new persist-insert persist-update)]
-    (let [[bv-instance bv-success] (run-callbacks bv-name instance)]
+    (let [[bv-instance bv-success] (run-named-cbs instance bv-name)]
       (if-not bv-success
         bv-instance
         (let [v-instance (validated instance)]
           (if (errors? v-instance)
             v-instance
-            (let [[av-instance av-success] (run-callbacks av-name instance)
-                  [bs-instance bs-success] (run-callbacks bs-name instance)]
+            (let [[av-instance av-success] (run-named-cbs instance av-name)
+                  [bs-instance bs-success] (run-named-cbs instance bs-name)]
               (if-not bs-success
                 bs-instance
                 (let [s-instance (persist-fn instance)
-                      [as-instance as-success] (run-callbacks as-name instance)]
+                      [as-instance as-success] (run-named-cbs instance as-name)]
                   as-instance)))))))))
 
 (defn create
@@ -119,10 +119,10 @@
   "Deletes the instance, running before- and after- destroy callbacks.
    Returns the instance, which is marked as deleted if appropriate."
   [instance]
-  (let [[bd-instance bd-success] (run-callbacks :before-destroy instance)]
+  (let [[bd-instance bd-success] (run-named-cbs instance :before-destroy)]
     (if-not bd-success
       bd-instance
       (do
         (let [d-instance (delete instance)
-              [ad-instance ad-success] (run-callbacks :after-destroy instance)]
+              [ad-instance ad-success] (run-named-cbs instance :after-destroy)]
           ad-instance)))))

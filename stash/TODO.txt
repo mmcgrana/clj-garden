@@ -2,8 +2,8 @@ Testing
 
 Transactions
 
-danger of quiting uuid with identity
-
+E. escaping
+currently silently eats bogus callback names at declaration time
 
 Associations
 Validations
@@ -11,6 +11,8 @@ Validations
   of virtual attributes
   context validations
 Form saving
+
+
 
 Mutual model dependencies => dynamic resolution (has-one '+post+)
 

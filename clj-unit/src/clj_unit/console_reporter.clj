@@ -24,7 +24,7 @@
   [#^Exception e]
   (let [elems      (seq (.getStackTrace e))
         ours?      (fn [#^StackTraceElement m]
-                     (.startsWith (.getClassName m) "clj_unit.core$run_test"))
+                     (.startsWith (.getClassName m) "clj_unit.core$run_tests"))
         user-elems (take-while #(not (ours? %)) elems)]
     (println (str e))
     (doseq [user-elem user-elems]
@@ -35,30 +35,32 @@
      (fn [ns-sym]
        (printf "\nTesting: %s\n" ns-sym))
    :test
-     (fn []
-       (swap! *test-count* inc))
+     (fn [test-info]
+       (if (:pending test-info)
+         (do
+           (swap! *pending-count* inc)
+           (printf "\nPEND: %s\n" (:doc test-info)))
+         (swap! *test-count* inc)))
    :success
-     (fn []
+     (fn [test-info]
        (swap! *success-count* inc)
        (print ".") (flush))
    :pass
-    (fn [doc]
+    (fn [test-info]
       (swap! *pass-count* inc))
    :failure
-    (fn [doc message]
+    (fn [test-info message]
       (swap! *failure-count* inc)
-      (printf "\nFAIL: %s\n  %s\n" doc message))
+      (printf "\nFAIL: %s (%s:%s)\n"
+        message (:file test-info) (:line test-info)))
    :error
-    (fn [doc #^Exception e]
+    (fn [test-info #^Exception e]
       (swap! *error-count* inc)
-      (printf "\nEXCP: %s\n" doc)
+      (printf "\nEXCP: %s (%s:%s)\n"
+        (:doc test-info) (:file test-info) (:line test-info))
       (print-stack-trace e))
-   :pending
-     (fn [doc]
-       (swap! *pending-count* inc)
-       (printf "\nPEND: %s\n" doc))
    :end
-     (fn []
+     (fn [ns-sym]
        (println) (println)
        (printf "%s tests, %s assertions\n"
          @*test-count* (+ @*success-count* @*failure-count*))
@@ -67,4 +69,4 @@
        (println))
    :no-tests
      (fn [ns-sym]
-       (printf "No tests for %!" ns-sym))})
+       (printf "No tests for %s" ns-sym))})

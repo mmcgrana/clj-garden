@@ -1,5 +1,13 @@
 (ns stash.utils)
 
+(defn update-by
+  "Returns a new version of the given map with the value at the given key equal
+  to invoking f on its old value.
+  Like clojure.core/update-in, but less ambitious."
+  [map key f]
+  (assoc map key
+    (f (get map key))))
+
 (defn mash
   "Reduce a seq-able to a map. The given fn should return a 2-element tuple
   representing a key and value in the new map."

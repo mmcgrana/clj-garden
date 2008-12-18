@@ -43,9 +43,6 @@
   [model]
   (:callbacks model))
 
-(def privates
-  {:callbacks callbacks})
-
 (defn- check-data-source
   [model-map]
   (get-or model-map :data-source
@@ -62,62 +59,72 @@
     (throwf ":columns not provided in model map")))
 
 (defn- compile-column-names-sans-id
+  "Returns a seq of non-:id column names based on column-defs."
   [column-defs]
   (map first column-defs))
 
 (defn- compile-column-names
+  "Returns a seq of column names based on column-defs that additionally
+  includes :id."
   [column-defs]
   (cons :id (compile-column-names-sans-id column-defs)))
 
 (defn- compile-mappers-by-name
-  [column-defs quoter-or-caster]
-  (let [mapper
-          (mash
-            (fn [[name type]]
-              [name (quoter-or-caster (column-mapper type))])
-            column-defs)]
-    (assoc mapper :id (quoter-or-caster (column-mapper :string)))))
-
-(defn- compile-quoters-by-name
-  [column-defs]
-  (compile-mappers-by-name column-defs :quoter))
-
-(defn- compile-casters-by-name
-  [column-defs]
-  (compile-mappers-by-name column-defs :caster))
+  "TODOC"
+  [mapper-finder column-defs]
+  (assoc
+    (mash (fn [[name type]] [name (mapper-finder type)]) column-defs)
+    :id (mapper-finder :uuid)))
 
 (defn- check-validations
+  "Returns a integrity-checked validations map based on model-map."
   [model-map]
   (:validations model-map))
 
-(defn- compile-callbacks
-  [cbs]
-  {:before-validation-on-create
-     (concat (get cbs :before-validation-on-create)
-             (get cbs :before-validation))
-   :after-validation-on-create
-     (concat (get cbs :after-validation)
-             (get cbs :after-validation-on-create))
-   :before-create
-     (concat (get cbs :before-create) (get cbs :before-save))
-   :after-create
-     (concat (get cbs :after-save) (get cbs :after-create))
-   :before-validation-on-update
-     (concat (get cbs :before-validation-on-update)
-             (get cbs :before-validation))
-   :after-validation-on-update
-     (concat (get cbs :after-validation)
-             (get cbs :after-validation-on-update))
-   :before-update
-     (concat (get cbs :before-update) (get cbs :before-save))
-   :after-update
-     (concat (get cbs :after-save) (get cbs :after-update))
-   :before-destroy
-     (get cbs :before-destroy)
-   :after-destroy
-     (get cbs :after-destroy)})
+(def- recognized-callbacks
+  #{:before-validation-on-create :before-validation
+    :after-validation-on-create :after-validation
+    :before-create :before-save :after-save :after-create
+    :before-validation-on-update :before-validation
+    :after-validation-on-update :after-validation
+    :before-update :before-save :after-save :after-update
+    :before-destroy :after-destroy})
 
-(defn compile-model
+(defn- compile-callbacks
+  "Returns a normalized map of callback names to callback fn colls.
+  Raises on any unrecognized callback names."
+  [model-map]
+  (let [cb-map   (get model-map :callbacks)
+        cb-keys  (set (keys cb-map))
+        bad-keys (difference cb-keys recognized-callbacks)]
+    (if (not (empty? bad-keys))
+      (throwf "Unrecognized callback names %s" bad-keys)
+      {:before-validation-on-create
+         (concat (get cb-map :before-validation-on-create)
+                 (get cb-map :before-validation))
+       :after-validation-on-create
+         (concat (get cb-map :after-validation)
+                 (get cb-map :after-validation-on-create))
+       :before-create
+         (concat (get cb-map :before-create) (get cb-map :before-save))
+       :after-create
+         (concat (get cb-map :after-save) (get cb-map :after-create))
+       :before-validation-on-update
+         (concat (get cb-map :before-validation-on-update)
+                 (get cb-map :before-validation))
+       :after-validation-on-update
+         (concat (get cb-map :after-validation)
+                 (get cb-map :after-validation-on-update))
+       :before-update
+         (concat (get cb-map :before-update) (get cb-map :before-save))
+       :after-update
+         (concat (get cb-map :after-save) (get cb-map :after-update))
+       :before-destroy
+         (get cb-map :before-destroy)
+       :after-destroy
+         (get cb-map :after-destroy)})))
+
+(defn compiled-model
   "Define a model according the given model-map specification. Returns a
   representation that can be used later as the ubiquitious model parameter.
   
@@ -140,8 +147,12 @@
      :data-source          (check-data-source model-map)
      :column-names-sans-id (compile-column-names-sans-id column-defs)
      :column-names         (compile-column-names column-defs)
-     :quoters-by-name      (compile-quoters-by-name column-defs)
-     :casters-by-name      (compile-casters-by-name column-defs)
+     :quoters-by-name      (compile-mappers-by-name column-quoter column-defs)
+     :casters-by-name      (compile-mappers-by-name column-caster column-defs)
      :validations          (check-validations model-map)
      :callbacks            (compile-callbacks model-map)}))
 
+(defmacro defmodel
+  "Short for (def name (compiled-model model-map))"
+  [name model-map]
+  `(def ~name (compiled-model ~model-map)))

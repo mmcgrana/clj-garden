@@ -15,7 +15,7 @@
      ~@body))
 
 (defmacro with-statement
-  "TODOC Statement for the given conn corresponding to the given query."
+  "Evaluates body in the context of a new Statement for the given conn."
   [[binding-sym #^Connection conn-sym] & body]
   `(with-open [~binding-sym (.createStatement ~conn-sym)]
      ~@body))
