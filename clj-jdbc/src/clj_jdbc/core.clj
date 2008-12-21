@@ -39,7 +39,7 @@
   "Returns a lazy seq of single values corresponding to the resultset's rows."
   [#^ResultSet rs]
   (when (.next rs)
-    (lazy-cons (.getString rs 1) (resultset-values rs))))
+    (lazy-cons (.getObject rs 1) (resultset-values rs))))
 
 (defn resultset-tuples
   "Returns a lazy seq of value tuples corresponding to the resultset's rows."
@@ -48,7 +48,7 @@
         tuples (fn thisfn []
                  (when (.next rs)
                    (lazy-cons
-                     (doall (map (fn [#^Integer i] (.getString rs i)) idxs))
+                     (doall (map (fn [#^Integer i] (.getObject rs i)) idxs))
                      (thisfn))))]
     (tuples)))
 
@@ -65,7 +65,7 @@
                  (when (.next rs)
                    (lazy-cons
                      (zipmap
-                       keys (map (fn [#^Integer i] (.getString rs i)) idxs))
+                       keys (map (fn [#^Integer i] (.getObject rs i)) idxs))
                      (thisfn))))]
     (maps)))
 

@@ -19,7 +19,7 @@
         column-names (column-names-sans-id model)
         quoters      (quoters-by-name model)]
     (str "UPDATE " (table-name-str model) " SET "
-         (str-join ","
+         (str-join ", "
            (map #(str (name %) " = " ((quoters %) (instance %))) column-names))
            " WHERE id = " ((quoters :id) (instance :id)))))
 
@@ -65,10 +65,10 @@
   "Returns a version of the uncast-attrs cast according to the specifactions
   of the mdoel."
   [model uncast-attrs]
-  (let [casters (casters-by-name model)]
+  (let [parsers (parsers-by-name model)]
     (reduce
       (fn [cast-attrs [name val]]
-        (assoc cast-attrs name ((casters name) val)))
+        (assoc cast-attrs name ((parsers name) val)))
       {}
       uncast-attrs)))
 
@@ -83,6 +83,11 @@
   [instance]
   (:new (meta instance)))
 
+(defn deleted?
+  "Returns true if the instance has been deleted form the database."
+  [instance]
+  (:deleted (meta instance)))
+
 (defn save
   "Save the instance to the database. Returns the instance, marked as not new 
   and perhaps trasformed by callbacks."
@@ -95,18 +100,18 @@
         bs-name    (if new :before-create :before-update)
         as-name    (if new :after-create  :after-update)
         persist-fn (if new persist-insert persist-update)]
-    (let [[bv-instance bv-success] (run-named-cbs instance bv-name)]
-      (if-not bv-success
+    (let [[bv-instance bv?] (run-named-callbacks instance bv-name)]
+      (if-not bv?
         bv-instance
-        (let [v-instance (validated instance)]
+        (let [v-instance (validated bv-instance)]
           (if (errors? v-instance)
             v-instance
-            (let [[av-instance av-success] (run-named-cbs instance av-name)
-                  [bs-instance bs-success] (run-named-cbs instance bs-name)]
-              (if-not bs-success
+            (let [[av-instance av?] (run-named-callbacks v-instance av-name)
+                  [bs-instance bs?] (run-named-callbacks av-instance bs-name)]
+              (if-not bs?
                 bs-instance
-                (let [s-instance (persist-fn instance)
-                      [as-instance as-success] (run-named-cbs instance as-name)]
+                (let [s-instance (persist-fn bs-instance)
+                      [as-instance as?] (run-named-callbacks s-instance as-name)]
                   as-instance)))))))))
 
 (defn create
@@ -119,10 +124,9 @@
   "Deletes the instance, running before- and after- destroy callbacks.
    Returns the instance, which is marked as deleted if appropriate."
   [instance]
-  (let [[bd-instance bd-success] (run-named-cbs instance :before-destroy)]
-    (if-not bd-success
+  (let [[bd-instance bd?] (run-named-callbacks instance :before-destroy)]
+    (if-not bd?
       bd-instance
-      (do
-        (let [d-instance (delete instance)
-              [ad-instance ad-success] (run-named-cbs instance :after-destroy)]
-          ad-instance)))))
+      (let [d-instance (delete bd-instance)
+           [ad-instance ad?] (run-named-callbacks d-instance :after-destroy)]
+        ad-instance))))

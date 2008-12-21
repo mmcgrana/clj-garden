@@ -13,11 +13,7 @@
   [escaped]
   (java.net.URLDecoder/decode escaped "UTF-8"))
 
-(defn- assoc-last
-  [coll val]
-  (if (empty? coll)
-    [val]
-    (assoc coll (dec (count coll)) val)))
+
 
 (defvar- after-initial-key-pat #"^([^\[]*)(\[.*)$"
   "Matches keys of the form key-head([..key-trail..)")
@@ -28,9 +24,10 @@
 (defvar- nested-hash-key-pat   #"^\[\]\[([^\]]+)\](.*)$"
   "Matches keys of the form [][key-head](..key-tail..)")
 
-; cases - "", "[]", "[foo]...", "[][foo]..."
+; 3 Internets awarded to whoever makes this implementation smaller.
 (defn- pairs-parse-nested
   [params key value]
+  ; cases - "", "[]", "[foo]...", "[][foo]..."
   (if (= key "")
     value
     (if (= key "[]")
@@ -51,10 +48,12 @@
                 (conj params
                   {key-head (pairs-parse-nested nil key-rest value)})
               :else
-                (assoc-last params
-                  (assoc last-inner key-head
-                    (pairs-parse-nested (get last-inner key-head)
-                      key-rest value)))))
+                (let [inner (assoc last-inner key-head
+                              (pairs-parse-nested (get last-inner key-head)
+                                key-rest value))]
+                  (if (empty? params)
+                    [inner]
+                    (assoc params (dec (count params)) inner)))))
           (throwf "Unrecognized key: %s" key))))))
 
 (defn pairs-parse
@@ -75,6 +74,7 @@
       non-empty)))
 
 (defn- querylike-parse
+  "Helper for public facing functions parsing querystring-like values."
   [separator string]
   (if string
     (let [segments  (re-split separator string)

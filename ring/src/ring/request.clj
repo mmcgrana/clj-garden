@@ -11,8 +11,8 @@
 
 (defvar- +multipart-re+         #"multipart/form-data")
 (defvar- +form-url-encoded-re+  #"^application/x-www-form-urlencoded")
-(defvar- +ajax-http-request-re+ #"XMLHttpRequest(?i)")
-(defvar- +local-ip-re+          #"^unknown$|^(127|10|172.16|192.168)\.(?i)")
+(defvar- +ajax-http-request-re+ #"(?i)XMLHttpRequest")
+(defvar- +local-ip-re+          #"^(?i)unknown$|^(127|10|172.16|192.168)\.")
 
 (defvar- +recognized-nonpiggyback-methods+
   #{:get :head :put :delete :options}
@@ -26,12 +26,12 @@
 (defn content-length
   "Returns an Integer for the request's content length."
   [request]
-  (request :env) :content-length)
+  ((request :env) :content-length))
 
 (defn character-encoding
   "Returns a String for the request's character encoding."
   [request]
-  (request :env) :character-encoding)
+  ((request :env) :character-encoding))
 
 (defn query-string
   "Returns a String for the request's query string."
@@ -130,9 +130,8 @@
 (defn ajax?
   "Returns true if the given request was an AJAX request."
   [request]
-  (re-matches?
-    +ajax-http-request-re+
-    (((request :env) :headers) "x-requested-with")))
+  (if-let [xrw (((request :env) :headers) "x-requested-with")]
+    (re-matches? +ajax-http-request-re+ xrw)))
 
 (defn remote-ip
   "Returns a String representing our best guess for the IP of the requesting 
@@ -147,8 +146,8 @@
             (if (not (empty? remote-ips)) (.trim (first remote-ips)))))
         (env "remote-addr"))))
 
-(defn referer
-  "Returns a String for the http referer"
+(defn referrer
+  "Returns a String for the http refer(r)er"
   [request]
   (((request :env) :headers) "http-referer"))
 

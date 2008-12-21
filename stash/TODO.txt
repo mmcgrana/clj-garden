@@ -1,79 +1,45 @@
-Testing
-
-Transactions
-
-E. escaping
-currently silently eats bogus callback names at declaration time
-
-Associations
-Validations
-  :if, :if-not
-  of virtual attributes
-  context validations
-Form saving
+Blocking
+- implement, test, and document valid-url
+- attribute methods
+- transactions
+- form-set
+- validators
+- error messages
+- form helpers
+- test and doc clj-time
 
 
-
-Mutual model dependencies => dynamic resolution (has-one '+post+)
-
-Backtrace Awsomeification tool
-
-
-Types
-  varchar        String
-  boolean        Boolean
-  int            Integer
-  float          Float
-  double         Double
-  uuid           String
-  inet           String
-  datetime       LocalDateTime
-  zoned_datetime DateTime
-  time           LocalTime
-  zoned_time     Time
-  date           LocalDate
-
-:columns
-  [[:name      :string]
-   [:title     :string]
-   [:hit-count :integer]]
+Want
+- extensions
+- migrations
 
 
-; before-validation-on-create
-;   validate-on-create
-; after-validation-on-create
-; before-create
-;   create
-; after-create
-;
-; before-validation-on-update
-;   validate-on-update
-; after-validation-on-update
-; before-update
-;   update
-; after-update
-;
-; before-destroy
-;   destroy
-; after-destroy
+Distant
+- datetime caster
+- select-except
+- associations
+- aggregations
+- calculations
+- locking
+- observers
+- serialization
+- identity map
+- awsome-backtrace
+- double check escaping
+- multi-repository, sharding
 
-; (call-if something conditions)
-; (fn [instance] (if (condition instance) (something instance) instance))
-; 
-; (defn email-admin [instance]
-;   (send-email "hai" (:email instance)))
-; 
-; (defn admin-writer? [instance]
-;   (user/admin? (writer instance)))
-; 
-; (defmacro conditionally [f condition pred]
-;   (case
-;     condition
-;     :if
-;     `(fn [instance] (if (~pred instance) (f instance) instance))))
-; [save-draft (conditionally email-admin :if admin-writer?)]
-; [save-draft #(if (admin-writer? %) (email-admin %))]
-; before- and after- save are pure sugar
-; before- and after- validation are pure sugar
 
-; finders accross models
+Implementation
+- handling of mutual model dependencies (dynamic resolution)
+- think about blank, empty stuff from browsers
+- rethink passing model when only need data source
+- datetime caster
+- faster number casting
+- include original query in exceptions raised within db calls
+- defmodel might be made to infer the table name.
+
+
+Tangential
+- running unit tests without reboot for better speed
+- cljack to search over clojure code
+- assoc assoc-in (update) update-in

@@ -1,14 +1,16 @@
-(ns ring.http-util-test
+(ns ring.http-utils-test
   (:use clj-unit.core
-        rint.http-util
-        [clojure.contrib.def :only (defvar-)]))
+        ring.http-utils))
 
-(deftest "url-escape and url-unescape round-trips as expected"
+(deftest "url-escape, url-unescape: round-trip as expected"
   (let [given "foo123!@#$%^&*(){}[]<>?/"]
     (assert= given (url-unescape (url-escape given)))))
 
-(defvar- query-parse-cases
-  [[nil                                   {}]
+(deftest "parse-pairs")
+
+; Test cases mostly from Merb.
+(def query-parse-cases
+  [[""                                    {}]
    ["foo=bar&baz=bat"                     {:foo "bar", :baz "bat"}]
    ["foo=bar&foo=baz"                     {:foo "baz"}]
    ["foo[]=bar&foo[]=baz"                 {:foo ["bar" "baz"]}]
@@ -23,7 +25,11 @@
    ["foo[bar][][baz]=1&foo[bar][][zot]=2&foo[bar][][fuz]=A&foo[bar][][baz]=3&foo[bar][][zot]=4" {:foo {:bar [{:baz "1" :zot "2" :fuz "A"} {:baz "3" :zot "4"}]}}]
    ["foo[bar][][baz]=1&foo[bar][][zot]=2&foo[bar][][fuz]=A&foo[bar][][baz]=3&foo[bar][][zot]=4&foo[bar][][fuz]=B&foo[bar][][foz]=C" {:foo {:bar [{:baz "1" :zot "2" :fuz "A"} {:baz "3" :zot "4" :fuz "B" :foz "C"}]}}]])
 
-
 (doseq [[query-string query-params] query-parse-cases]
-  (deftest (format "query-parse works" query-string)
+  (deftest (format "query-parse: works on %s" query-string)
     (assert= query-params (query-parse query-string))))
+
+(deftest "cookie-parse"
+  (assert=
+    {:foo "bar" :baz "bat" :whiz "bang"}
+    (cookie-parse "foo=bar;baz=bat; whiz=bang")))

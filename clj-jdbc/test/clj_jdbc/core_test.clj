@@ -27,7 +27,7 @@
         row-count    (select-value conn "SELECT count(id) FROM fruits")]
     (list
       (assert= 1 change-count)
-      (assert= "2" row-count))))
+      (assert= 2 row-count))))
 
 
 (defconntest "select-value returns a single value when row found" conn
@@ -48,7 +48,7 @@
 
 
 (defconntest "select-tuple returns a single tuple when row found" conn
-  (assert= `("1" "apple")
+  (assert= `(1 "apple")
     (select-tuple conn "SELECT id, name FROM fruits WHERE id = 1")))
 
 (defconntest "select-tuple returns nil when no rows found" conn
@@ -57,7 +57,7 @@
 
 (defconntest "select-tuples returns a seq of tuples when rows found" conn
   (assert=
-    '(("1" "apple") ("2" "pear") ("3" "grape"))
+    '((1 "apple") (2 "pear") (3 "grape"))
     (select-tuples conn "SELECT id, name FROM fruits ORDER BY id")))
 
 (defconntest "select-tuples returns nil when no rows found" conn
@@ -65,7 +65,7 @@
 
 
 (defconntest "select-map returns a single map when row found" conn
-  (assert= {:id "1" :name "apple"}
+  (assert= {:id 1 :name "apple"}
     (select-map conn "SELECT id, name FROM fruits WHERE id = 1")))
 
 (defconntest "select-maps returns nil when no rows found" conn
@@ -74,7 +74,7 @@
 
 (defconntest "select-maps returns a seq of maps when rows found" conn
   (assert=
-    '({:id "1" :name "apple"} {:id "2" :name "pear"} {:id "3" :name "grape"})
+    '({:id 1 :name "apple"} {:id 2 :name "pear"} {:id 3 :name "grape"})
     (select-maps conn "SELECT id, name FROM fruits ORDER BY id")))
 
 (defconntest "select-maps returns nil when no rows found" conn
@@ -96,4 +96,4 @@
       (modify conn "INSERT INTO fruits (id, name) VALUES (4,'orange')")
       (throw (Exception. "o noes")))
     (catch Exception e nil))
-  (assert= "3" (select-value conn "SELECT count(id) FROM fruits")))
+  (assert= 3 (select-value conn "SELECT count(id) FROM fruits")))

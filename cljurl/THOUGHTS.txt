@@ -1,11 +1,4 @@
-draw dependncy map of literal and paramaterized dependency, see where we can 
-downgrade or eliminate dependency
-
-errors rack tool
-
 eliminate special form of first hash key
-
-whats up with merbs last query parsing spec?
 
 http://profiler.netbeans.org/
 

@@ -2,8 +2,8 @@
 
 (def *app-host* "localhost:8000")
 
-(def *database-name* "cljurl-development")
-
-(def *database-user* "mmcgrana")
-
-(def *database-password* "")
+(def +data-source+
+  (doto (org.postgresql.ds.PGPoolingDataSource.)
+    (.setDatabaseName "cljurl_development")
+    (.setUser         "mmcgrana")
+    (.setPassword     "")))

@@ -23,6 +23,20 @@
 
 )
 
+
+
+(defmacro sfl []
+  `(map ^(def x#) [:file :line]))
+
+(defmacro sfl []
+  [(var-get clojure.lang.Compiler/SOURCE)
+   (var-get clojure.lang.Compiler/LINE)])
+
+1:39 user=> (source-file-line)
+["repl-1" 39]
+
+
+  (def (gensym)))
 (ns 'app.models.post
   (:use stash.timestamps stash.validators app.config.db))
 
@@ -144,6 +158,25 @@ or
 (defn destroy
   [request]
   (cookies-dissoc request :auth-token))
+
+
+  (defn presence
+    "Returns a presence validator for attr-name."
+    [attr-name]
+    (let [error (struct +error+ attr-name :presence)]
+      (fn [instance]
+        (if (nil? (attr-name instance))
+          error))))
+
+  (defn min-length
+    "Returns a minimum length validator for attr-name requiring at least a
+    specified length."
+    [attr-name length]
+    (let [error (struct +error+ attr-name :min-length length)]
+      (fn [instance]
+        (let [val (attr-name instance)]
+          (if (or (nil? val) (< (.length val) length))
+            error)))))
 
 
 ;;;;;;;

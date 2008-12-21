@@ -1,30 +1,62 @@
-catch not found error on find-shortening-by-slugs
-
-create and catch invalid error 
-public files
-
-caster and quoter by name to include id
-columns-with-id
+something for (domap-str [foo foos] (html body))
 
 error handling, in framework, controller, and model/view code
 
-implement api
+API
+
+hit tracking functionality
+
+Check for reflection in whole app
+ - ability to test for this?
 
 ddl
   create rename drop table
   add rename change-limit drop column
   add drop index
-  
-validation - models, views, controllers, normalizing by e.g. removing whitespace
 
-locking / concurrency
+how to implement automatic http:// adding? functionally?
+
+validation - models, views, controllers, normalizing by e.g. removing whitespace
 
 production / dev / testing environments
 
 might want to move a bunch of routes.clj into ring, bundle clj-routing with ring
 
-need to implement all of the tests to be satisfied with de-coupling
+implement tests
 
-move utils somewhere else
+errors rack tool
 
-more and better testing, with helpers
+(ns cljurl.app.controllers-test
+  (:use clj-unit.core cljurl.app.controllers))
+
+; assert-success
+; assert(-body)-matches
+; assert(-body)-selector
+; assert-redirect
+; assert-status 400 
+; assert-content (specific text)
+; assert-selector (css selector)
+; assert-xpath (xpath selector)
+; assert-tag (special case of above??)
+; (let [r (handler-thing request-thing)]
+;   (assert-matches #"(?i)hello world" (body r)))
+; 
+; where to enter - controller, mock request, etc.
+; i like the idea of the default test going through the entire stack,
+; including middleware and router
+; also some model tests to ensure domain logic is implemented
+; target views tests for tricky cases
+
+; (deftest "index"
+;   (given shortenings-exist
+;     (let [response (some-request)]
+;       (assert-stuff response))))
+
+(deftest "not-found"
+  (let [r ()]))
+  
+http://atmos.org/index.php/2008/11/29/merb-10-controller-testing/
+
+logging fail
+
+http://rjack.rubyforge.org/jetty/classes/Jetty/ServerFactory.html

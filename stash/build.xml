@@ -1,0 +1,17 @@
+<project name="stash" default="jar">
+  <description>Pack all sources into a JAR.</description>
+
+  <property name="jarfile" location="stash.jar"/>
+
+  <target name="clean"
+          description="Remove generated files and directories.">
+    <delete file="${jarfile}"/>
+  </target>
+
+  <target name="jar"
+          description="Create jar file.">
+    <jar jarfile="${jarfile}">
+      <fileset dir="./src" includes="stash/**/*.clj"/>
+    </jar>
+  </target>
+</project>

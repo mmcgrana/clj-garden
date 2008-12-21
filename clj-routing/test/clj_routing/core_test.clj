@@ -15,14 +15,7 @@
 (def gen (compile-generator routes))
 (def rec (compile-recognizer routes))
 
-; Declaration, runner, handlers
-; Handlers
-;   start test
-;   report assertion
-;   end test
-;
 
-; (defcontext "Generator"
 (deftest "Returns static route with all params unused"
   (assert= [:get "foo/bars" {:extra "stuff"}]
     (gen :index-bars {:extra "stuff"}))

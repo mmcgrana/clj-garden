@@ -1,50 +1,21 @@
 (in-ns 'stash.core-test)
 
-(defmacro defquote-parse-test
-  [type quote-map cast-map]
-  `(let [quoter# (column-quoter ~type)
-         caster# (column-caster ~type)]
-     (deftest (str ~type " quoting")
-       (doseq [[val# expected-quote#] ~quote-map]
-         (assert= expected-quote# (quoter# val#))))
-     (deftest (str ~type " casting")
-       (doseq [[val# expected-cast#] ~cast-map]
-          (assert= expected-cast# (caster# val#))))))
+; also test nil
+(def quote-cast-test-cases
+  {:uuid     ["a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"]
+   :boolean  [true false]
+   :integer  [0 3 765 -1 -23]
+   :long     [0 12345678987654321]
+   :float    [(float 0.0) (float 1.23) (float -1.23)]
+   :double   [0.0, 0.00000000000001, 1.2345678987654321]
+   :string   ["foo bar" "foo'bar''biz\\bat\\\\bang"]
+   :datetime [(now)]})
 
-(defquote-parse-test :boolean
-  {true "'t'" false "'f'"}
-  {"t" true "f" false})
-
-(defquote-parse-test :integer
-  {0 "0"  3 "3" 765 "765" -1 "-1" -23 "-23"}
-  {"0" 0 "3" 3 "765" 765 "-1" -1 "-23" -23})
-
-(defquote-parse-test :float
-  {0.0  "0.0" 7.65 "7.65" -1.2 "-1.2"}
-  {"0.0" (Float. 0.0) "7.65" (Float. 7.65) "-1.2" (Float. -1.2)})
-
-(defquote-parse-test :string
-  {"foo bar"   "'foo bar'"
-   "`_-+;"     "'`_-+;'"
-   "foo'bar"   "'foo''bar'"
-   "foo\\bar"  "'foo\\\\bar'"}
-  {"foo bar"   "foo bar"
-   "`_-+;"     "`_-+;"
-   "foo'bar"   "foo'bar"
-   "foo\\bar"  "foo\\bar"
-   "foo''\\\\" "foo''\\\\"})
-
-(defquote-parse-test :uuid
-  {"a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
-     "'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'"}
-  {"a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
-    "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"})
-
-(def- the-time
-  (org.joda.time.DateTime.
-    2008 12 18 1 55 17 797
-    (org.joda.time.DateTimeZone/UTC)))
-
-(defquote-parse-test :datetime
-  {the-time "'2008-12-18T01:55:17.797Z'"}
-  {"2008-12-18 01:55:17.797" the-time})
+(doseq [[type values] quote-cast-test-cases]
+  (doseq [val values]
+    (deftest-db (str "??: " type " quote and cast round trips" val)
+      (let [schmor (assoc empty-schmorg type val)]
+        (persist-insert schmor)
+        (assert=
+          (get schmor type)
+          (get (find-one +schmorg+) type))))))

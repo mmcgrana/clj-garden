@@ -1,3 +1,8 @@
-(require 'clj-unit.core 'cljurl.http-util-test)
+(use 'clj-unit.core)
+(require 'cljurl.app.models-test 'cljurl.routing-test 'cljurl.utils-test)
 
-(clj-unit.core/run-tests 'cljurl.http-util-test)
+(run-tests '(
+  cljurl.app.models-test
+  cljurl.routing-test
+  cljurl.utils-test
+))

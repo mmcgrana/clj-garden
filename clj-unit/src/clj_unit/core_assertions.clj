@@ -9,7 +9,7 @@
 (defmacro flunk
   "Always fail, optionally with the given message"
   [& [message]]
-    (failure (or message "flunk")))
+    `(failure (or ~message "flunk")))
 
 (defmacro assert=
   "Assert that two values are equal according to =."
@@ -29,6 +29,13 @@
                       (< actual# (+ expected# delta#)))
       (format "Expected %s +-%s, got %s" expected# delta# actual#))))
 
+(defmacro assert-truth
+  "Assert that a value is logically true - i.e. not nil or false."
+  [form]
+  `(let [val# ~form]
+     (assert-that val#
+       (format "Expected logical truth, got %s" val#))))
+
 (defmacro assert-not
   "Assert that a value is logically false - i.e. either nil or false."
   [form]
@@ -42,6 +49,15 @@
   `(let [val# ~form]
      (assert-that (nil? val#)
        (format "Expected nil, got %s" val#))))
+
+(defmacro assert-instance
+  "Assert that an object is an instance of a class according to instance?"
+  [expected-class-form actual-instance-form]
+  `(let [expected# ~expected-class-form
+         actual#   ~actual-instance-form]
+     (assert-that (instance? expected# actual#)
+       (format "Expected an instance of %s, but %s is not."
+         expected# actual#))))
 
 (defmacro assert-isa
   "Assert that an object is a child of a parent according to isa?"
@@ -65,17 +81,17 @@
   ([form]         (assert-throws Exception nil     form))
   ([message form] (assert-throws Exception message form))
   ([klass message form]
-    `(try
-       ~form
-       (failure "Expecting throw, got none")
-       (catch ~klass e#
-         (if (test-failure-exception? e#)
-           (throw e#)
-           (let [e-message# (.getMessage e#)]
-             (assert-that (or (not ~message) (= ~message e-message#))
-               (format "Expected message \"%s\" got \"%s\""
-                 ~message e-message#)))))
-       (catch Exception e#
-         (if (test-failure-exception? e#)
+   `(try
+      ~form
+      (failure "Expecting throw, got none")
+      (catch ~klass e#
+        (if (test-failure-exception? e#)
           (throw e#)
-          (failure (format "Expected class %s got %s" ~klass (class e#))))))))
+          (let [e-message# (.getMessage e#)]
+            (assert-that (or (not ~message) (= ~message e-message#))
+              (format "Expected message \"%s\" got \"%s\""
+                ~message e-message#)))))
+      (catch Exception e#
+        (if (test-failure-exception? e#)
+         (throw e#)
+         (failure (format "Expected class %s got %s" ~klass (class e#))))))))

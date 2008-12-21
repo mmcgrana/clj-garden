@@ -1,19 +1,14 @@
-(ns stash.validators)
+(ns stash.validators
+  (:use stash.core stash.utils))
 
-(defn presence
-  "Returns a presence validator for attr-name."
+(def- +url-re+ #"(?i)(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)")
+
+(defn valid-url
+  "Returns a validator that returns a :valid-url error if an instances value for
+  attr-name is not a valid url."
   [attr-name]
-  (let [error (struct +error+ attr-name :presence)]
+  (let [error (struct +error+ attr-name :valid-url)]
     (fn [instance]
-      (if (nil? (attr-name instance))
-        error))))
-
-(defn min-length
-  "Returns a minimum length validator for attr-name requiring at least a
-  specified length."
-  [attr-name length]
-  (let [error (struct +error+ attr-name :min-length length)]
-    (fn [instance]
-      (let [val (attr-name instance)]
-        (if (or (nil? val) (< (.length val) length))
+      (let [val (get instance attr-name)]
+        (if (not (and val (re-matches? +url-re+ val)))
           error)))))

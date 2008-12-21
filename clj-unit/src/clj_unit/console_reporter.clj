@@ -17,6 +17,7 @@
 (def *failure-count* (atom 0))
 (def *error-count*   (atom 0))
 (def *pending-count* (atom 0))
+(def *start-time*    (atom nil))
 
 (defn print-stack-trace
   "A sort of modified .printStackTrace. Prints to *out* as apposed to *err* and
@@ -24,7 +25,7 @@
   [#^Exception e]
   (let [elems      (seq (.getStackTrace e))
         ours?      (fn [#^StackTraceElement m]
-                     (.startsWith (.getClassName m) "clj_unit.core$run_tests"))
+                     (re-find #"clj_unti_T_" (.getClassName m)))
         user-elems (take-while #(not (ours? %)) elems)]
     (println (str e))
     (doseq [user-elem user-elems]
@@ -33,6 +34,7 @@
 (def +console-reporter+
   {:start
      (fn [ns-sym]
+       (swap! *start-time* (fn [v] (System/currentTimeMillis)))
        (printf "\nTesting: %s\n" ns-sym))
    :test
      (fn [test-info]
@@ -61,9 +63,11 @@
       (print-stack-trace e))
    :end
      (fn [ns-sym]
-       (println) (println)
-       (printf "%s tests, %s assertions\n"
-         @*test-count* (+ @*success-count* @*failure-count*))
+       (println)
+       (printf "%s tests, %s assertions (%.3f secs)\n"
+         @*test-count*
+         (+ @*success-count* @*failure-count*)
+         (float (/ (- (System/currentTimeMillis) @*start-time*) 1000)))
        (printf "%s failures, %s erros, %s pending\n"
          @*failure-count* @*error-count* @*pending-count*)
        (println))

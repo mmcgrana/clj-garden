@@ -2,11 +2,11 @@
 
 (defmodel +macro-post+ +post-map+)
 
-(deftest "defmodel works"
+(deftest "defmodel"
   (assert= +macro-post+ (compiled-model +post-map+)))
 
-(deftest "defmodel throws on unrecognized callback names"
-  (assert-throws "wat"
-    (compiled-model (assoc +post-map+ :callbacks {:before-update [:foobar]}))))
+(deftest "defmodel: throws on unrecognized callback names"
+  (assert-throws "Unrecognized keys (:foobar)"
+    (compiled-model (assoc +post-map+ :callbacks {:foobar [identity]}))))
 
-; quite a bit more to test here, not terrible interesting
+; TODO: test rest

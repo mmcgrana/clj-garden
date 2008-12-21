@@ -3,32 +3,30 @@
 (defstruct +error+ :on :cause :expected)
 
 (defn errors
-  "Returns a seq of errors for the given instance. Will be an empty coll if
-  there are no errors."
+  "Returns a coll of errors for the given instance, or nil if there are none."
   [instance]
-  (get (meta instance) :errors []))
+  (get (meta instance) :errors))
 
 (defn with-error
   "Returns an instance with the error in the errors metadata."
   [instance error]
-  (with-meta instance
-    (assoc (meta instance) :errors (conj (errors instance) error))))
+  (update-meta-by instance :errors #(conj (or % []) error)))
 
 (defn validated
   "Validates the given instance, returning a new instance that has assocatied
   errors metadata."
   [instance]
-  (let [validations (validations (instance-model instance))]
+  (let [validators (validators (instance-model instance))]
     (reduce
       (fn [instance validator]
         (if-let [error (validator instance)]
           (with-error instance error)
           instance))
       instance
-      validations)))
+      validators)))
 
 (defn errors?
   "Returns true iff the instance has a non-zero number of errors. Does not
   run any validations itself."
   [instance]
-  (not (empty (errors instance))))
+  (not (empty? (errors instance))))

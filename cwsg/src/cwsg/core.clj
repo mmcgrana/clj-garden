@@ -19,7 +19,7 @@
      :request-method     (keyword (.toLowerCase (.getMethod request)))
      :content-type       (.getContentType request)
      :content-length     (let [len (.getContentLength request)]
-                           (if (<= 0 len) len))
+                           (if (>= len 0) len))
      :character-encoding (.getCharacterEncoding request)
      :server-port        (.getServerPort request)
      :server-name        (.getServerName request)
@@ -31,7 +31,6 @@
                                (.getHeader request header-name)))
                            {}
                            (enumeration-seq (.getHeaderNames request)))
-     :reader-fn          #(.getReader request)
      :stream-fn          #(.getInputStream request)}))
 
 (defn- apply-response-tuple
@@ -79,4 +78,5 @@
         server  (doto (Server. port) (.setSendDateHeader true))
         context (Context. server "/" false false)]
     (.addServlet context (ServletHolder. servlet) "/")
-    (.start server)))
+    (.start server)
+    (.join  server)))
