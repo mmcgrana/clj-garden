@@ -1,7 +1,9 @@
 (ns cljurl.app
-  (:use ring.app)
-  (:require ring.app
-            cljurl.routing
-            cljurl.app.controllers))
+  (:require
+    cwsg.middleware.show-exceptions
+    ring.app
+    cljurl.routing cljurl.app.controllers))
 
-(def app (spawn-app cljurl.routing/action-recognizer))
+(def app
+  (cwsg.middleware.show-exceptions/wrap
+    (ring.app/spawn-app cljurl.routing/action-recognizer)))

@@ -2,9 +2,12 @@
   (:use clj-unit.core ring.controller))
 
 (deftest "not-found"
-  (assert=
-    [404 {"Content-Type" "text/html"} "hello"]
+  (assert= [404 {"Content-Type" "text/html"} "hello"]
     (not-found "hello")))
+
+(deftest "internal-error"
+  (assert= [500 {"Content-Type" "text/html"} "o no"]
+    (internal-error "o no")))
 
 (deftest "render"
   (assert=
@@ -17,8 +20,7 @@
 
 (deftest "redirect"
   (assert= base-redirect (redirect "http://google.com"))
-  (assert=
-    (assoc base-redirect 0 301)
+  (assert= (assoc base-redirect 0 301)
     (redirect "http://google.com" {:status 301})))
 
 (def base-file   (java.io.File. "/foo/bar.txt"))

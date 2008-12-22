@@ -62,4 +62,10 @@
   "404 Not Found page."
   []
   (with-layout
-    "O noes - we couldn't find that"))
+    "Were sorry - we couldn't find that."))
+
+(defn internal-error
+  "500 Internal Error page"
+  []
+  (with-layout
+    "Were sorry - something went wrong."))

@@ -2,8 +2,13 @@
   (:import (org.apache.commons.io FilenameUtils)))
 
 (defn not-found
+  "Reterns a tuple for a 400 html response with the given html content."
   [content]
   [404 {"Content-Type" "text/html"} content])
+
+(defn internal-error
+  [content]
+  [500 {"Content-Type" "text/html"} content])
 
 (defn render
   "Returns a tuple for a 200 html reponse with the given html content."

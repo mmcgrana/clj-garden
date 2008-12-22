@@ -17,10 +17,20 @@
   (let [shortenings (m/find-recent-shortenings 10)]
     (render (v/index shortenings))))
 
+(defmacro with-filters
+  [& body]
+  `(try
+     ~@body
+     (catch Exception e#
+       (throw (Exception. "foiled"))
+       (internal-error (v/internal-error)))))
+
 (defn new
   "Renders a form for creating a new shortening."
   [request]
-  (render (v/new (stash/init m/+shortening+))))
+  (with-filters
+    (throw (Exception. "failz"))
+    (render (v/new (stash/init m/+shortening+)))))
 
 (defn create
   "Consume a url given by the user, find its shortening, and redirect to the
