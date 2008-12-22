@@ -6,7 +6,7 @@
     {:primitive "uuid"
      :quoter    #(str "'" % "'")
      :parser    (fn [#^org.postgresql.util.PGobject obj] (.getValue obj))
-     :caster    #(let [s (str %)] (if (re-matches? +uuid-re+ s) s))}
+     :caster    #(let [s (str %)] (if (re-match? +uuid-re+ s) s))}
    :boolean
     {:primitive "bool"
      :quoter    #(if % "'t'" "'f'")

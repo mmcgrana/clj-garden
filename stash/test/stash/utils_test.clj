@@ -32,19 +32,19 @@
   (assert-truth (:private (meta (def- foo "bar")))))
 
 (deftest "get-or"
-  (assert= :bar (get-or {:foo :bar} :foo :bat))
+  (assert= :bar (get-or {:foo :bar} :foo (throw (Exception. "fail"))))
   (assert= :bat (get-or {:foo :bar} :biz :bat)))
 
 (deftest "limit-keys"
   (assert-nil (limit-keys {:foo :bar :biz :bat} [:foo :biz :whiz]))
-  (assert-throws "Unrecognized keys (:biz)"
+  (assert-throws #"Unrecognized keys \(:biz\)"
     (limit-keys {:foo :bar :biz :bat} [:foo :whiz])))
 
 (deftest "the-str"
   (assert= "foo" (the-str :foo))
   (assert= "foo" (the-str "foo")))
 
-(deftest "re-matches?"
-  (assert-truth (re-matches? #"f.o" "foo"))
-  (assert-truth (re-matches? #"f.o" "foobar"))
-  (assert-not   (re-matches? #"b.r" "foo")))
+(deftest "re-match?"
+  (assert-truth (re-match? #"f.o" "foo"))
+  (assert-truth (re-match? #"f.o" "foobar"))
+  (assert-not   (re-match? #"b.r" "foo")))

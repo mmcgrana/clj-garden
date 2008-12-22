@@ -2,5 +2,5 @@
   (:use clj-unit.core clj-time.core))
 
 (deftest "now"
-  (prn (class (now)))
+  ; TODO: test for utc zone
   (assert-instance org.joda.time.DateTime (now)))

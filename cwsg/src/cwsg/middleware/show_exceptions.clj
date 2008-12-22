@@ -1,7 +1,8 @@
 (ns cwsg.middleware.show-exceptions
   (:use (clj-html core helpers)
         clojure.contrib.str-utils
-        clj-backtrace.core))
+        clj-backtrace.core
+        clojure.contrib.repl-utils))
 
 (def css "
 /*
@@ -16,12 +17,17 @@ table.trace {
   background: lightgrey;
 }
 
-span.method {
-  padding-right: 1em;
+table.trace tr {
+  line-height: 1.4em;
 }
 
-span.source {
-  font-weight: bold;
+table.trace td.source {
+  text-align: right;
+}
+
+table.trace td.method {
+  padding-left: .5em;
+  text-aligh: left;
 }
 ")
 
@@ -30,7 +36,7 @@ span.source {
 
 (defn source-str [parsed]
   (if (and (:file parsed) (:line parsed))
-    (str "(" (:file parsed) ":" (:line parsed) ")")
+    (str (:file parsed) ":" (:line parsed))
     "(Unknown Source)"))
 
 (defn- clojure-elem-str [parsed]
@@ -38,6 +44,9 @@ span.source {
 
 (defn java-elem-str [parsed]
   (str (:class parsed) "." (:method parsed)))
+
+(defn clojure-source [parsed]
+  (get-source (symbol (str (:ns parsed) "/" (:fn parsed)))))
 
 (defn- exceptions-response
   "Returns a response showing debugging information about the exception."
@@ -61,19 +70,14 @@ span.source {
                       (if (:clojure parsed)
                         (html
                           [:tr
-                            [:td
-                              [:span.source (h (source-str       parsed))]
-                              [:span.method (h (clojure-elem-str parsed))]]]
-                          ;[:tr
-                           ;[:td
-                            ; [:pre "some source\ni has it"]]]
-                            )
+                            [:td.source (h (source-str       parsed))]
+                            [:td.method (h (clojure-elem-str parsed))]]
+                          (if-let [clj-src (clojure-source parsed)]
+                            (html [:tr [:td {:colspan 2} [:pre clj-src]]])))
                         (html
                           [:tr
-                            [:td
-                              [:span.source (h (source-str    parsed))]
-                              [:span.method (h (java-elem-str parsed))]
-                              ]]))]))]]]]])])
+                            [:td.source (h (source-str    parsed))]
+                            [:td.method (h (java-elem-str parsed))]]))]))]]]]])])
 
 (defn wrap
   "Returns an app corresponding to the given one but for which catches all

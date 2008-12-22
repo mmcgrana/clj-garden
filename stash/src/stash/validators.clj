@@ -10,5 +10,5 @@
   (let [error (struct +error+ attr-name :valid-url)]
     (fn [instance]
       (let [val (get instance attr-name)]
-        (if (not (and val (re-matches? +url-re+ val)))
+        (if (not (and val (re-match? +url-re+ val)))
           error)))))

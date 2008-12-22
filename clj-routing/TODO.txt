@@ -1,23 +1,9 @@
 check conformance to regexs during generation
-coercien from strings to desired types
 raise on capturing groups
-(let [path-builder (StringBuilder.)]
-  (.append path-builder "/foo/")
-  (.append path-builder (params :bar))
-  (.append path-builder "/")
-  (.append path-builder (params :bat))
-  (.append path-builder (params ".biz"))
-  [(.toString path-builder) (dissoc (dissoc params :bar) :bat)])
-  
-
 
 ;; (deftest "raises if named route is not found")
 ;; (deftest "what heppens when no ")
 ;; should we also raise below, on assumption of use of catch-all
-
-contribute str-join to allow no seperator
-
-str-slice to fix .subString .length garbage
 
 
 Don't know how to create ISeq from symbol when :only var instead of :only (defvar)

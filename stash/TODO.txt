@@ -1,9 +1,7 @@
 Blocking
-- implement, test, and document valid-url
 - attribute methods
 - transactions
 - form-set
-- validators
 - error messages
 - form helpers
 - test and doc clj-time
@@ -12,6 +10,7 @@ Blocking
 Want
 - extensions
 - migrations
+- more validators
 
 
 Distant

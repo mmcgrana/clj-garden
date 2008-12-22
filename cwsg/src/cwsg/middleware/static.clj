@@ -1,6 +1,6 @@
 (ns cwsg.middleware.static
   (:use clojure.contrib.except
-        cwsg.util)
+        cwsg.utils)
   (:import (java.io File)))
 
 (defn- ensure-dir
@@ -39,7 +39,7 @@
           (forbidden)
           (let [path (cond
                        (.endsWith "/" uri) (str uri "index.html")
-                       (re-matches? #"\.[a-z]+$" uri) uri
+                       (re-match? #"\.[a-z]+$" uri) uri
                        :else (str uri ".html"))]
             (if-let [file (maybe-file dir path)]
               (success file)

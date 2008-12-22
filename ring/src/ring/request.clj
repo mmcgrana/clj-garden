@@ -131,7 +131,7 @@
   "Returns true if the given request was an AJAX request."
   [request]
   (if-let [xrw (((request :env) :headers) "x-requested-with")]
-    (re-matches? +ajax-http-request-re+ xrw)))
+    (re-match? +ajax-http-request-re+ xrw)))
 
 (defn remote-ip
   "Returns a String representing our best guess for the IP of the requesting 
@@ -142,7 +142,7 @@
     (or (headers "client-ip")
         (if-let [forwarded (headers "x-forwarded-for")]
           (let [all-ips       (re-split #"," forwarded)
-                remote-ips (remove #(re-matches? +local-ip-re+ %) all-ips)]
+                remote-ips (remove #(re-match? +local-ip-re+ %) all-ips)]
             (if (not (empty? remote-ips)) (.trim (first remote-ips)))))
         (env "remote-addr"))))
 
@@ -166,7 +166,7 @@
   the raw-body, otherwise returns nil."
   [request]
   (if-let [ctype (content-type request)]
-    (if (re-matches? +form-url-encoded-re+ ctype)
+    (if (re-match? +form-url-encoded-re+ ctype)
       (query-parse (raw-body request)))))
 
 (defn- parse-multipart-params
@@ -174,7 +174,7 @@
   the multipart body, otherwise returns nil."
   [request]
   (if-let [ctype (content-type request)]
-    (if (re-matches? +multipart-re+ ctype)
+    (if (re-match? +multipart-re+ ctype)
       (let [factory (doto (DiskFileItemFactory.) (.setMaxMemorySize 0))
             upload  (FileUpload. factory)
             context (proxy [RequestContext] []

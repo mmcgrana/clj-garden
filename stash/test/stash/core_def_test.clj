@@ -6,7 +6,7 @@
   (assert= +macro-post+ (compiled-model +post-map+)))
 
 (deftest "defmodel: throws on unrecognized callback names"
-  (assert-throws "Unrecognized keys (:foobar)"
+  (assert-throws #"Unrecognized keys \(:foobar\)"
     (compiled-model (assoc +post-map+ :callbacks {:foobar [identity]}))))
 
 ; TODO: test rest

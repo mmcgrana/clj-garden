@@ -1,12 +1,13 @@
 (ns clj-backtrace.core
   (:use clj-backtrace.utils))
 
-(defn- clojure-elem? [filename]
+(defn- clojure-elem? [class-name file]
   "Returns true if the filename is non-null and indicates a clj source file."
-  (and filename (re-matches? #"\.clj$" filename)))
+  (or (re-match? #"^user" class-name)
+      (and file (re-match? #"\.clj$" file))))
 
 (defn- clojure-ns [class-name]
-  (re-get #"(([a-z-]+\.)+[^$]+)\$" class-name 1))
+  (re-get #"([^$]+)\$" class-name 1))
 
 (defn- clojure-fn
   "Returns the clojure function name implied by the bytecode class name."
@@ -16,7 +17,7 @@
 (defn clojure-annon-fn?
   "Returns true if the bytecode class name implies an annon fn."
   [class-name]
-  (re-matches? #"\$fn__" class-name))
+  (re-match? #"\$fn__" class-name))
 
 (defn parse-elem
   "Returns a map of information about the trace element."
@@ -25,7 +26,7 @@
         file       (.getFileName  elem)
         line       (let [l (.getLineNumber elem)] (if (> l 0) l))
         parsed     {:file file :line line}]
-    (if (clojure-elem? file)
+    (if (clojure-elem? class-name file)
       (assoc parsed
         :clojure true
         :ns       (clojure-ns class-name)

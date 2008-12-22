@@ -1,8 +1,8 @@
 (ns clj-routing.core
   (:use clojure.contrib.str-utils
         clojure.contrib.def
-        clojure.contrib.except)
-  (:load "core_util"))
+        clojure.contrib.except
+        clj-routing.utils))
 
 (defn- route-segments
   "A seq of Strings and keywords based on the given route pattern, 
@@ -26,7 +26,7 @@
       (let [path (map-str
                    (fn [seg]
                      (if (keyword? seg)
-                        (or (get params seg) (throwf "Missing param: %s" seg))
+                        (get-or params seg (throwf "Missing param: %s" seg))
                         seg))
                    segments)
             unused-params (apply dissoc params sym-segments)]

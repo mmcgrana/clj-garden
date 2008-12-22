@@ -50,9 +50,13 @@
 
 (deftest "Coerces non-string param values"
   (assert= [:get "foo/bars/27" {}]
-    (gen :show-bar {:id 27})));)
+    (gen :show-bar {:id 27})))
 
-; (defcontext "Recognizer"
+(deftest "Throws if missing param"
+  (assert-throws #"Missing param: :id"
+    (gen :show-bar {})))
+
+
 (deftest "Throws if no routes match"
   (assert-throws (rec :get "biz/bat")))
 

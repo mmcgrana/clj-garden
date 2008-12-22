@@ -78,9 +78,9 @@
 
 (defmacro assert-throws
   "Assert that a form throws."
-  ([form]         (assert-throws Exception nil     form))
-  ([message form] (assert-throws Exception message form))
-  ([klass message form]
+  ([form]            (assert-throws Exception nil     form))
+  ([message-re form] (assert-throws Exception message-re form))
+  ([klass message-re form]
    `(try
       ~form
       (failure "Expecting throw, got none")
@@ -88,9 +88,9 @@
         (if (test-failure-exception? e#)
           (throw e#)
           (let [e-message# (.getMessage e#)]
-            (assert-that (or (not ~message) (= ~message e-message#))
-              (format "Expected message \"%s\" got \"%s\""
-                ~message e-message#)))))
+            (assert-that (or (not ~message-re) (re-match? ~message-re e-message#))
+              (format "Expected message matching \"%s\" got \"%s\""
+                ~message-re e-message#)))))
       (catch Exception e#
         (if (test-failure-exception? e#)
          (throw e#)

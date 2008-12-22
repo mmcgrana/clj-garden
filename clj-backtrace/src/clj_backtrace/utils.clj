@@ -16,7 +16,7 @@
   [pattern string]
   (re-gsub pattern "" string))
 
-(defn re-matches?
+(defn re-match?
   "Returns true iff the given string contains a match for the given pattern."
   [#^java.util.regex.Pattern pattern string]
   (.find (.matcher pattern string)))
@@ -28,3 +28,19 @@
   (let [m (re-matcher re s)]
     (if (.find m)
       (.group m n))))
+
+(defn high
+  "Like max, but for collections."
+  [vals]
+  (apply max vals))
+
+(defn zip
+  "Zip collections into tuples."
+  [& colls]
+  (apply map list colls))
+
+(defn rjust
+  "If width is greater than the length of s, returns a new string
+  of length width with s right justified within it, otherwise returns s."
+  [width s]
+  (format (str "%" width "s") s))

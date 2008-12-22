@@ -8,6 +8,9 @@
    ["foo.bar$biz__123$fn__456" "invoke" "bar.clj" 789
     {:clojure true :ns "foo.bar" :fn "biz" :file "bar.clj" :line 789 :annon-fn true}]
 
+   ["user$eval__345" "invoke" nil -1
+    {:clojure true :ns "user" :fn "eval" :file nil :line nil :annon-fn false}]
+
    ["clojure.lang.Var" "invoke" "Var.java" 123
     {:java true :class "clojure.lang.Var" :method "invoke" :file "Var.java" :line 123}]
 
@@ -35,15 +38,4 @@
 (deftest "parse-trace"
   (assert= (map second cases) (parse-trace (map first cases))))
 
-
-  1:28 user=> (.getClassName native-elem)
-  "sun.reflect.NativeMethodAccessorImpl"
-  1:29 user=> (.getFileName native-elem)
-  "NativeMethodAccessorImpl.java"
-  1:30 user=> (.getLineNumber native-elem)
-  -2
-  1:31 user=> (.getMethodName native-elem)
-  "invoke0"
-  1:32 user=> (.isNativeMethod native-elem)
-  true
 

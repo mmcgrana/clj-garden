@@ -1,13 +1,12 @@
 something for (domap-str [foo foos] (html body))
+partials (domap-html)
 
-error handling, in framework, controller, and model/view code
-
-API
+API - hence clojure => json and clojure => xml serializers 
+(write json pretty-printer, use old html stuff for xml)
 
 hit tracking functionality
 
 Check for reflection in whole app
- - ability to test for this?
 
 ddl
   create rename drop table
@@ -16,7 +15,7 @@ ddl
 
 how to implement automatic http:// adding? functionally?
 
-validation - models, views, controllers, normalizing by e.g. removing whitespace
+validation and normalizing of params in controllers e.g. removing whitespace
 
 production / dev / testing environments
 
@@ -26,6 +25,7 @@ implement tests
 
 errors rack tool (IN DEV)
 failsafe middleware, configurable with canned response. (IN PROD)
+
 in-app error handling
 
 (ns cljurl.app.controllers-test

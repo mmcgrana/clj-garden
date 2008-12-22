@@ -6,10 +6,10 @@
   (assert= "foobat" (re-without #"bar" "foobarbat"))
   (assert= "foobat" (re-without #"\d*" "foo123bat")))
 
-(deftest "re-matches?"
-  (assert-truth (re-matches? #"foo" "foo"))
-  (assert-truth (re-matches? #"o"   "foo"))
-  (assert-not   (re-matches? #"bar" "foo")))
+(deftest "re-match?"
+  (assert-truth (re-match? #"foo" "foo"))
+  (assert-truth (re-match? #"o"   "foo"))
+  (assert-not   (re-match? #"bar" "foo")))
 
 (deftest "take-last"
   (assert= (list 3 4 5) (take-last 3 (list 1 2 3 4 5)))
