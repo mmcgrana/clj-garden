@@ -16,12 +16,12 @@ table.trace {
   background: lightgrey;
 }
 
-table td.method {
-  text-align: right;
+span.method {
+  padding-right: 1em;
 }
 
-table td.source {
-  text-align: left;
+span.source {
+  font-weight: bold;
 }
 ")
 
@@ -34,7 +34,7 @@ table td.source {
     "(Unknown Source)"))
 
 (defn- clojure-elem-str [parsed]
-  (str (:ns parsed) "/" (:fn parsed) (if (:annon-fn parsed) "(fn)")))
+  (str (:ns parsed) "/" (:fn parsed) (if (:annon-fn parsed) "[fn]")))
 
 (defn java-elem-str [parsed]
   (str (:class parsed) "." (:method parsed)))
@@ -61,16 +61,19 @@ table td.source {
                       (if (:clojure parsed)
                         (html
                           [:tr
-                            [:td.method (h (clojure-elem-str parsed))]
-                            [:td.source (h (source-str        parsed))]]
+                            [:td
+                              [:span.source (h (source-str       parsed))]
+                              [:span.method (h (clojure-elem-str parsed))]]]
                           ;[:tr
                            ;[:td
                             ; [:pre "some source\ni has it"]]]
                             )
                         (html
                           [:tr
-                            [:td.method (h (java-elem-str parsed))]
-                            [:td.source (h (source-str    parsed))]]))]))]]]]])])
+                            [:td
+                              [:span.source (h (source-str    parsed))]
+                              [:span.method (h (java-elem-str parsed))]
+                              ]]))]))]]]]])])
 
 (defn wrap
   "Returns an app corresponding to the given one but for which catches all
