@@ -1,12 +1,18 @@
 // line 1 "rl/hpricot_scan.java.rl"
 package hpricotjam.ext;
 
-import hpricotjam.ext.ParseException;
 import java.io.IOException;
 import java.util.HashMap;
 
 public class Scanner {
-  public void ELE(String N) {
+  private void yield_tokens(TokenType sym, String tag, HashMap attr, String raw) {
+    if (sym == TokenType.SYM_TEXT) {
+      raw = tag;
+    }
+    System.out.println(new Token(sym, tag, attr, raw));
+  }
+  
+  public void ELE(TokenType N) {
     if (te > ts || text) {
       String raw_string = null;
       ele_open = false; text = false;
@@ -52,7 +58,6 @@ public class Scanner {
       } else if(N == aval) {
         mark = mark_aval;
       }
-      // PORT: less than ideal...
       N[0] = new StringBuilder(N[0]).append(new String(buf, mark, E - mark)).toString();
     }
   }
@@ -114,16 +119,16 @@ public class Scanner {
     }
   }
   
-  public void EBLK(String N, int T) {
+  public void EBLK(TokenType N, int T) {
     CAT(tag, p - T + 1);
     ELE(N);
   }
 
-// line 167 "rl/hpricot_scan.java.rl"
+// line 172 "rl/hpricot_scan.java.rl"
 
 
   
-// line 127 "src/hpricotjam/ext/Scanner.java"
+// line 132 "src/hpricotjam/ext/Scanner.java"
 private static byte[] init__hpricot_scan_actions_0()
 {
 	return new byte [] {
@@ -729,16 +734,9 @@ static final int hpricot_scan_en_html_cdata = 216;
 static final int hpricot_scan_en_html_procins = 218;
 static final int hpricot_scan_en_main = 204;
 
-// line 170 "rl/hpricot_scan.java.rl"
+// line 175 "rl/hpricot_scan.java.rl"
   
   public final static int BUFSIZE = 16384;
-  
-  private void yield_tokens(String sym, String tag, HashMap attr, String raw) {
-    if (sym == "text".intern()) {
-      raw = tag;
-    }
-    System.out.println(sym + " " + tag + " " + attr + " " + raw);
-  }
   
   int cs, act, have = 0, nread = 0, curline = 1, p = -1;
   boolean text = false;
@@ -751,15 +749,15 @@ static final int hpricot_scan_en_main = 204;
   boolean done = false, ele_open = false;
   int buffer_size = 0;
    
-  String xmldecl =  "xmldecl".intern(), 
-         doctype =  "doctype".intern(), 
-         procins =  "procins".intern(), 
-         stag =     "stag".intern(), 
-         etag =     "etag".intern(), 
-         emptytag = "emptytag".intern(), 
-         comment =  "comment".intern(),
-         cdata =    "cdata".intern(),
-         sym_text = "text".intern();
+  TokenType xmldecl =  TokenType.XMLDECL,
+            doctype =  TokenType.DOCTYPE,
+            procins =  TokenType.PROCINS,
+            stag =     TokenType.STAG, 
+            etag =     TokenType.ETAG,
+            emptytag = TokenType.EMPTYTAG,
+            comment =  TokenType.COMMENT,
+            cdata =    TokenType.CDATA,
+            sym_text = TokenType.SYM_TEXT;
   
   public Object scan(String port) throws ParseException {
     attr = null;
@@ -770,14 +768,14 @@ static final int hpricot_scan_en_main = 204;
     buf = new char[BUFSIZE];
   
     
-// line 774 "src/hpricotjam/ext/Scanner.java"
+// line 772 "src/hpricotjam/ext/Scanner.java"
 	{
 	cs = hpricot_scan_start;
 	ts = -1;
 	te = -1;
 	act = 0;
 	}
-// line 210 "rl/hpricot_scan.java.rl"
+// line 208 "rl/hpricot_scan.java.rl"
   
     while(!done) {
       String str;
@@ -818,7 +816,7 @@ static final int hpricot_scan_en_main = 204;
       char[] data = buf;
   
       
-// line 822 "src/hpricotjam/ext/Scanner.java"
+// line 820 "src/hpricotjam/ext/Scanner.java"
 	{
 	int _klen;
 	int _trans = 0;
@@ -843,7 +841,7 @@ case 1:
 // line 1 "rl/hpricot_scan.java.rl"
 	{ts = p;}
 	break;
-// line 847 "src/hpricotjam/ext/Scanner.java"
+// line 845 "src/hpricotjam/ext/Scanner.java"
 		}
 	}
 
@@ -908,7 +906,7 @@ case 3:
 			switch ( _hpricot_scan_actions[_acts++] )
 			{
 	case 0:
-// line 125 "rl/hpricot_scan.java.rl"
+// line 130 "rl/hpricot_scan.java.rl"
 	{
     if (text) {
       CAT(tag, p);
@@ -922,58 +920,58 @@ case 3:
   }
 	break;
 	case 1:
-// line 137 "rl/hpricot_scan.java.rl"
+// line 142 "rl/hpricot_scan.java.rl"
 	{ mark_tag = p;    }
 	break;
 	case 2:
-// line 138 "rl/hpricot_scan.java.rl"
+// line 143 "rl/hpricot_scan.java.rl"
 	{ mark_aval = p;   }
 	break;
 	case 3:
-// line 139 "rl/hpricot_scan.java.rl"
+// line 144 "rl/hpricot_scan.java.rl"
 	{ mark_akey = p;   }
 	break;
 	case 4:
-// line 140 "rl/hpricot_scan.java.rl"
+// line 145 "rl/hpricot_scan.java.rl"
 	{ SET(tag, p);     }
 	break;
 	case 5:
-// line 142 "rl/hpricot_scan.java.rl"
+// line 147 "rl/hpricot_scan.java.rl"
 	{ SET(aval, p);    }
 	break;
 	case 6:
-// line 143 "rl/hpricot_scan.java.rl"
+// line 148 "rl/hpricot_scan.java.rl"
 	{ 
     if (buf[p-1] == '"' || buf[p-1] == '\'') { SET(aval, p-1); }
     else { SET(aval, p); }
   }
 	break;
 	case 7:
-// line 147 "rl/hpricot_scan.java.rl"
+// line 152 "rl/hpricot_scan.java.rl"
 	{ SET(akey, p); }
 	break;
 	case 8:
-// line 148 "rl/hpricot_scan.java.rl"
+// line 153 "rl/hpricot_scan.java.rl"
 	{ SET(aval, p); ATTR("version",    aval); }
 	break;
 	case 9:
-// line 149 "rl/hpricot_scan.java.rl"
+// line 154 "rl/hpricot_scan.java.rl"
 	{ SET(aval, p); ATTR("encoding",   aval); }
 	break;
 	case 10:
-// line 150 "rl/hpricot_scan.java.rl"
+// line 155 "rl/hpricot_scan.java.rl"
 	{ SET(aval, p); ATTR("standalone", aval); }
 	break;
 	case 11:
-// line 151 "rl/hpricot_scan.java.rl"
+// line 156 "rl/hpricot_scan.java.rl"
 	{ SET(aval, p); ATTR("public_id",  aval); }
 	break;
 	case 12:
-// line 152 "rl/hpricot_scan.java.rl"
+// line 157 "rl/hpricot_scan.java.rl"
 	{ SET(aval, p); ATTR("system_id",  aval); }
 	break;
 	case 13:
-// line 154 "rl/hpricot_scan.java.rl"
+// line 159 "rl/hpricot_scan.java.rl"
 	{ 
     akey[0] = null;
     aval[0] = null;
@@ -982,7 +980,7 @@ case 3:
   }
 	break;
 	case 14:
-// line 161 "rl/hpricot_scan.java.rl"
+// line 166 "rl/hpricot_scan.java.rl"
 	{ 
     ATTR(akey, aval);
   }
@@ -1141,7 +1139,7 @@ case 3:
 	}
 	}
 	break;
-// line 1145 "src/hpricotjam/ext/Scanner.java"
+// line 1143 "src/hpricotjam/ext/Scanner.java"
 			}
 		}
 	}
@@ -1155,7 +1153,7 @@ case 2:
 // line 1 "rl/hpricot_scan.java.rl"
 	{ts = -1;}
 	break;
-// line 1159 "src/hpricotjam/ext/Scanner.java"
+// line 1157 "src/hpricotjam/ext/Scanner.java"
 		}
 	}
 
@@ -1177,7 +1175,7 @@ case 5:
 	}
 	break; }
 	}
-// line 250 "rl/hpricot_scan.java.rl"
+// line 248 "rl/hpricot_scan.java.rl"
       
       if (cs == hpricot_scan_error) {
         if(tag[0] == null) {

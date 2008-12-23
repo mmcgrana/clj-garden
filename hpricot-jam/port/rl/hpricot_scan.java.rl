@@ -1,11 +1,17 @@
 package hpricotjam.ext;
 
-import hpricotjam.ext.ParseException;
 import java.io.IOException;
 import java.util.HashMap;
 
 public class Scanner {
-  public void ELE(String N) {
+  private void yield_tokens(TokenType sym, String tag, HashMap attr, String raw) {
+    if (sym == TokenType.SYM_TEXT) {
+      raw = tag;
+    }
+    System.out.println(new Token(sym, tag, attr, raw));
+  }
+  
+  public void ELE(TokenType N) {
     if (te > ts || text) {
       String raw_string = null;
       ele_open = false; text = false;
@@ -51,7 +57,6 @@ public class Scanner {
       } else if(N == aval) {
         mark = mark_aval;
       }
-      // PORT: less than ideal...
       N[0] = new StringBuilder(N[0]).append(new String(buf, mark, E - mark)).toString();
     }
   }
@@ -113,7 +118,7 @@ public class Scanner {
     }
   }
   
-  public void EBLK(String N, int T) {
+  public void EBLK(TokenType N, int T) {
     CAT(tag, p - T + 1);
     ELE(N);
   }
@@ -170,13 +175,6 @@ public class Scanner {
   
   public final static int BUFSIZE = 16384;
   
-  private void yield_tokens(String sym, String tag, HashMap attr, String raw) {
-    if (sym == "text".intern()) {
-      raw = tag;
-    }
-    System.out.println(sym + " " + tag + " " + attr + " " + raw);
-  }
-  
   int cs, act, have = 0, nread = 0, curline = 1, p = -1;
   boolean text = false;
   int ts = -1, te;
@@ -188,15 +186,15 @@ public class Scanner {
   boolean done = false, ele_open = false;
   int buffer_size = 0;
    
-  String xmldecl =  "xmldecl".intern(), 
-         doctype =  "doctype".intern(), 
-         procins =  "procins".intern(), 
-         stag =     "stag".intern(), 
-         etag =     "etag".intern(), 
-         emptytag = "emptytag".intern(), 
-         comment =  "comment".intern(),
-         cdata =    "cdata".intern(),
-         sym_text = "text".intern();
+  TokenType xmldecl =  TokenType.XMLDECL,
+            doctype =  TokenType.DOCTYPE,
+            procins =  TokenType.PROCINS,
+            stag =     TokenType.STAG, 
+            etag =     TokenType.ETAG,
+            emptytag = TokenType.EMPTYTAG,
+            comment =  TokenType.COMMENT,
+            cdata =    TokenType.CDATA,
+            sym_text = TokenType.SYM_TEXT;
   
   public Object scan(String port) throws ParseException {
     attr = null;
