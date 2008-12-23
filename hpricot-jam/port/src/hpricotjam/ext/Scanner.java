@@ -1,7 +1,7 @@
 // line 1 "rl/hpricot_scan.java.rl"
 package hpricotjam.ext;
 
-import hpricotjam.ParseException;
+import hpricotjam.ext.ParseException;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -123,7 +123,7 @@ public class Scanner {
 
 
   
-// line 127 "src/hpricotjam/ext/Scan.java"
+// line 127 "src/hpricotjam/ext/Scanner.java"
 private static byte[] init__hpricot_scan_actions_0()
 {
 	return new byte [] {
@@ -770,7 +770,7 @@ static final int hpricot_scan_en_main = 204;
     buf = new char[BUFSIZE];
   
     
-// line 774 "src/hpricotjam/ext/Scan.java"
+// line 774 "src/hpricotjam/ext/Scanner.java"
 	{
 	cs = hpricot_scan_start;
 	ts = -1;
@@ -818,7 +818,7 @@ static final int hpricot_scan_en_main = 204;
       char[] data = buf;
   
       
-// line 822 "src/hpricotjam/ext/Scan.java"
+// line 822 "src/hpricotjam/ext/Scanner.java"
 	{
 	int _klen;
 	int _trans = 0;
@@ -843,7 +843,7 @@ case 1:
 // line 1 "rl/hpricot_scan.java.rl"
 	{ts = p;}
 	break;
-// line 847 "src/hpricotjam/ext/Scan.java"
+// line 847 "src/hpricotjam/ext/Scanner.java"
 		}
 	}
 
@@ -1141,7 +1141,7 @@ case 3:
 	}
 	}
 	break;
-// line 1145 "src/hpricotjam/ext/Scan.java"
+// line 1145 "src/hpricotjam/ext/Scanner.java"
 			}
 		}
 	}
@@ -1155,7 +1155,7 @@ case 2:
 // line 1 "rl/hpricot_scan.java.rl"
 	{ts = -1;}
 	break;
-// line 1159 "src/hpricotjam/ext/Scan.java"
+// line 1159 "src/hpricotjam/ext/Scanner.java"
 		}
 	}
 
