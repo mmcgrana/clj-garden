@@ -185,7 +185,7 @@ public class Scan {
          stag =     "stag", 
          etag =     "etag", 
          emptytag = "emptytag", 
-         comment =  "comment"
+         comment =  "comment",
          cdata =    "cdata",
          sym_text = "text";
   
@@ -243,7 +243,7 @@ public class Scan {
       // PORT: where does this symbol come from?
       if (cs == hpricot_scan_error) {
         if(tag[0] == null) {
-          throws new ParseException("parse error on line " + curline);
+          throw new ParseException("parse error on line " + curline);
         } else {
           throw new ParseException("parse error on element <" + tag.toString() + ">, starting on line " + curline); 
         }

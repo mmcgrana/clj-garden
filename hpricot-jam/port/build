@@ -1,0 +1,1 @@
+ragel -J -o ext/hpricot_scan/HpricotScanService.java ext/hpricot_scan/hpricot_scan.java.rl

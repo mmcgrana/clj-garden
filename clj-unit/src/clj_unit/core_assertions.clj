@@ -54,7 +54,7 @@
   "Assert that a function returns logical truth when given a val."
   [pred-form val-form]
   `(let [val# ~val-form]
-     (assert-that val#
+     (assert-that (~pred-form val#)
        (format "Expected pred to return logical truth for %s, but it did not."
          val#))))
 
@@ -62,7 +62,7 @@
   "Assert that a function returns logical false when given a val."
   [pred-form val-form]
   `(let [val# ~val-form]
-     (assert-that (not val#)
+     (assert-that (not (~pred-form val#))
        (format "Expected pred to return logical false for %s, but it did not."
          val#))))
 

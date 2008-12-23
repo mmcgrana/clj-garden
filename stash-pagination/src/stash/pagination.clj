@@ -54,7 +54,10 @@
 
 (defn pager
   "Construct a pager object.
-  TODOC
+  Both page and per-page are required and must be integers. count-fn is a fn
+  of arity 1 that takes a pager object and returns the total number of entires
+  in the collection. find-fn likewise takes a pager and returns the indicated
+  page of entries. 
   The returned object can then be used as arguments to e.g. next-page."
   [page per-page count-fn find-fn]
   (let [pgr {:page page :per-page per-page}
