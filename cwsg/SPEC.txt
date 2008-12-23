@@ -1,0 +1,22 @@
+= Apps
+Apps are fns of arity one, taking an environment as specified in Envs below and
+returning a seq-able of 3 items:
+
+  [response-code headers body]
+
+The first is the HTTP response code and must be and Integer.
+
+The second represents the HTTP headers and must be a map of String header names
+to string header values.
+
+The third is the body and may be any of the following:
+String:
+  Contents written to the response body as-is.
+File:
+  Contents at the specified location sent to the client. The server may use an 
+  optimized method to send the file if such a method is available.
+InputStream:
+  Written to the response stream and then .close'd.
+
+
+= Env

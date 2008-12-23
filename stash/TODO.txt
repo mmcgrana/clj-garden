@@ -16,6 +16,7 @@ Want
 Distant
 - datetime caster
 - select-except
+- multi-order (while still keeping simple case)
 - associations
 - aggregations
 - calculations
@@ -30,7 +31,6 @@ Distant
 
 Implementation
 - handling of mutual model dependencies (dynamic resolution)
-- think about blank, empty stuff from browsers
 - rethink passing model when only need data source
 - datetime caster
 - faster number casting

@@ -3,7 +3,7 @@
 
 (deftest "generate-slug"
   (let [[shortening success] (generate-slug {})]
-    (assert-matches #"[abcdefghijk12345]{5}" (:slug shortening))
+    (assert-match #"[abcdefghijk12345]{5}" (:slug shortening))
     (assert-truth success)))
 
 (deftest "find-shortenings"

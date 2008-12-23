@@ -50,6 +50,22 @@
      (assert-that (nil? val#)
        (format "Expected nil, got %s" val#))))
 
+(defmacro assert-fn
+  "Assert that a function returns logical truth when given a val."
+  [pred-form val-form]
+  `(let [val# ~val-form]
+     (assert-that val#
+       (format "Expected pred to return logical truth for %s, but it did not."
+         val#))))
+
+(defmacro assert-not-fn
+  "Assert that a function returns logical false when given a val."
+  [pred-form val-form]
+  `(let [val# ~val-form]
+     (assert-that (not val#)
+       (format "Expected pred to return logical false for %s, but it did not."
+         val#))))
+
 (defmacro assert-instance
   "Assert that an object is an instance of a class according to instance?"
   [expected-class-form actual-instance-form]
@@ -67,7 +83,7 @@
      (assert-that (isa? actual# expected#)
        (format "Expected a child of %s, but %s is not." expected# actual#))))
 
-(defmacro assert-matches
+(defmacro assert-match
   "Asserts that a String matches a pattern"
   [expected-pattern-form actual-string-form]
   `(let [expected# ~expected-pattern-form

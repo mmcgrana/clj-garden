@@ -3,4 +3,4 @@ explicit vs. thread-accounted transactions
   will we ever need more than 1 connection per thread
 transactions
 logging
-note String situation
+re-raise error with message

@@ -19,6 +19,13 @@ validation and normalizing of params in controllers e.g. removing whitespace
 
 production / dev / testing environments
 
+logging in general
+  - sql
+  - framework: params, routing, timing.
+  - exceptions
+; cljurl.config
+(def *logger* (clj-logger/to-path "log/development.log"))
+
 might want to move a bunch of routes.clj into ring, bundle clj-routing with ring
 
 implement tests
@@ -41,7 +48,7 @@ in-app error handling
 ; assert-xpath (xpath selector)
 ; assert-tag (special case of above??)
 ; (let [r (handler-thing request-thing)]
-;   (assert-matches #"(?i)hello world" (body r)))
+;   (assert-match #"(?i)hello world" (body r)))
 ; 
 ; where to enter - controller, mock request, etc.
 ; i like the idea of the default test going through the entire stack,
@@ -58,7 +65,5 @@ in-app error handling
   (let [r ()]))
   
 http://atmos.org/index.php/2008/11/29/merb-10-controller-testing/
-
-logging fail
 
 http://rjack.rubyforge.org/jetty/classes/Jetty/ServerFactory.html

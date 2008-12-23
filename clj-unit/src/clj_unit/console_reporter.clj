@@ -1,4 +1,5 @@
-(ns clj-unit.console-reporter)
+(ns clj-unit.console-reporter
+  (:use clj-unit.utils clj-backtrace.repl))
 
 ; composed of tests
 ; a test may be pending or not pending
@@ -19,17 +20,16 @@
 (def *pending-count* (atom 0))
 (def *start-time*    (atom nil))
 
-(defn print-stack-trace
+(defn print-exception
   "A sort of modified .printStackTrace. Prints to *out* as apposed to *err* and
   only prints those stack elements above the test invocation code."
   [#^Exception e]
-  (let [elems      (seq (.getStackTrace e))
+  (let [elems      (.getStackTrace e)
         ours?      (fn [#^StackTraceElement m]
-                     (re-find #"clj_unti_T_" (.getClassName m)))
+                     (re-match? #"clj_unit.core\$run_tests" (.getClassName m)))
         user-elems (take-while #(not (ours? %)) elems)]
     (println (str e))
-    (doseq [user-elem user-elems]
-      (println (str "  " user-elem)))))
+    (print-trace user-elems)))
 
 (def +console-reporter+
   {:start
@@ -60,7 +60,7 @@
       (swap! *error-count* inc)
       (printf "\nEXCP: %s (%s:%s)\n"
         (:doc test-info) (:file test-info) (:line test-info))
-      (print-stack-trace e))
+      (print-exception e))
    :end
      (fn [ns-sym]
        (println)

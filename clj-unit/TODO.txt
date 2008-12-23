@@ -1,9 +1,12 @@
-multiple ns
-better handling of file names and line numbers
+use pretty backtrace
+per-assertion file and line numbers
+nested tests
+per-function tests
+  attached to tests
 System.exit(0/1)
 line numbers
 prn instead of print
-(assert= +macro-post+ (compiled-model +post-map+)) ouside of test gives nonhelpful error about *reporter* not being bound
+(assert= +macro-post+ (compiled-model +post-map+)) outside of test gives nonhelpful error about *reporter* not being bound
 
 Time taken for tests (perhaps even each one, to identify slow tests)
 
