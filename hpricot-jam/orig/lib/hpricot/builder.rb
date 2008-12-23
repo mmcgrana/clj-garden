@@ -47,12 +47,12 @@ module Hpricot
 
     # Write a +string+ to the HTML stream, making sure to escape it.
     def text!(string)
-      (self.children ||= []) << Text.new(string.fast_xs)
+      @children << Text.new(string.fast_xs)
     end
 
     # Write a +string+ to the HTML stream without escaping it.
     def text(string)
-      (self.children ||= []) << Text.new(string)
+      @children << Text.new(string)
       nil
     end
     alias_method :<<, :text
@@ -105,15 +105,14 @@ module Hpricot
       end
 
       # create the element itself
-      tag = tag.to_s
-      f = Elem.new(tag, attrs, childs, ETag.new(tag))
+      f = Elem.new(STag.new(tag, attrs), childs, ETag.new(tag))
 
       # build children from the block
       if block
         build(f, &block)
       end
 
-      (self.children ||= []) << f
+      @children << f
       f
     end
 
@@ -146,7 +145,7 @@ module Hpricot
     end
 
     def doctype(target, pub, sys)
-      (self.children ||= []) << DocType.new(target, pub, sys)
+      @children << DocType.new(target, pub, sys)
     end
 
     remove_method :head

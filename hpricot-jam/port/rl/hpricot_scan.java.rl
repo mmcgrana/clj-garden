@@ -1,20 +1,22 @@
+package hpricotjam.ext;
+
+import hpricotjam.ext.ParseException;
 import java.io.IOException;
 import java.util.HashMap;
-import hpricotjam.ParseException;
 
-public class Scan {
-  public void ELE(Object N) {
+public class Scanner {
+  public void ELE(String N) {
     if (te > ts || text) {
       String raw_string = null;
       ele_open = false; text = false;
       if (ts != -1 && N != cdata && N != sym_text && N != procins && N != comment) { 
         raw_string = new String(buf, ts, te - ts);
       }
-      // PORT: do we need something to replace rb_yield_tokens here? 
+      yield_tokens(N, tag[0], attr, raw_string);
     }
   }
   
-  public void SET(Object[] N, int E) {
+  public void SET(String[] N, int E) {
     int mark = 0;
     if(N == tag) { 
       if(mark_tag == -1 || E == mark_tag) {
@@ -37,7 +39,7 @@ public class Scan {
     }
   }
   
-  public void CAT(Object[] N, int E) {
+  public void CAT(String[] N, int E) {
     if(null == N[0]) {
       SET(N, E);
     } else {
@@ -111,7 +113,7 @@ public class Scan {
     }
   }
   
-  public void EBLK(Object N, int T) {
+  public void EBLK(String N, int T) {
     CAT(tag, p - T + 1);
     ELE(N);
   }
@@ -168,32 +170,39 @@ public class Scan {
   
   public final static int BUFSIZE = 16384;
   
+  private void yield_tokens(String sym, String tag, HashMap attr, String raw) {
+    if (sym == "text".intern()) {
+      raw = tag;
+    }
+    System.out.println(sym + " " + tag + " " + attr + " " + raw);
+  }
+  
   int cs, act, have = 0, nread = 0, curline = 1, p = -1;
   boolean text = false;
   int ts = -1, te;
   int eof = -1;
   char[] buf;
   HashMap attr;
-  Object[] tag, akey, aval;
+  String[] tag, akey, aval;
   int mark_tag, mark_akey, mark_aval;
   boolean done = false, ele_open = false;
   int buffer_size = 0;
    
-  String xmldecl =  "xmldecl", 
-         doctype =  "doctype", 
-         procins =  "procins", 
-         stag =     "stag", 
-         etag =     "etag", 
-         emptytag = "emptytag", 
-         comment =  "comment",
-         cdata =    "cdata",
-         sym_text = "text";
+  String xmldecl =  "xmldecl".intern(), 
+         doctype =  "doctype".intern(), 
+         procins =  "procins".intern(), 
+         stag =     "stag".intern(), 
+         etag =     "etag".intern(), 
+         emptytag = "emptytag".intern(), 
+         comment =  "comment".intern(),
+         cdata =    "cdata".intern(),
+         sym_text = "text".intern();
   
-  public Object scan(String port) {
+  public Object scan(String port) throws ParseException {
     attr = null;
-    tag  = new Object[]{null};
-    akey = new Object[]{null};
-    aval = new Object[]{null};
+    tag  = new String[]{null};
+    akey = new String[]{null};
+    aval = new String[]{null};
   
     buf = new char[BUFSIZE];
   
@@ -216,10 +225,9 @@ public class Scan {
          space = buffer_size - have;
       }
   
-      // PORT: probably can do less over the next 10 lines.
       int back = nread + space;
       if (port.length() < back) {
-        str = post.substring(nread);
+        str = port.substring(nread);
       } else {
         str = port.substring(nread, nread + space);
       }
@@ -240,7 +248,6 @@ public class Scan {
   
       %% write exec;
       
-      // PORT: where does this symbol come from?
       if (cs == hpricot_scan_error) {
         if(tag[0] == null) {
           throw new ParseException("parse error on line " + curline);
@@ -282,7 +289,6 @@ public class Scan {
         ts = 0;
       }
     }
-    // PORT: return value??.
     return null;
   }
 }

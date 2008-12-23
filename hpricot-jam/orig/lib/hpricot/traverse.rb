@@ -26,7 +26,7 @@ module Hpricot
       if parent and parent.respond_to? :make
         parent.make(input, &blk)
       else
-        Hpricot.make(input, &blk).children
+        Hpricot.make(input, &blk)
       end
     end
 
@@ -51,7 +51,7 @@ module Hpricot
         return i if (x.respond_to?(:name) and name == x.name) or
           (x.text? and name == "text()")
         i += 1
-      end if children
+      end
       -1
     end
 
@@ -146,20 +146,16 @@ module Hpricot
     # Builds a string from the text contained in this node.  All
     # HTML elements are removed.
     def to_plain_text
-      if respond_to?(:children) and children
+      if respond_to? :children
         children.map { |x| x.to_plain_text }.join.strip.gsub(/\n{2,}/, "\n\n")
-      else
-        ""
       end
     end
 
     # Builds a string from the text contained in this node.  All
     # HTML elements are removed.
     def inner_text
-      if respond_to?(:children) and children
+      if respond_to? :children
         children.map { |x| x.inner_text }.join
-      else
-        ""
       end
     end
     alias_method :innerText, :inner_text
@@ -176,10 +172,8 @@ module Hpricot
         end
         reparent self.children
       else
-        if respond_to?(:children) and children
+        if respond_to? :children
           children.map { |x| x.output("") }.join
-        else
-          ""
         end
       end
     end
@@ -213,7 +207,7 @@ module Hpricot
         parent.children.each do |e|
           id = sim if e == self
           sim += 1 if e.pathname == self.pathname
-        end if parent.children
+        end
         p = File.join(parent.xpath, self.pathname)
         p += "[#{id+1}]" if sim >= 2
         p
@@ -230,7 +224,7 @@ module Hpricot
         parent.children.each do |e|
           id = sim if e == self
           sim += 1 if e.pathname == self.pathname
-        end if parent.children
+        end
         p = parent.css_path
         p = p ? "#{p} > #{self.pathname}" : self.pathname
         p += ":nth(#{id})" if sim >= 2
@@ -495,13 +489,13 @@ module Hpricot
 
     # +each_child+ iterates over each child.
     def each_child(&block) # :yields: child_node
-      children.each(&block) if children
+      children.each(&block)
       nil
     end
 
     # +each_child_with_index+ iterates over each child.
     def each_child_with_index(&block) # :yields: child_node, index
-      children.each_with_index(&block) if children
+      children.each_with_index(&block)
       nil
     end
 
@@ -632,7 +626,7 @@ module Hpricot
   # :stopdoc:
   module Doc::Trav
     def traverse_all_element(&block)
-      children.each {|c| c.traverse_all_element(&block) } if children
+      children.each {|c| c.traverse_all_element(&block) }
     end
     def xpath
       "/"
@@ -645,7 +639,7 @@ module Hpricot
   module Elem::Trav
     def traverse_all_element(&block)
       yield self
-      children.each {|c| c.traverse_all_element(&block) } if children
+      children.each {|c| c.traverse_all_element(&block) }
     end
   end
 
@@ -657,14 +651,14 @@ module Hpricot
 
   module Doc::Trav
     def traverse_some_element(name_set, &block)
-      children.each {|c| c.traverse_some_element(name_set, &block) } if children
+      children.each {|c| c.traverse_some_element(name_set, &block) }
     end
   end
 
   module Elem::Trav
     def traverse_some_element(name_set, &block)
       yield self if name_set.include? self.name
-      children.each {|c| c.traverse_some_element(name_set, &block) } if children
+      children.each {|c| c.traverse_some_element(name_set, &block) }
     end
   end
 
@@ -803,7 +797,7 @@ module Hpricot
   module Doc::Trav
     def root
       es = []
-      children.each {|c| es << c if c.elem? } if children
+      children.each {|c| es << c if c.elem? }
       raise Hpricot::Error, "no element" if es.empty?
       raise Hpricot::Error, "multiple top elements" if 1 < es.length
       es[0]

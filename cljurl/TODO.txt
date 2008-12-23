@@ -30,6 +30,9 @@ might want to move a bunch of routes.clj into ring, bundle clj-routing with ring
 
 implement tests
 
+ragel-based json decoder
+fast and pp json encoders that don't suck
+
 errors rack tool (IN DEV)
 failsafe middleware, configurable with canned response. (IN PROD)
 

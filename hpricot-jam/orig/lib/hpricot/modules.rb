@@ -4,6 +4,7 @@ module Hpricot
 
   # :stopdoc:
   module Tag; include Hpricot end
+    class STag; include Tag end
     class ETag; include Tag end
   # :startdoc:
 
@@ -11,7 +12,6 @@ module Hpricot
     module Container; include Node end
       class Doc; include Container end
       class Elem; include Container end
-
     module Leaf; include Node end
       class Text; include Leaf end
       class XMLDecl; include Leaf end
@@ -25,7 +25,6 @@ module Hpricot
   module Leaf::Trav; include Traverse end
   class Doc;       module Trav; include Container::Trav end; include Trav end
   class Elem;      module Trav; include Container::Trav end; include Trav end
-  class CData;     module Trav; include Leaf::Trav      end; include Trav end
   class Text;      module Trav; include Leaf::Trav      end; include Trav end
   class XMLDecl;   module Trav; include Leaf::Trav      end; include Trav end
   class DocType;   module Trav; include Leaf::Trav      end; include Trav end

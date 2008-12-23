@@ -14,13 +14,13 @@ class TestParser < Test::Unit::TestCase
 
   # Test creating a new element 
   def test_new_element 
-    elem = Hpricot::Elem.new('form') 
+    elem = Hpricot::Elem.new(Hpricot::STag.new('form')) 
     assert_not_nil(elem) 
     assert_not_nil(elem.attributes) 
   end 
 
   def test_scan_text
-    assert_equal 'FOO', Hpricot.make("FOO").children.first.content
+    assert_equal 'FOO', Hpricot.make("FOO").first.content
   end
 
   def test_filter_by_attr
@@ -306,8 +306,10 @@ class TestParser < Test::Unit::TestCase
     assert_equal "blah='blah'", doc.children[2].content
   end
 
-  def test_no_buffer_error
-    Hpricot(%{<p>\n\n<input type="hidden" name="__VIEWSTATE"  value="#{(("X" * 2000) + "\n") * 44}" />\n\n</p>})
+  def test_buffer_error
+    assert_raise Hpricot::ParseError, "ran out of buffer space on element <input>, starting on line 3." do
+      Hpricot(%{<p>\n\n<input type="hidden" name="__VIEWSTATE"  value="#{(("X" * 2000) + "\n") * 22}" />\n\n</p>})
+    end
   end
 
   def test_youtube_attr
