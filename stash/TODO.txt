@@ -11,6 +11,7 @@ Want
 - extensions
 - migrations
 - more validators
+- key-based window pagination
 
 
 Distant
