@@ -10,7 +10,7 @@
          '[clojure.contrib.zip-filter.xml :as zfxml]
          '[clojure.zip :as zip])
 
-
+; http://paste.lisp.org/display/70171
 (defn- startparse-tagsoup [s ch]
   "startparse fn required by xml/parse constructor for generating a tagsoup
   parse stream."
@@ -24,16 +24,16 @@
   (zip/xml-zip
     (xml/parse (org.xml.sax.InputSource. stream) startparse-tagsoup)))
 
-(def xml->      zfxml/xml->)
-(def xml1->     zfxml/xml1->)
-(def desc       zf/descendants)
-(def leftmost?  zf/leftmost?)
-(def rightmost? zf/rightmost?)
-(def ansc       zf/ancestors)
-(def children   zf/children)
-(def attr       zfxml/attr)
-(def attr=      zfxml/attr=)
-(def text       zfxml/text)
+(def xml->       zfxml/xml->)
+(def xml1->      zfxml/xml1->)
+(def rightmost?  zf/leftmost?)
+(def rightmost?  zf/rightmost?)
+(def desc        zf/descendants)
+(def ansc        zf/ancestors)
+(def children    zf/children)
+(def attr        zfxml/attr)
+(def attr=       zfxml/attr=)
+(def text        zfxml/text)
 
 (defn class= [target-name]
   "Returns a query predicate that matches a node when has a class named
