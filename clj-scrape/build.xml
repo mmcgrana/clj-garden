@@ -1,9 +1,9 @@
-<project name="clj-http-client" default="jar">
+<project name="clj-scrape" default="jar">
   <description>
     Pack all sources into a JAR.
   </description>
 
-  <property name="jarfile" location="clj-http-client.jar"/>
+  <property name="jarfile" location="clj-scrape.jar"/>
 
   <target name="clean"
           description="Remove generated files and directories.">
@@ -13,7 +13,7 @@
   <target name="jar"
           description="Create jar file.">
     <jar jarfile="${jarfile}">
-      <fileset dir="./src" includes="clj_http_client/**/*.clj"/>
+      <fileset dir="./src" includes="clj_scrape/**/*.clj"/>
     </jar>
   </target>
 </project>

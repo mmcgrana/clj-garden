@@ -136,11 +136,12 @@
   (http-execute-method (DeleteMethod. url) headers nil
     (fn [s h delete-method] [s h (method-body delete-method)])))
 
+
+(comment
 (defn serialize
   "TODOC"
   (TODO))
 
-(comment
 (def out (java.io.FileOutputStream. "/Users/mmcgrana/Desktop/google.gif"))
 (http-get-stream "http://google.com/intl/en_ALL/images/logo.gif" {}
   (fn [s h b-stream] (org.apache.commons.io.IOUtils/copy b-stream out)))
