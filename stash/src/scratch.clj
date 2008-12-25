@@ -42,7 +42,7 @@
 
 (defmacro in-transaction [model & body]
   `(jdbc/with-connection [conn (data-source model)]
-     (jdbc/transaction conn ~@body)))
+     (jdbc/in-transaction conn ~@body)))
 
 (defmacro with-logging [logger level sql form]
   `(do

@@ -14,7 +14,7 @@
   "Returns the original model map used to define the compiled model."
   (:model-map model))
 
-(defn- data-source
+(defn data-source
   "Returns the data source for to the model."
   [model]
   (:data-source model))
