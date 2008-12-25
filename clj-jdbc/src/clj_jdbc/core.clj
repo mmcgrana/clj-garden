@@ -3,6 +3,7 @@
   (:import (java.sql Connection Statement ResultSet)))
 
 (def *connections* {})
+(def *t-levels* {})
 
 (defn require-driver
   "Ensure that the driver corresponding to the given class name is loaded."
@@ -20,7 +21,8 @@
        (let [~binding-sym existing-conn#]
          ~@body)
        (with-open [new-conn# (.getConnection data-source#)]
-         (binding [*connections* (assoc *connections* data-source# new-conn#)]
+         (binding [*connections* (assoc *connections* data-source# new-conn#)
+                   *t-levels*    (assoc *t-levels* new-conn# 0)]
            (let [~binding-sym new-conn#]
               ~@body))))))
 
@@ -132,11 +134,13 @@
     (first (resultset-maps rs))))
 
 (defmacro in-transaction
-  "Evaluates body as a transaction on the given database connection. Updates
-  are committed together or rolled back after an uncaught exception. 
-  Supports nested transactions."
+  "Evaluates body as in transaction on the connection. Updates
+  are committed if the execution completes without error or rolled back 
+  after an uncaught exception. Supports nested transactions."
   [conn-sym & body]
   `(do
+    (let [level# (*t-levels* ~conn-sym)]
+      (binding [*t-levels* (if level# (update *t-levels* ~conn-sym inc) (assoc *t-levels* 1))]
      (.setAutoCommit ~conn-sym false)
      (try
        (let [ret# (do ~@body)]
