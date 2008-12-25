@@ -1,4 +1,10 @@
-state passing
+show exception class?
+
+NOTE: should be clj_unit.utils/re-match?
+java.lang.ClassCastException: java.lang.String
+     utils.clj:13 clj_unit.utils/re
+ core_test.clj:38 clj_jdbc.core_test/fn[fn]
+
 
 per-assertion file and line numbers
 

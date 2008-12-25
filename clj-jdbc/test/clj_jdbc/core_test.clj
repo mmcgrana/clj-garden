@@ -23,13 +23,20 @@
      (with-test-connection ~conn-sym
        ~@body)))
 
-(defconntest "modify preforms a change and returns affected row count" conn
+(defconntest "modify: preforms a change and returns affected row count" conn
   (let [change-count (modify conn "DELETE FROM fruits WHERE id = 2")
         row-count    (select-value conn "SELECT count(id) FROM fruits")]
     (list
       (assert= 1 change-count)
       (assert= 2 row-count))))
 
+(defconntest "modify: re-raises exceptions with sql in message" conn
+  (assert-throws #"ERROR.*foobar"
+    (modify conn "foobar")))
+
+(defconntest "with-resultset: re-raises exceptions with sql in message" conn
+  (assert-throws #"ERROR.*foobar"
+    (with-resultset [rs conn "foobar"])))
 
 (defconntest "select-value returns a single value when row found" conn
   (assert= "apple"
@@ -86,15 +93,25 @@
     (assert= "apple"
       (select-value conn "SELECT name FROM fruits where id = 1"))))
 
-(defconntest "in-transaction propogates exceptions" conn
-  (in-transaction conn
-    (assert-throws #"Transaction rolled back:.*bogus sql"
-      (select-value conn "bogus sql"))))
+(defconntest "in-transaction: propogates exceptions" conn
+  (assert-throws #"o noes"
+    (in-transaction conn
+      (throwf "o noes"))))
 
 (defconntest "in-transaction: rolls back changes after exceptions" conn
   (try
     (in-transaction conn
       (modify conn "INSERT INTO fruits (id, name) VALUES (4,'orange')")
+      (throwf "o noes"))
+    (catch Exception e))
+  (assert= 3 (select-value conn "SELECT count(id) FROM fruits")))
+
+(defconntest "in-transaction: allows nesting without autocommit" conn
+  (try
+    (in-transaction conn
+      (modify conn "INSERT INTO fruits (id, name) VALUES (4,'orange')")
+      (in-transaction conn
+        (modify conn "INSERT INTO fruits (id, name) VALUES (5,'bannana')"))
       (throwf "o noes"))
     (catch Exception e))
   (assert= 3 (select-value conn "SELECT count(id) FROM fruits")))

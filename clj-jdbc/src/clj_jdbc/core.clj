@@ -9,7 +9,9 @@
 
 (defmacro with-connection
   "Evaluates body in the context of a new connection to a database from the
-  given datasource, then closes the connection when done."
+  given datasource, then closes the connection when done. If this thread
+  has an existing connection to the datasource, that one will be provided
+  instead of opening a new one."
   [[binding-sym #^DataSource data-source-form] & body]
   `(with-open [~binding-sym (.getConnection ~data-source-form)]
      ~@body))
@@ -23,13 +25,14 @@
 (defmacro with-resultset
   "Evaluates the body in the context of a resultset from the given connection
   based on the given sql."
-  [[binding-sym #^Connection conn-sym sql-sym] & body]
+  [[binding-sym #^Connection conn-sym sql-form] & body]
   `(with-statement [statement# ~conn-sym]
-     (let [~binding-sym
+     (let [sql# ~sql-form
+           ~binding-sym
              (try
-               (.executeQuery statement# ~sql-sym)
+               (.executeQuery statement# sql#)
                (catch Exception e#
-                 (throwf "%s: %s" (.getMessage e#) ~sql-sym)))]
+                 (throwf "%s: %s" (.getMessage e#) sql#)))]
        ~@body)))
 
 (defn modify
@@ -37,7 +40,10 @@
   statement, returning the number of items affected."
   [#^Connection conn sql]
   (with-statement [statement conn]
-    (.executeUpdate statement sql)))
+    (try
+      (.executeUpdate statement sql)
+      (catch Exception e
+        (throwf "%s: %s" (.getMessage e) sql)))))
 
 (defn resultset-values
   "Returns a lazy seq of single values corresponding to the resultset's rows."
