@@ -11,3 +11,10 @@
   "Returns true iff the given string contains a match for the given pattern."
   [#^java.util.regex.Pattern pattern string]
   (.find (.matcher pattern string)))
+
+(defmacro file-line
+  "Expands into a [file, line] pair corresponding to the function in which the
+  expansion occurs."
+  []
+  [(var-get clojure.lang.Compiler/SOURCE)
+   (var-get clojure.lang.Compiler/LINE)])

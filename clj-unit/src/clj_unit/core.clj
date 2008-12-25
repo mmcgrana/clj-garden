@@ -20,12 +20,6 @@
 ; :end      <ns-sym>                end of namespace test suite
 ; :no-tests <ns-sym>                no-tests for namespace, called exclusively
 
-(defmacro file-line []
-  "Expands into a [file, line] pair corresponding to the function in which the
-  expansion occurs."
-  [(var-get clojure.lang.Compiler/SOURCE)
-   (var-get clojure.lang.Compiler/LINE)])
-
 (defmacro deftest
   "Define a unit test."
   [doc & body]
@@ -38,14 +32,6 @@
          (fn [tests-info#]
            (update tests-info# ns-sym#
              (fn [tests#] (conj (or tests# []) test-info#))))))))
-
-(defn test-failure-exception?
-  "Returns true if this exception was thrown from our failure message to
-  indicate that execution for this test should stop."
-  [e]
-  (let [top-elem  (aget (.getStackTrace e) 0)
-        top-cname (.getClassName top-elem)]
-    (.startsWith top-cname "clj_unit.core$failure")))
 
 (defn run-tests
   "Run all tests for the namespace symbols, with either the default console
@@ -64,8 +50,7 @@
                   ((*test-info* :fn))
                   ((*reporter* :pass) *test-info*)
                   (catch Exception e
-                    (if-not (test-failure-exception? e)
-                      ((*reporter* :error) *test-info* e)))))))
+                    ((*reporter* :error) *test-info* e))))))
           ((*reporter* :end) ns-sym))
         ((*reporter* :no-tests) ns-sym)))))
 
@@ -74,11 +59,9 @@
   []
   ((*reporter* :success) *test-info*))
 
-; need to throw abort exception here, catch above as before
 (defn failure
   "Report a failed assertion, with a message indicating the reason."
   [message]
-  ((*reporter* :failure) *test-info* message)
-  (throwf "test failure"))
+  ((*reporter* :failure) *test-info* message))
 
 (load "core_assertions")

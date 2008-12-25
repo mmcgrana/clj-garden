@@ -1,6 +1,7 @@
-EXCEPTIONS AS FLOW CONTROL IS NOT WORKING, REMOVE IT
+state passing
 
 per-assertion file and line numbers
+
 nested tests
 per-function tests
   attached to tests
