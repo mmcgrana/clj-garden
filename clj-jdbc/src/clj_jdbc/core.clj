@@ -1,5 +1,5 @@
 (ns clj-jdbc.core
-  (:use clojure.contrib.except)
+  (:use clojure.contrib.except clj-jdbc.utils)
   (:import (java.sql Connection Statement ResultSet)))
 
 (def *connections* {})
@@ -25,6 +25,24 @@
                    *t-levels*    (assoc *t-levels* new-conn# 0)]
            (let [~binding-sym new-conn#]
               ~@body))))))
+
+(defmacro in-transaction
+  "Evaluates body as in transaction on the connection. Updates
+  are committed if the execution completes without error or rolled back 
+  after an uncaught exception. Supports nested transactions."
+  [conn-sym & body]
+  `(do
+    (let [level# (*t-levels* ~conn-sym)]
+      (binding [*t-levels* (assoc *t-levels* ~conn-sym (inc level#))]
+        (when (zero? level#)
+          (.setAutoCommit ~conn-sym false))
+        (try
+          (returning (do ~@body)
+            (when (zero? level#)
+              (.commit ~conn-sym)))
+          (catch Exception e#
+            (.rollback ~conn-sym)
+            (throwf "Transaction rolled back: %s", (.getMessage e#))))))))
 
 (defmacro with-statement
   "Evaluates body in the context of a new Statement for the given conn."
@@ -132,20 +150,3 @@
   [conn sql]
   (with-resultset [rs conn sql]
     (first (resultset-maps rs))))
-
-(defmacro in-transaction
-  "Evaluates body as in transaction on the connection. Updates
-  are committed if the execution completes without error or rolled back 
-  after an uncaught exception. Supports nested transactions."
-  [conn-sym & body]
-  `(do
-    (let [level# (*t-levels* ~conn-sym)]
-      (binding [*t-levels* (if level# (update *t-levels* ~conn-sym inc) (assoc *t-levels* 1))]
-     (.setAutoCommit ~conn-sym false)
-     (try
-       (let [ret# (do ~@body)]
-         (.commit ~conn-sym)
-         ret#)
-       (catch Exception e#
-         (.rollback ~conn-sym)
-         (throwf "Transaction rolled back: %s", (.getMessage e#))))))
