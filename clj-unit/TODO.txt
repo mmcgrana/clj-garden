@@ -1,5 +1,7 @@
 show exception class?
 
+- running unit tests without reboot for better speed
+
 NOTE: should be clj_unit.utils/re-match?
 java.lang.ClassCastException: java.lang.String
      utils.clj:13 clj_unit.utils/re

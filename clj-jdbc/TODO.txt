@@ -1,0 +1,2 @@
+think carefully about conn-pasing business, may want to just use bindings
+research proper connection pooling

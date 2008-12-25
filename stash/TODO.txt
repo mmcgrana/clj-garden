@@ -1,16 +1,16 @@
 Blocking   
 - form-set
-
+  - datetime caster
+  
 
 Want
-- transactions
 - extensions
 - migrations
+
+
+Later
 - more validators
 - key-based window pagination
-
-
-Distant
 - select-except
 - multi-order (while still keeping simple case)
 - associations
@@ -26,12 +26,7 @@ Distant
 
 Implementation
 - handling of mutual model dependencies (dynamic resolution)
-- datetime caster
-- faster number casting
-- defmodel might be made to infer the table name.
 
 
 Tangential
-- running unit tests without reboot for better speed
-- cljack to search over clojure code
 - assoc assoc-in (update) update-in
