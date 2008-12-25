@@ -5,20 +5,24 @@
 
 (def *tests-info* (atom {}))
 
-(declare *reporter* *test-info*)
+(declare *reporter* *reporter-state* *test-info*)
 
 
 ; reporter interface
 ; hash with keys valued by the functions with sigs as below
+; each function (except init) takes state as its first argument and should
+; return the updated state, which it will then be passed back on the next
+; report call, etc.
 ; 
-; :start    <ns-sym>                start of namespace test suite
-; :test     <test-info>             start of 1 test, note possibly :pending
-; :success  <test-info>             assertion within a test succeeded
-; :failure  <test-info> <message>   assertion within a test failed
-; :pass     <test-info>             1 test passsed without error or failure
-; :error    <test-finfo> <thrown>   uncaught error during test
-; :end      <ns-sym>                end of namespace test suite
-; :no-tests <ns-sym>                no-tests for namespace, called exclusively
+; init      <>                            return starting state
+; :start    <state ns-sym>                start of namespace test suite
+; :test     <state test-info>             start of 1 test, note possibly :pending
+; :success  <state test-info>             assertion within a test succeeded
+; :failure  <state test-info> <message>   assertion within a test failed
+; :pass     <state test-info>             1 test passsed without error or failure
+; :error    <state test-finfo> <thrown>   uncaught error during test
+; :end      <state ns-sym>                end of namespace test suite
+; :no-tests <state ns-sym>                no-tests for namespace, called exclusively
 
 (defmacro deftest
   "Define a unit test."
@@ -33,35 +37,43 @@
            (update tests-info# ns-sym#
              (fn [tests#] (conj (or tests# []) test-info#))))))))
 
+(defn report
+  "Invoke the reporter function corresponding to the type keyword with the
+  current reporter state and any additional args, setting the reporter
+  state to the updated value returned by the fn."
+  [type & args]
+  (set! *reporter-state* (apply (type *reporter*) *reporter-state* args)))
+
 (defn run-tests
   "Run all tests for the namespace symbols, with either the default console
   reporter or if given a custom reporter."
   [ns-syms & [reporter]]
-  (binding [*reporter* (or reporter +console-reporter+)]
-    (doseq [ns-sym ns-syms]
-      (if-let [ns-tests-info (@*tests-info* ns-sym)]
-        (do
-          ((*reporter* :start) ns-sym)
-          (doseq [test-info ns-tests-info]
-            (binding [*test-info* test-info]
-              ((*reporter* :test) *test-info*)
-              (if-not (*test-info* :pending)
-                (try
-                  ((*test-info* :fn))
-                  ((*reporter* :pass) *test-info*)
-                  (catch Exception e
-                    ((*reporter* :error) *test-info* e))))))
-          ((*reporter* :end) ns-sym))
-        ((*reporter* :no-tests) ns-sym)))))
+  (binding [*reporter*       (or reporter +console-reporter+)]
+    (binding [*reporter-state* ((:init *reporter*))]
+      (doseq [ns-sym ns-syms]
+        (if-let [ns-tests-info (@*tests-info* ns-sym)]
+          (do
+            (report :start ns-sym)
+            (doseq [test-info ns-tests-info]
+              (binding [*test-info* test-info]
+                (report :test *test-info*)
+                (if-not (*test-info* :pending)
+                  (try
+                    ((*test-info* :fn))
+                    (report :pass *test-info*)
+                    (catch Exception e
+                      (report :error *test-info* e))))))
+            (report :end ns-sym))
+          (report :no-tests ns-sym))))))
 
 (defn success
   "Report a successfull assertion."
   []
-  ((*reporter* :success) *test-info*))
+  (report :success *test-info*))
 
 (defn failure
   "Report a failed assertion, with a message indicating the reason."
   [message]
-  ((*reporter* :failure) *test-info* message))
+  (report :failure *test-info* message))
 
 (load "core_assertions")

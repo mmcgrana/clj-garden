@@ -32,45 +32,56 @@
     (print-trace user-elems)))
 
 (def +console-reporter+
-  {:start
-     (fn [ns-sym]
-       (swap! *start-time* (fn [v] (System/currentTimeMillis)))
-       (printf "\nTesting: %s\n" ns-sym))
+  {:init
+    (fn []
+      {:test-count    0
+       :success-count 0
+       :pass-count    0
+       :failure-count 0
+       :error-count   0
+       :pending-count 0
+       :start-time    nil})
+   :start
+     (fn [state ns-sym]
+       (printf "\nTesting: %s\n" ns-sym)
+       (assoc state :start-time (System/currentTimeMillis)))
    :test
-     (fn [test-info]
+     (fn [state test-info]
        (if (:pending test-info)
          (do
-           (swap! *pending-count* inc)
-           (printf "\nPEND: %s\n" (:doc test-info)))
-         (swap! *test-count* inc)))
+           (printf "\nPEND: %s\n" (:doc test-info))
+           (update state :pending-count inc))
+         (update state :test-count inc)))
    :success
-     (fn [test-info]
-       (swap! *success-count* inc)
-       (print ".") (flush))
+     (fn [state test-info]
+       (print ".") (flush)
+       (update state :success-count inc))
    :pass
-    (fn [test-info]
-      (swap! *pass-count* inc))
+    (fn [state test-info]
+      (update state :pass-count inc))
    :failure
-    (fn [test-info message]
-      (swap! *failure-count* inc)
+    (fn [state test-info message]
       (printf "\nFAIL: %s (%s:%s)\n"
-        message (:file test-info) (:line test-info)))
+        message (:file test-info) (:line test-info))
+      (update state :failure-count inc))
    :error
-    (fn [test-info #^Exception e]
-      (swap! *error-count* inc)
+    (fn [state test-info #^Exception e]
       (printf "\nEXCP: %s (%s:%s)\n"
         (:doc test-info) (:file test-info) (:line test-info))
-      (print-exception e))
+      (print-exception e)
+      (update state :error-count inc))
    :end
-     (fn [ns-sym]
+     (fn [state ns-sym]
        (println)
        (printf "%s tests, %s assertions (%.3f secs)\n"
-         @*test-count*
-         (+ @*success-count* @*failure-count*)
-         (float (/ (- (System/currentTimeMillis) @*start-time*) 1000)))
+         (:test-count state)
+         (+ (:success-count state) (:failure-count state))
+         (float (/ (- (System/currentTimeMillis) (:start-time state)) 1000)))
        (printf "%s failures, %s erros, %s pending\n"
-         @*failure-count* @*error-count* @*pending-count*)
-       (println))
+         (:failure-count state) (:error-count state) (:pending-count state))
+       (println)
+       state)
    :no-tests
-     (fn [ns-sym]
-       (printf "No tests for %s" ns-sym))})
+     (fn [state ns-sym]
+       (printf "No tests for %s" ns-sym)
+       state)})

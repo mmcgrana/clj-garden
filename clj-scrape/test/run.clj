@@ -17,6 +17,8 @@
 
 (def ghp (string-dom (get (http-get "http://github.com/topfunky") 2)))
 
+(prn (xml-> ghp desc (class= "followers") desc :a (attr :title)))
+
 
 ; note: dont print out results of zipper/filters, they print out huge...
 
@@ -93,3 +95,4 @@
 ; (prn (zfxml/xml1-> pace-dom zf/descendants :form (zfxml/attr= :name "frmSect11") (zfxml/attr :method)))
 ; n - (xml1-> pace-dom desc :form (attr= :name "frmSect111") (attr :method))
 ; (prn)
+
