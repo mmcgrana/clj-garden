@@ -1,8 +1,8 @@
 (in-ns 'stash.core-test)
 
-(deftest-db "in-transaction"
+(deftest-db "transaction"
   (try
-    (in-transaction +post+
+    (transaction +post+
       (create +post+ complete-post-map)
       (throwf "o noes"))
     (catch Exception e))
