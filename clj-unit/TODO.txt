@@ -1,18 +1,16 @@
-use pretty backtrace
+EXCEPTIONS AS FLOW CONTROL IS NOT WORKING, REMOVE IT
+
 per-assertion file and line numbers
 nested tests
 per-function tests
   attached to tests
 System.exit(0/1)
 line numbers
-prn instead of print
 (assert= +macro-post+ (compiled-model +post-map+)) outside of test gives nonhelpful error about *reporter* not being bound
 
 Time taken for tests (perhaps even each one, to identify slow tests)
 
-assertion-level line numbering
-
-perhaps allow some sort of error message input to assertions so that you know what went reng
+perhaps allow some sort of error message input to assertions so that you know what went wrong, as in ruby's test/unit
 
 Alternate for assert-truth -is -does -that (need to rename other -that)
 FAIL: defmodel throws on unrecognized callback names

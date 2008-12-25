@@ -7,6 +7,8 @@ API - hence clojure => json and clojure => xml serializers
 hit tracking functionality
 
 Check for reflection in whole app
+- error messages
+- form helpers
 
 ddl
   create rename drop table

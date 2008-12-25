@@ -1,6 +1,7 @@
 (ns clj-jdbc.core-test
   (:use clj-unit.core
-        clj-jdbc.core))
+        clj-jdbc.core
+        clojure.contrib.except))
 
 (def test-data-source
   (doto (org.postgresql.ds.PGPoolingDataSource.)
@@ -80,20 +81,20 @@
 (defconntest "select-maps returns nil when no rows found" conn
   (assert-nil (select-tuples conn "SELECT id, name FROM fruits WHERE id > 3")))
 
-(defconntest "with-transaction returns the value on a success" conn
-  (with-transaction conn
+(defconntest "in-transaction: returns the value on a success" conn
+  (in-transaction conn
     (assert= "apple"
       (select-value conn "SELECT name FROM fruits where id = 1"))))
 
-(defconntest "with-transaction propogates exceptions" conn
-  (with-transaction conn
-    (assert-throws
+(defconntest "in-transaction propogates exceptions" conn
+  (in-transaction conn
+    (assert-throws #"Transaction rolled back:.*bogus sql"
       (select-value conn "bogus sql"))))
 
-(defconntest "with-transaction rolls back changes after exceptions" conn
+(defconntest "in-transaction: rolls back changes after exceptions" conn
   (try
-    (with-transaction conn
+    (in-transaction conn
       (modify conn "INSERT INTO fruits (id, name) VALUES (4,'orange')")
-      (throw (Exception. "o noes")))
-    (catch Exception e nil))
+      (throwf "o noes"))
+    (catch Exception e))
   (assert= 3 (select-value conn "SELECT count(id) FROM fruits")))

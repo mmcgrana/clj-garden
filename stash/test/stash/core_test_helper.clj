@@ -38,7 +38,6 @@
 (def empty-schmorg
   (init +schmorg+ {}))
 
-
 (def +post-map+
   {:data-source +data-source+
    :table-name :posts

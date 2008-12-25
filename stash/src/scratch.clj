@@ -16,6 +16,51 @@
 (ns cljblog.models.post
   (:use stash.def stash.validators stash.timestamps))
 
+(defn find-value-by-sql
+  [model sql]
+  (let [[result db-time]
+          (jdbc/with-connection [conn (data-source model)]
+            (jdbc/select-value conn sql))]
+    (logging sql time
+      result)))
+
+(defn find-value-by-sql
+  [model sql]
+  (with-logging (logger model) :info sql
+    (jdbc/with-connection [conn (data-source model)]
+      (jdbc/select-value conn sql))))
+
+(defn find-value-by-sql
+  [model sql]
+  (with-logging (logger model) :info sql
+    (jdbc/with-connection [conn (data-source model)]
+      (jdbc/select-value conn sql))))
+
+(in-transaction +post+
+  (delete-all +post+)
+  (delete-all +comment+))
+
+(defmacro in-transaction [model & body]
+  `(jdbc/with-connection [conn (data-source model)]
+     (jdbc/transaction conn ~@body)))
+
+(defmacro with-logging [logger level sql form]
+  `(do
+     (if ~logger
+       (let [[result# time#] (realtime ~form)]
+         (logger ~level (str "(" time# ") " ~sql))
+         result#)
+       ~form)))
+
+(defn find-one-by-sql
+  "Returns an instance of model found by the given sql, or nil if no such
+  instances are found. "
+  [model sql]
+  (if-let [uncast-attrs (jdbc/with-connection [conn (data-source model)]
+                          (jdbc/select-map conn sql))]
+    (instantiate model uncast-attrs)))
+
+(with-transaction)
 (declare gen-slug)
 (
 [:title      (min-length 10) {:if-not admin?}]]
@@ -63,8 +108,8 @@
       :before-create
         [timestamp-create]
       :before-update
-        [timestamp-update]}}
-  {:def-accessors true})
+        [timestamp-update]}})
+(defaccessors +post+ {:except [:title?]})
 
 (def word-count [post]
   (str-lib/word-count (body post)))

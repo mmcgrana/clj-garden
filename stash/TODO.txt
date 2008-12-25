@@ -1,13 +1,9 @@
-Blocking
-- attribute methods
-- transactions
+Blocking   
 - form-set
-- error messages
-- form helpers
-- test and doc clj-time
 
 
 Want
+- transactions
 - extensions
 - migrations
 - more validators
@@ -15,7 +11,6 @@ Want
 
 
 Distant
-- datetime caster
 - select-except
 - multi-order (while still keeping simple case)
 - associations
@@ -25,17 +20,14 @@ Distant
 - observers
 - serialization
 - identity map
-- awsome-backtrace
 - double check escaping
 - multi-repository, sharding
 
 
 Implementation
 - handling of mutual model dependencies (dynamic resolution)
-- rethink passing model when only need data source
 - datetime caster
 - faster number casting
-- include original query in exceptions raised within db calls
 - defmodel might be made to infer the table name.
 
 

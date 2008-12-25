@@ -1,5 +1,5 @@
 (ns clj-jdbc.core
-  (:use [clojure.contrib.def :only (defvar- defmacro-)])
+  (:use clojure.contrib.except)
   (:import (java.sql Connection Statement ResultSet)))
 
 (defn require-driver
@@ -25,7 +25,11 @@
   based on the given sql."
   [[binding-sym #^Connection conn-sym sql-sym] & body]
   `(with-statement [statement# ~conn-sym]
-     (let [~binding-sym (.executeQuery statement# ~sql-sym)]
+     (let [~binding-sym
+             (try
+               (.executeQuery statement# ~sql-sym)
+               (catch Exception e#
+                 (throwf "%s: %s" (.getMessage e#) ~sql-sym)))]
        ~@body)))
 
 (defn modify
@@ -113,10 +117,10 @@
   (with-resultset [rs conn sql]
     (first (resultset-maps rs))))
 
-(defmacro with-transaction
+(defmacro in-transaction
   "Evaluates body as a transaction on the given database connection. Updates
-  are committed together or rolled back after an uncaught exception. Does not 
-  support nested transactions."
+  are committed together or rolled back after an uncaught exception. 
+  Supports nested transactions."
   [conn-sym & body]
   `(do
      (.setAutoCommit ~conn-sym false)
@@ -126,5 +130,4 @@
          ret#)
        (catch Exception e#
          (.rollback ~conn-sym)
-         (throw (Exception.
-           (format "Transaction rolled back: %s", (.getMessage e#)) e#))))))
+         (throwf "Transaction rolled back: %s", (.getMessage e#))))))

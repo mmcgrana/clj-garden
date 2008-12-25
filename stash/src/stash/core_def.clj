@@ -29,12 +29,12 @@
   [model]
   (name (:table-name model)))
 
-(defn- column-names
+(defn column-names
   "Returns as a seq of keywords the column names for the model, including :id."
   [model]
   (:column-names model))
 
-(defn- column-names-sans-id
+(defn column-names-sans-id
   "Returns as a seq of keywords the column names for the model, excluding :id."
   [model]
   (:column-names-sans-id model))
@@ -166,7 +166,23 @@
      :callbacks            (compiled-callbacks model-map)
      :model-map            model-map}))
 
+(defn- define-accessors
+  "Define attrname, attrname=, and attrname? accessors for every column of
+  model."
+  [model]
+  (doseq [cname (column-names-sans-id model)]
+    (eval `(defn ~(symbol (name cname)) [instance#]
+             (get instance# ~cname)))
+    (eval `(defn ~(symbol (str (name cname) "=")) [instance# val#]
+             (assoc instance# ~cname val#)))
+    (eval `(defn ~(symbol (str (name cname) "?")) [instance#]
+             (get instance# ~cname)))))
+
 (defmacro defmodel
   "Short for (def name (compiled-model model-map))"
-  [name model-map]
-  `(def ~name (compiled-model ~model-map)))
+  [name model-map & [options]]
+  (limit-keys options '(:accessors))
+  (if (get options :accessors)
+    `(do (def ~name (compiled-model ~model-map))
+       ((resolve 'stash.core/define-accessors) ~name))
+    `(def ~name (compiled-model ~model-map))))

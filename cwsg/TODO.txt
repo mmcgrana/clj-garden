@@ -1,8 +1,2 @@
-Note that we currently eed to close InputStreams passed down to server.
-Perhaps inversion of control to allow lexical scope for server response.
-
-Write spec
-
-be able to click on source in show-exceptions
-
+finish show-exceptions
 linter

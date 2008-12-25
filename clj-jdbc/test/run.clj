@@ -1,2 +1,3 @@
-(require 'clj-unit.core 'clj-jdbc.core-test)
-(clj-unit.core/run-tests 'clj-jdbc.core-test)
+(use 'clj-unit.core)
+(require 'clj-jdbc.core-test)
+(run-tests '(clj-jdbc.core-test))
