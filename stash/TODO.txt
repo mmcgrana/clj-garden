@@ -1,14 +1,11 @@
 Blocking   
 - form-set
   - datetime caster
-  
-
-Want
-- extensions
-- migrations
 
 
 Later
+- extensions
+- migrations
 - more validators
 - key-based window pagination
 - select-except

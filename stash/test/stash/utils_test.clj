@@ -36,7 +36,8 @@
   (assert= :bat (get-or {:foo :bar} :biz :bat)))
 
 (deftest "limit-keys"
-  (assert-nil (limit-keys {:foo :bar :biz :bat} [:foo :biz :whiz]))
+  (let [m {:foo :bar :biz :bat}]
+    (assert= m (limit-keys m [:foo :biz :whiz])))
   (assert-throws #"Unrecognized keys \(:biz\)"
     (limit-keys {:foo :bar :biz :bat} [:foo :whiz])))
 

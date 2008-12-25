@@ -148,23 +148,33 @@
        (get cb-map :after-destroy)}))
 
 (def- recognized-model-keys
-  #{:table-name :data-source :columns :callbacks :validations})
+  #{:table-name :data-source :columns :callbacks :validations :extensions})
+
+(defn- checked-model-map
+  "Returns the given model map provided that it contains only valid keys,
+  raises otherwise."
+  [model-map]
+  (limit-keys model-map recognized-model-keys))
 
 (defn compiled-model
-  "Define a model according the given model-map specification. Returns a
-  representation that can be used later as the ubiquitious model parameter."
-  [model-map]
-  (limit-keys model-map recognized-model-keys)
-  (let [column-defs (checked-column-defs model-map)]
-    {:table-name           (checked-table-name model-map)
-     :data-source          (checked-data-source model-map)
-     :column-names-sans-id (compiled-column-names-sans-id column-defs)
-     :column-names         (compiled-column-names column-defs)
-     :quoters-by-name      (compiled-mappers-by-name type-quoter column-defs)
-     :parsers-by-name      (compiled-mappers-by-name type-parser column-defs)
-     :validators           (compiled-validators model-map)
-     :callbacks            (compiled-callbacks model-map)
-     :model-map            model-map}))
+  "Returns a compiled model representation that can be used later as the 
+  ubiquitious model parameter."
+  [unextended-model-map]
+  (let [model-map
+          (reduce
+            (fn [m extension] (checked-model-map (extension m)))
+            (checked-model-map unextended-model-map)
+            (:extensions unextended-model-map))]
+    (let [column-defs (checked-column-defs model-map)]
+      {:table-name           (checked-table-name model-map)
+       :data-source          (checked-data-source model-map)
+       :column-names-sans-id (compiled-column-names-sans-id column-defs)
+       :column-names         (compiled-column-names column-defs)
+       :quoters-by-name      (compiled-mappers-by-name type-quoter column-defs)
+       :parsers-by-name      (compiled-mappers-by-name type-parser column-defs)
+       :validators           (compiled-validators model-map)
+       :callbacks            (compiled-callbacks model-map)
+       :model-map            model-map})))
 
 (defn- define-accessors
   "Define attrname, attrname=, and attrname? accessors for every column of

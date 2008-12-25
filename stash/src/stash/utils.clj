@@ -43,11 +43,14 @@
   `(or (get ~map ~key) ~or-form))
 
 (defn limit-keys
-  "Assures that the given map has only keys included in recognized-keys."
-  [map recognized-keys]
-  (let [bad (reduce #(dissoc %1 %2) map recognized-keys)]
+  "Assures that the given map has only keys included in recognized-keys,
+  throwing an exception if there are unrecognized keys or returning the map
+  otherwise."
+  [m recognized-keys]
+  (let [bad (reduce #(dissoc %1 %2) m recognized-keys)]
     (if-not (empty? bad)
-      (throwf "Unrecognized keys %s" (pr-str (keys bad))))))
+      (throwf "Unrecognized keys %s" (pr-str (keys bad)))))
+  m)
 
 (defn the-str
   "Returns the name of the val if it is a clojure.lang.Name, otherwise val."
