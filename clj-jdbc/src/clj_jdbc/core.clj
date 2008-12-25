@@ -2,6 +2,8 @@
   (:use clojure.contrib.except)
   (:import (java.sql Connection Statement ResultSet)))
 
+(def *connections* {})
+
 (defn require-driver
   "Ensure that the driver corresponding to the given class name is loaded."
   [classname]
@@ -13,8 +15,14 @@
   has an existing connection to the datasource, that one will be provided
   instead of opening a new one."
   [[binding-sym #^DataSource data-source-form] & body]
-  `(with-open [~binding-sym (.getConnection ~data-source-form)]
-     ~@body))
+  `(let [data-source# ~data-source-form]
+     (if-let [existing-conn# (get *connections* data-source#)]
+       (let [~binding-sym existing-conn#]
+         ~@body)
+       (with-open [new-conn# (.getConnection data-source#)]
+         (binding [*connections* (assoc *connections* data-source# new-conn#)]
+           (let [~binding-sym new-conn#]
+              ~@body))))))
 
 (defmacro with-statement
   "Evaluates body in the context of a new Statement for the given conn."

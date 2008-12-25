@@ -23,6 +23,11 @@
      (with-test-connection ~conn-sym
        ~@body)))
 
+(deftest "with-connection: reuses connections in nested calls"
+  (with-connection [conn-outer test-data-source]
+    (with-connection [conn-inner test-data-source]
+      (assert= conn-outer conn-inner))))
+
 (defconntest "modify: preforms a change and returns affected row count" conn
   (let [change-count (modify conn "DELETE FROM fruits WHERE id = 2")
         row-count    (select-value conn "SELECT count(id) FROM fruits")]
