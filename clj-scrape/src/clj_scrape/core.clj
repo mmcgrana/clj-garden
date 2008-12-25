@@ -70,4 +70,3 @@
   the re."
   [re]
   (fn [loc] (re-match? re (text loc))))
-

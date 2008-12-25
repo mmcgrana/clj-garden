@@ -1,2 +1,0 @@
-ragel -J -o src/hpricotjam/ext/Scanner.java rl/hpricot_scan.java.rl
-javac -d classes/ src/hpricotjam/ext/*.java
