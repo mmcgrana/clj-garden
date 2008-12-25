@@ -1,6 +1,0 @@
-consider api:
-explicit vs. thread-accounted transactions
-  will we ever need more than 1 connection per thread
-transactions
-logging
-re-raise error with message
