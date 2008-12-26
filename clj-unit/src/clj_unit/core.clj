@@ -14,15 +14,16 @@
 ; return the updated state, which it will then be passed back on the next
 ; report call, etc.
 ; 
-; init      <>                            return starting state
+; :init     <ns-syms>                     return starting state
 ; :start    <state ns-sym>                start of namespace test suite
 ; :test     <state test-info>             start of 1 test, note possibly :pending
 ; :success  <state test-info>             assertion within a test succeeded
 ; :failure  <state test-info> <message>   assertion within a test failed
 ; :pass     <state test-info>             1 test passsed without error or failure
 ; :error    <state test-finfo> <thrown>   uncaught error during test
-; :end      <state ns-sym>                end of namespace test suite
-; :no-tests <state ns-sym>                no-tests for namespace, called exclusively
+; :finish   <state ns-sym>                end of namespace test suite
+; :end      <state>                       end of all test suites
+; :no-tests <state ns-sym>                no-tests for namespace
 
 (defmacro deftest
   "Define a unit test."
@@ -48,8 +49,8 @@
   "Run all tests for the namespace symbols, with either the default console
   reporter or if given a custom reporter."
   [ns-syms & [reporter]]
-  (binding [*reporter*       (or reporter +console-reporter+)]
-    (binding [*reporter-state* ((:init *reporter*))]
+  (binding [*reporter* (or reporter +console-reporter+)]
+    (binding [*reporter-state* ((:init *reporter*) ns-syms)]
       (doseq [ns-sym ns-syms]
         (if-let [ns-tests-info (@*tests-info* ns-sym)]
           (do
@@ -63,8 +64,9 @@
                     (report :pass *test-info*)
                     (catch Exception e
                       (report :error *test-info* e))))))
-            (report :end ns-sym))
-          (report :no-tests ns-sym))))))
+            (report :finish ns-sym))
+          (report :no-tests ns-sym)))
+      (report :end))))
 
 (defn success
   "Report a successfull assertion."

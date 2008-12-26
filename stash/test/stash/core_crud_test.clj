@@ -25,7 +25,6 @@
 
 (deftest-db "persist-update: updates the record for the instance, returns it"
   (with-clean-db
-    ; TODO: test actual update
     (assert= complete-post (persist-update (persist-insert complete-post)))))
 
 (deftest-db "delete: deletes the record for the instance, returns as deleted"
@@ -36,6 +35,10 @@
 (deftest "init: returns instance marked as new"
   (assert-truth (new? complete-post))
   (assert= complete-post-map (dissoc complete-post :id)))
+
+(deftest "init: casts attrs"
+  (assert= 7
+    (:view_count (init +post+ (assoc complete-post-map :view_count "7")))))
 
 (def +post-with-save-callbacks+
   (compiled-model
@@ -63,9 +66,14 @@
     (assert-not (new? created))
     (assert-truth (find-one +post+ {:where [:id := (:id created)]}))))
 
+(deftest-db "create: casts attrs"
+  (assert= 7
+    (:view_count (create +post+ (assoc complete-post-map :view_count "7")))))
+
 (deftest "update-attrs"
-  (assert= "new title"
-    (:title (update-attrs (init complete-post-map) {:title "new title"}))))
+  (assert= 7
+    (:view_count
+      (update-attrs (init +post+ complete-post-map) {:view_count "7"}))))
 
 (def +post-with-destroy-cbs+
   (compiled-model

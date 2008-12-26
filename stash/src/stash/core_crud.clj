@@ -56,14 +56,9 @@
       (jdbc/modify conn sql)
       (with-assoc-meta instance :deleted true))))
 
-(defn init
-  "Returns an instance of the model with the given attrs having new status."
-  [model & [attrs]]
-  (with-meta (assoc attrs :id (gen-uuid)) {:model model :new true}))
-
 (defn parsed-attrs
-  "Returns a version of the unparsed-attrs parsed according to the specifactions
-  of the mdoel."
+  "Returns a version of the unparsed-attrs that are parsed according to the 
+  specifactions of the mdoel."
   [model unparsed-attrs]
   (let [parsers (parsers-by-name model)]
     (reduce
@@ -71,6 +66,28 @@
         (assoc parsed name ((parsers name) val)))
       {}
       unparsed-attrs)))
+
+(defn cast-attrs
+  "Returns a version of the uncast-attrs that are cast according to the
+  specifications of the model."
+  [model uncast-attrs]
+  (let [casters (casters-by-name model)]
+    (reduce
+      (fn [cast [name val]]
+        (assoc cast name ((casters name) val)))
+      {}
+      uncast-attrs)))
+
+(defn update-attrs
+  "Returns a new instance based on the given instance but reflecting any
+  attribute values in attrs. Does not touch the databse."
+  [instance attrs]
+  (merge instance (cast-attrs (instance-model instance) attrs)))
+
+(defn init
+  "Returns an instance of the model with the given attrs having new status."
+  [model & [attrs]]
+  (update-attrs (with-meta {:id (gen-uuid)} {:model model :new true}) attrs))
 
 (defn instantiate
   "Returns an instance based on unparsed versions of the given quoted attrs 
@@ -119,12 +136,6 @@
   and create callbacks."
   [model attrs]
   (save (init model attrs)))
-
-(defn update-attrs
-  "Returns a new instance based on the given instance but reflecting any
-  attribute values in attrs. Does not touch the databse."
-  [instance attrs]
-  (merge instance attrs))
 
 (defn destroy
   "Deletes the instance, running before- and after- destroy callbacks.

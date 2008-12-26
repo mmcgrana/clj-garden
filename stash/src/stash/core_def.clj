@@ -49,6 +49,11 @@
   [model]
   (:parsers-by-name model))
 
+(defn- casters-by-name
+  "Returns a map of keyword column names to a caster fn for the column."
+  [model]
+  (:casters-by-name model))
+
 (defn- validators
   "Returns an seq of validator fns used to validate instances of the model."
   [model]
@@ -172,6 +177,7 @@
        :column-names         (compiled-column-names column-defs)
        :quoters-by-name      (compiled-mappers-by-name type-quoter column-defs)
        :parsers-by-name      (compiled-mappers-by-name type-parser column-defs)
+       :casters-by-name      (compiled-mappers-by-name type-caster column-defs)
        :validators           (compiled-validators model-map)
        :callbacks            (compiled-callbacks model-map)
        :model-map            model-map})))
