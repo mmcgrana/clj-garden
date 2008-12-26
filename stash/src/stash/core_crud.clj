@@ -61,22 +61,22 @@
   [model & [attrs]]
   (with-meta (assoc attrs :id (gen-uuid)) {:model model :new true}))
 
-(defn cast-attrs
-  "Returns a version of the uncast-attrs cast according to the specifactions
+(defn parsed-attrs
+  "Returns a version of the unparsed-attrs parsed according to the specifactions
   of the mdoel."
-  [model uncast-attrs]
+  [model unparsed-attrs]
   (let [parsers (parsers-by-name model)]
     (reduce
-      (fn [cast-attrs [name val]]
-        (assoc cast-attrs name ((parsers name) val)))
+      (fn [parsed [name val]]
+        (assoc parsed name ((parsers name) val)))
       {}
-      uncast-attrs)))
+      unparsed-attrs)))
 
 (defn instantiate
-  "Returns an instance based on cast versions of the given quoted attrs having 
-  non-new status. "
-  [model uncast-attrs]
-  (with-meta (cast-attrs model uncast-attrs) {:model model} ))
+  "Returns an instance based on unparsed versions of the given quoted attrs 
+  having non-new status. "
+  [model unparsed-attrs]
+  (with-meta (parsed-attrs model unparsed-attrs) {:model model}))
 
 (defn new?
   "Returns true if the instance has not been saved to the database."

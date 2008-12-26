@@ -22,7 +22,7 @@
      :db-type   "uuid"
      :quoter    #(str "'" % "'")
      :parser    (fn [#^org.postgresql.util.PGobject obj] (.getValue obj))
-     :caster    identity}
+     :caster    #(if (re-match? +uuid-re+ %) %)}
    :boolean
     {:clj-type  Boolean
      :db-type   "bool"
