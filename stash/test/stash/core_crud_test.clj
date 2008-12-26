@@ -20,8 +20,8 @@
 (deftest-db "persist-insert: inserts a record for the instance, returns as new"
   (with-clean-db
     (let [inserted (persist-insert complete-post)]
-      ; TODO: test actual insert
-      (assert-not (new? inserted)))))
+      (assert-not (new? inserted))
+      (assert= 1 (count-all +post+)))))
 
 (deftest-db "persist-update: updates the record for the instance, returns it"
   (with-clean-db
@@ -63,6 +63,10 @@
     (assert-not (new? created))
     (assert-truth (find-one +post+ {:where [:id := (:id created)]}))))
 
+(deftest "update-attrs"
+  (assert= "new title"
+    (:title (update-attrs (init complete-post-map) {:title "new title"}))))
+
 (def +post-with-destroy-cbs+
   (compiled-model
     (assoc +post-map+ :callbacks
@@ -75,4 +79,3 @@
     (assert-truth (deleted? destroyed))
     (assert-not   (find-one +post+ {:where [:id := (:id destroyed)]}))
     (assert= [:before :after] (:track destroyed))))
-

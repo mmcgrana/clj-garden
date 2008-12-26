@@ -1,10 +1,11 @@
 Blocking   
+- valid?
+- form condition escape
 - form-set
   - datetime caster
-
+  - form-init, form-create, form-update-attrs (update-attrs?)
 
 Later
-- extensions
 - migrations
 - more validators
 - key-based window pagination

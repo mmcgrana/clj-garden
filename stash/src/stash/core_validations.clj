@@ -25,8 +25,14 @@
       instance
       validators)))
 
+(defn valid?
+  "Returns true iff the instance has no errors. Does not run any validations
+  itself."
+  [instance]
+  (empty? (errors instance)))
+
 (defn errors?
   "Returns true iff the instance has a non-zero number of errors. Does not
   run any validations itself."
   [instance]
-  (not (empty? (errors instance))))
+  (not (valid? instance)))

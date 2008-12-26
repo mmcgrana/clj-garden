@@ -120,6 +120,12 @@
   [model attrs]
   (save (init model attrs)))
 
+(defn update-attrs
+  "Returns a new instance based on the given instance but reflecting any
+  attribute values in attrs. Does not touch the databse."
+  [instance attrs]
+  (merge instance attrs))
+
 (defn destroy
   "Deletes the instance, running before- and after- destroy callbacks.
    Returns the instance, which is marked as deleted if appropriate."

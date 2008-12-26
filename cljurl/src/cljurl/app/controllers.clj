@@ -30,16 +30,16 @@
   [request]
   (with-filters
     (throw (Exception. "failz"))
-    (render (v/new (stash/init m/+shortening+)))))
+    (render (v/new (stash/form-init m/+shortening+)))))
 
 (defn create
   "Consume a url given by the user, find its shortening, and redirect to the
   shortening show page."
   [request]
-  (let [shortening (stash/create m/+shortening+ (params request :shortening))]
-    (if (stash/errors? shortening)
-      (render (v/new shortening))
-      (redirect (path :show shortening)))))
+  (let [shortening (stash/form-create m/+shortening+ (params request :shortening))]
+    (if (stash/valid? shortening)
+      (redirect (path :show shortening))
+      (render (v/new shortening)))))
 
 (defn show
   "Show the known expansion of a url."

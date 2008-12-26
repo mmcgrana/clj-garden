@@ -26,11 +26,15 @@
   (let [errs (errors (validated invalid-instance))]
     nil))
 
-(deftest "errors?, validated: is logically false if an instance has no errors"
+(deftest "errors?, valid?, validated: when no invalidities."
   (assert-not (errors? valid-instance))
-  (assert-not (errors? (validated valid-instance))))
+  (assert-truth (valid? valid-instance))
+  (assert-not (errors? (validated valid-instance)))
+  (assert-truth (valid? (validated valid-instance))))
 
 (deftest "errors?, validated: is logically true if an instance has errors"
   (assert-not   (errors? invalid-instance))
-  (assert-truth (errors? (validated invalid-instance))))
+  (assert-truth (valid? invalid-instance))
+  (assert-truth (errors? (validated invalid-instance)))
+  (assert-not   (valid? (validated invalid-instance))))
 
