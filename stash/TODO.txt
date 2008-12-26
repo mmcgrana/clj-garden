@@ -1,6 +1,4 @@
 Blocking   
-- casters with tests
-- form condition escape
 - form-set
   - form-init, form-create, form-update-attrs
   - or just one path, but w/ double coercion
@@ -8,6 +6,7 @@ Blocking
 - mass assignement protection, esp for id
 
 Later
+- datetime caster
 - migrations
 - more validators
 - key-based window pagination
