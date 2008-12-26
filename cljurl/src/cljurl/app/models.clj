@@ -31,3 +31,4 @@
   [n]
   (find-all +shortening+ {:limit n :order [:created_at :desc]}))
 
+

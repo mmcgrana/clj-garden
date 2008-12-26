@@ -1,3 +1,5 @@
+get views working, then passing tests
+
 something for (domap-str [foo foos] (html body))
 partials (domap-html)
 
@@ -5,17 +7,15 @@ API - hence clojure => json and clojure => xml serializers
 (write json pretty-printer, use old html stuff for xml)
 
 hit tracking functionality
+  - naive tracker
+  - separate hits table
 
 Check for reflection in whole app
 - error messages
 - form helpers
 
-ddl
-  create rename drop table
-  add rename change-limit drop column
-  add drop index
-
 how to implement automatic http:// adding? functionally?
+  - :callbacks {:before-validation [(normalize-url :url)]}
 
 validation and normalizing of params in controllers e.g. removing whitespace
 
@@ -25,12 +25,9 @@ logging in general
   - sql
   - framework: params, routing, timing.
   - exceptions
-; cljurl.config
-(def *logger* (clj-logger/to-path "log/development.log"))
+  - (def *logger* (clj-logger/to-path "log/development.log"))
 
 might want to move a bunch of routes.clj into ring, bundle clj-routing with ring
-
-implement tests
 
 ragel-based json decoder
 fast and pp json encoders that don't suck
@@ -38,7 +35,7 @@ fast and pp json encoders that don't suck
 errors rack tool (IN DEV)
 failsafe middleware, configurable with canned response. (IN PROD)
 
-in-app error handling
+merb-like error handling based on types of errros
 
 (ns cljurl.app.controllers-test
   (:use clj-unit.core cljurl.app.controllers))

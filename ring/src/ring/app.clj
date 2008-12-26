@@ -1,13 +1,12 @@
 (ns ring.app
-  (:use ring.request))
+  (:use ring.request ring.routing))
 
 (defn spawn-app
-  "Returns an app paramaterized by the given recognizer, which should be a fn
-  taking two arguments - a method and uri, and returning an action-fn to call
-  and a map of route params derived from the uri."
-  [recognizer]
+  "Returns an app paramaterized by the given router, as compiled by
+  ring.routing/compiled-router."
+  [router]
   (fn [env]
-    (let [req                      (from-env env)
-          [action-fn route-params] (recognizer (request-method req) (uri req))
-          request                  (assoc-route-params req route-params)]
+    (let [req                 (from-env env)
+         [action-fn r-params] (recognize router (request-method req) (uri req))
+         request              (assoc-route-params req r-params)]
       (action-fn request))))

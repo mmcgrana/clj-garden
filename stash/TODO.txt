@@ -5,6 +5,9 @@ Blocking
 Later
 - datetime caster
 - migrations
+  - create, rename, drop table
+  - add, rename, drop column
+  - add, drop index
 - more validators
 - key-based window pagination
 - select-except
