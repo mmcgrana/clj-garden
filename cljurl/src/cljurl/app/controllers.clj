@@ -71,5 +71,4 @@
   [request]
   (with-filters
     (with-shortening [shortening request]
-      (m/hit-shortening shortening)
       (redirect (:url shortening)))))
