@@ -108,7 +108,9 @@
       :before-create
         [timestamp-create]
       :before-update
-        [timestamp-update]}})
+        [timestamp-update]}
+    :accesible-attrs
+      [:title :body]})
 (defaccessors +post+ {:except [:title?]})
 
 (def word-count [post]

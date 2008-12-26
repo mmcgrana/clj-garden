@@ -1,9 +1,6 @@
 Blocking   
-- form-set
-  - form-init, form-create, form-update-attrs
-  - or just one path, but w/ double coercion
-    - then init*, create*, and update-attrs* for optimization
 - mass assignement protection, esp for id
+  - then update-attrs* for no-protection perhaps.
 
 Later
 - datetime caster
