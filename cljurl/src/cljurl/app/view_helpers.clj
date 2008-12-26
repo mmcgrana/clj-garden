@@ -1,17 +1,18 @@
-(in-ns 'cljurl.app.views)
+(ns cljurl.app.view-helpers
+  (:use (clj-html core helpers)))
 
 (defn hstr
   "Returns an html-escaped string representation of val. Like (h (str val))."
   [val]
   (h (str val)))
 
-(defn- browser-method?
+(defn browser-method?
   "Given a keyword an http method, returns true iff the method is implemented by
   browsers."
   [method]
   (or (= method :get) (= method :post)))
 
-(defn- method-str
+(defn method-str
   "Returns the method string corresponding to the given method keyword"
   [method]
   (name method))

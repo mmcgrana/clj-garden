@@ -11,8 +11,9 @@ hit tracking functionality
   - separate hits table
 
 Check for reflection in whole app
-- error messages
-- form helpers
+
+error messages
+form helpers
 
 how to implement automatic http:// adding? functionally?
   - :callbacks {:before-validation [(normalize-url :url)]}
