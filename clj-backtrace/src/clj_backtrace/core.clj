@@ -1,4 +1,5 @@
 (ns clj-backtrace.core
+  (:use clojure.contrib.str-utils)
   (:use clj-backtrace.utils))
 
 (defn- clojure-elem? [class-name file]
@@ -7,14 +8,19 @@
       (and file (re-match? #"\.clj$" file))))
 
 (defn- clojure-ns [class-name]
-  (re-get #"([^$]+)\$" class-name 1))
+  (let [base-name (re-get #"([^$]+)\$" class-name 1)
+        hyph-name (re-gsub #"_" "-" base-name)]
+    hyph-name))
 
 (defn- clojure-fn
   "Returns the clojure function name implied by the bytecode class name."
   [class-name]
-  (re-get #"\$([a-z-]+)" class-name 1))
+  (let [base-name (re-without #"(^[^$]+\$)|(__\d+(\$[^$]+)*$)" class-name)
+        punc-name (re-sub #"_QMARK_" "?" base-name)
+        hyph-name (re-gsub #"_" "-" punc-name)]
+    hyph-name))
 
-(defn clojure-annon-fn?
+(defn- clojure-annon-fn?
   "Returns true if the bytecode class name implies an annon fn."
   [class-name]
   (re-match? #"\$fn__" class-name))

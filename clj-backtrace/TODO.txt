@@ -1,7 +1,8 @@
 figure out what to do with caused-by exceptions, definetely a prob at repl (/)
+perhaps array of arrays
 
-at user$thrower__428.invoke(Unknown Source)
-at user$caller_method_QMARK___448.invoke(Unknown Source)
-at user$eval__451.invoke(Unknown Source)
-at clojure.lang.Compiler.eval(Compiler.java:4142)
-... 24 more
+truncate duplicate elems in causes printing
+
+core$-SLASH-
+args passed to: core$--GT- (repl-1:7)
+(check clojure source for more of these)

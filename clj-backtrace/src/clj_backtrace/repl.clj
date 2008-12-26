@@ -23,10 +23,20 @@
         methods   (map method-str parsed)
         src-width (high (map (memfn length) sources))]
     (doseq [[src meth] (zip sources methods)]
-      (println (str " " (rjust src-width src) " " meth)))))
+      (println (str " " (rjust (+ src-width 3) src) " " meth)))))
+
+(defn- ppe-cause
+  "TODOC"
+  [e]
+  (println (str "Caused by: " e))
+  (print-trace (.getStackTrace e))
+  (if-let [cause (.getCause e)]
+    (ppe-cause cause)))
 
 (defn ppe
   "Print a pretty stack trace for *e."
   []
   (println (str *e))
-  (print-trace (.getStackTrace *e)))
+  (print-trace (.getStackTrace *e))
+  (if-let [cause (.getCause *e)]
+    (ppe-cause cause)))

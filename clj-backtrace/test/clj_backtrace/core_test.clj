@@ -5,8 +5,20 @@
   [["foo.bar$biz__123" "invoke" "bar.clj" 456
     {:clojure true :ns "foo.bar" :fn "biz" :file "bar.clj" :line 456 :annon-fn false}]
 
+   ["foo.bar$biz_bat__123" "invoke" "bar.clj" 456
+    {:clojure true :ns "foo.bar" :fn "biz-bat" :file "bar.clj" :line 456 :annon-fn false}]
+
+   ["foo.bar$biz_bat_QMARK___448" "invoke" "bar.clj" 456
+    {:clojure true :ns "foo.bar" :fn "biz-bat?" :file "bar.clj" :line 456 :annon-fn false}]
+
+   ["foo.bar$biz_bat_QMARK___448$fn__456" "invoke" "bar.clj" 456
+     {:clojure true :ns "foo.bar" :fn "biz-bat?" :file "bar.clj" :line 456 :annon-fn true}]
+
    ["foo.bar$biz__123$fn__456" "invoke" "bar.clj" 789
     {:clojure true :ns "foo.bar" :fn "biz" :file "bar.clj" :line 789 :annon-fn true}]
+
+   ["foo.bar_bat$biz__123" "invoke" "bar.clj" 456
+    {:clojure true :ns "foo.bar-bat" :fn "biz" :file "bar.clj" :line 456 :annon-fn false}]
 
    ["user$eval__345" "invoke" nil -1
     {:clojure true :ns "user" :fn "eval" :file nil :line nil :annon-fn false}]
