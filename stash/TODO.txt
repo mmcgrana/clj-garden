@@ -1,9 +1,11 @@
 Blocking   
-- valid?
+- casters with tests
 - form condition escape
 - form-set
-  - datetime caster
-  - form-init, form-create, form-update-attrs (update-attrs?)
+  - form-init, form-create, form-update-attrs
+  - or just one path, but w/ double coercion
+    - then init*, create*, and update-attrs* for optimization
+- mass assignement protection, esp for id
 
 Later
 - migrations
