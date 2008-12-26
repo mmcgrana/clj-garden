@@ -7,3 +7,6 @@
     (.setDatabaseName "cljurl_development")
     (.setUser         "mmcgrana")
     (.setPassword     "")))
+
+(def +public-dir+
+  (java.io.File. "public"))
