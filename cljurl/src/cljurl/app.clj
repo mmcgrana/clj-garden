@@ -1,8 +1,9 @@
 (ns cljurl.app
   (:require
-    [cwsg.middleware.show-exceptions :as show-exceptions]
-    [cswg.middleware.file-content-info :as file-content-info]
-    [cswg.middleware.string-content-length :as string-content-length]
+    [cwsg.middleware.show-exceptions :as       show-exceptions]
+    [cwsg.middleware.file-content-info :as     file-content-info]
+    [cwsg.middleware.string-content-length :as string-content-length]
+    [cwsg.middleware.static :as                static]
     ring.app
     cljurl.routing
     cljurl.app.controllers

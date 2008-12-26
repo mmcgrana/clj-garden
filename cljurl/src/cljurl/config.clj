@@ -10,3 +10,10 @@
 
 (def +public-dir+
   (java.io.File. "public"))
+
+(def +environment+ :dev)
+
+(defn dev?  [] (= +environment+ :dev))
+(defn test? [] (= +environment+ :test))
+
+(defn show-exceptions? [] (or dev? test?))

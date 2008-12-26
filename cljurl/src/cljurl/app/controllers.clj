@@ -4,60 +4,71 @@
         cljurl.routing)
   (:require [cljurl.app.models :as m]
             [cljurl.app.views  :as v]
+            [cljurl.config     :as config]
             [stash.core        :as stash]))
 
-(defn- find-shortening
-  "Find the shortening pased on the slug in the request"
-  [request]
-  (stash/find-one m/+shortening+ {:where [:slug := (params request :slug)]}))
-
-(defn index
-  "Render a page listing recent shortenings."
-  [request]
-  (let [shortenings (m/find-recent-shortenings 10)]
-    (render (v/index shortenings))))
-
 (defmacro with-filters
+  "Wrap all action code in a try catch that will either show exception details
+  or present an error page to the user, as appropriate."
   [& body]
   `(try
      ~@body
      (catch Exception e#
-       (throw (Exception. "foiled"))
-       (internal-error (v/internal-error)))))
-
-(defn new
-  "Renders a form for creating a new shortening."
-  [request]
-  (with-filters
-    (throw (Exception. "failz"))
-    (render (v/new (stash/form-init m/+shortening+)))))
-
-(defn create
-  "Consume a url given by the user, find its shortening, and redirect to the
-  shortening show page."
-  [request]
-  (let [shortening (stash/form-create m/+shortening+ (params request :shortening))]
-    (if (stash/valid? shortening)
-      (redirect (path :show shortening))
-      (render (v/new shortening)))))
-
-(defn show
-  "Show the known expansion of a url."
-  [request]
-  (if-let [shortening (find-shortening request)]
-    (render (v/show shortening))
-    (not-found (v/not-found))))
-
-(defn expand
-  "Redirect a user from a slug to its url expansion."
-  [request]
-  (if-let [shortening (find-shortening request)]
-    (redirect (get shortening :url))
-    (not-found (v/not-found))))
+       (if (config/show-exceptions?)
+         (throw e#)
+         (internal-error (v/internal-error))))))
 
 (defn page-not-found
   "Render a not found error page."
   [request]
   (not-found (v/not-found)))
 
+(defn- find-shortening
+  "Find the shortening pased on the slug in the request"
+  [request]
+  (stash/find-one m/+shortening+ {:where [:slug := (params request :slug)]}))
 
+(defmacro with-shortening
+  "Execute the body with the shortening found or render a not found page if
+  no shortening was found."
+  [[shortening-sym request-sym] & body]
+  `(if-let [~shortening-sym (find-shortening ~request-sym)]
+     (do ~@body)
+     (page-not-found ~request-sym)))
+
+(defn index
+  "Render a page listing recent shortenings."
+  [request]
+  (with-filters
+    (let [shortenings (m/find-recent-shortenings 10)]
+      (render (v/index shortenings)))))
+
+(defn new
+  "Renders a form for creating a new shortening."
+  [request]
+  (with-filters
+    (render (v/new (stash/init m/+shortening+)))))
+
+(defn create
+  "Consume a url given by the user, find its shortening, and redirect to the
+  shortening show page."
+  [request]
+  (with-filters
+    (let [shortening (stash/create m/+shortening+ (params request :shortening))]
+      (if (stash/valid? shortening)
+        (redirect (path :show shortening))
+        (render (v/new shortening))))))
+
+(defn show
+  "Show the known expansion of a url."
+  [request]
+  (with-filters
+    (with-shortening [shortening request]
+      (render (v/show shortening)))))
+
+(defn expand
+  "Redirect a user from a slug to its url expansion."
+  [request]
+  (with-filters
+    (with-shortening [shortening request]
+      (redirect (:url shortening)))))

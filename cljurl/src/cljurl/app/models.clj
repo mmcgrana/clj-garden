@@ -1,8 +1,8 @@
 (ns cljurl.app.models
   (:use    stash.core
-           stash.timestamps [stash.validators :only (valid-url)]
+           stash.timestamps stash.validators
            cljurl.utils)
-  (:require cljurl.config))
+  (:require [cljurl.config :as config]))
 
 
 (def +slug-chars+  [\a \b \c \d \e \f \g \h \i \j \k \1 \2 \3 \4 \5])
@@ -14,9 +14,8 @@
   (let [slug (str-cat (take +slug-length+ (map choice (repeat +slug-chars+))))]
     [(assoc shortening :slug slug) true]))
 
-
 (defmodel +shortening+
-  {:data-source cljurl.config/+data-source+
+  {:data-source config/+data-source+
    :table-name  :shortenings
    :columns
      [[:slug       :string]
@@ -26,7 +25,6 @@
      [[:url valid-url]]
    :callbacks
      {:before-create [timestamp-create generate-slug]}})
-
 
 (defn find-recent-shortenings
   "Returns the n most recently created shortenings."
