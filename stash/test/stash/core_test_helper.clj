@@ -6,7 +6,6 @@
     (.setUser         "mmcgrana")
     (.setPassword     "")))
 
-
 (defmacro with-clean-db
   [& body]
   `(try

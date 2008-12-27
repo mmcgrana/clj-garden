@@ -24,15 +24,15 @@
   (not-found (v/not-found)))
 
 (defn find-shortening
-  "Find the shortening pased on the slug in the request"
-  [params]
-  (stash/find-one m/+shortening+ {:where [:slug := (get params :slug)]}))
+  "Find the shortening based on a slug."
+  [slug]
+  (stash/find-one m/+shortening+ {:where [:slug := slug]}))
 
 (defmacro with-shortening
   "Execute the body with the shortening found or render a not found page if
   no shortening was found."
-  [[shortening-sym params-form] & body]
-  `(if-let [~shortening-sym (find-shortening ~params-form)]
+  [[shortening-sym slug-form] & body]
+  `(if-let [~shortening-sym (find-shortening ~slug-form)]
      (do ~@body)
      (page-not-found)))
 
@@ -63,12 +63,12 @@
   "Show the known expansion of a url."
   [request]
   (with-filters
-    (with-shortening [shortening request]
+    (with-shortening [shortening (params request :slug)]
       (render (v/show shortening)))))
 
 (defn expand
   "Redirect a user from a slug to its url expansion."
   [request]
   (with-filters
-    (with-shortening [shortening request]
+    (with-shortening [shortening (params request :slug)]
       (redirect (:url shortening)))))

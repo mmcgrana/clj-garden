@@ -8,12 +8,13 @@
 
 (defmacro with-fixtures
   "TODOC"
-  [& body]
+  [[binding-sym] & body]
   `(do
      (stash/delete-all +shortening+)
-     (doseq [short# [shortening-map1 shortening-map2]]
-       (stash/persist-insert (stash/init +shortening+ short#)))
-     ~@body))
+     (let [s1# (stash/persist-insert (stash/init +shortening+ shortening-map1))
+           s2# (stash/persist-insert (stash/init +shortening+ shortening-map1))
+           ~binding-sym {:shortenings {:1 s1# :2 s2#}}]
+       ~@body)))
 
 (defn request
   "Returns the response of app to mock request build according to the method,
