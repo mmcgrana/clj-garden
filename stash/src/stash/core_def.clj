@@ -2,14 +2,14 @@
 
 ;; Runtime model accessors
 
-(defn- instance-model
+(defn instance-model
   "Returns the model associated with the instance, or throws if this is missing
   that metadata / is not an instance."
   [instance]
   (or (:model (meta instance))
-      (throwf "No model found for %" instance)))
+      (throwf "No model found for %s" instance)))
 
-(defn- model-map
+(defn model-map
   [model]
   "Returns the original model map used to define the compiled model."
   (:model-map model))
@@ -19,12 +19,12 @@
   [model]
   (:data-source model))
 
-(defn- instance-data-source
+(defn instance-data-source
   "Returns the data source for the model of the instance."
   [instance]
   (data-source (instance-model instance)))
 
-(defn- table-name-str
+(defn table-name-str
   "Returns as a string the table name for the model."
   [model]
   (name (:table-name model)))
@@ -39,27 +39,27 @@
   [model]
   (:column-names-sans-id model))
 
-(defn- quoters-by-name
+(defn quoters-by-name
   "Returns a map of keyword column names to a quoter fn for the column."
   [model]
   (:quoters-by-name model))
 
-(defn- parsers-by-name
+(defn parsers-by-name
   "Returns a map of keyword column names to a parser fn for the column."
   [model]
   (:parsers-by-name model))
 
-(defn- casters-by-name
+(defn casters-by-name
   "Returns a map of keyword column names to a caster fn for the column."
   [model]
   (:casters-by-name model))
 
-(defn- validators
+(defn validators
   "Returns an seq of validator fns used to validate instances of the model."
   [model]
   (:validators model))
 
-(defn- callbacks
+(defn callbacks
   "Returns a map keyword callback names to a seq of corresponding callback fns."
   [model]
   (:callbacks model))

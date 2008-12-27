@@ -1,5 +1,6 @@
-Blocking   
-- mass assignement protection, esp for id
+Blocking  
+- assert-instance, i.e. to make sure that a thing has a model param 
+- mass assignment protection, esp for id
   - then update-attrs* for no-protection perhaps.
 
 Later

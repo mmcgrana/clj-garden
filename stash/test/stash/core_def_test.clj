@@ -2,6 +2,13 @@
 
 (defmodel +macro-post+ +post-map+)
 
+(deftest "instance-model: no model"
+  (assert-throws #"No model found"
+    (instance-model {})))
+
+(deftest "instance-model: model"
+  (assert= +post+ (instance-model (init +post+))))
+
 (deftest "defmodel"
   (assert= +macro-post+ (compiled-model +post-map+)))
 

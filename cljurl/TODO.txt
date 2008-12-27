@@ -22,6 +22,10 @@ validation and normalizing of params in controllers e.g. removing whitespace
 
 production / dev / testing environments
 
+stateless fixtures - like rsync
+
+try compilation
+
 logging in general
   - sql
   - framework: params, routing, timing.

@@ -31,6 +31,7 @@
 (def desc        zf/descendants)
 (def ansc        zf/ancestors)
 (def children    zf/children)
+(def node        zip/node)
 (def attr        zfxml/attr)
 (def attr=       zfxml/attr=)
 (def text        zfxml/text)
@@ -46,7 +47,6 @@
   "Returns a query predicate that matches a node when it has an id target-id."
   (fn [loc]
     (when-let [id (zfxml/attr loc :id)]
-      (prn id)
       (= id target-id))))
 
 (defn attr? [attrname]

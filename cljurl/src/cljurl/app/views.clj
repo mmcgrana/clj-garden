@@ -1,7 +1,7 @@
 (ns cljurl.app.views
   (:use cljurl.routing
-        clj-html.core
-        clj-html.helpers
+        (clj-html core helpers)
+        cljurl.app.view-helpers
         [stash.core :only (errors)])
   (:load "view_helpers"))
 
@@ -62,7 +62,7 @@
   "404 Not Found page."
   []
   (with-layout
-    "Were sorry - we couldn't find that."))
+    "Were sorry - we could not find that."))
 
 (defn internal-error
   "500 Internal Error page"

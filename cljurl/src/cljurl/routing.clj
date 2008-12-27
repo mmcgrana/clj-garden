@@ -11,7 +11,7 @@
    [c 'expand         :expand    :get  "/:slug"             ]
    [c 'page-not-found :not-found :any  "/:path" {:path ".*"}]])
 
-(def router (ring.routing/compiled-router routes config/*app-host*))
+(def router (ring.routing/compiled-router routes config/+app-host+))
 
 (def path-info (partial ring.routing/path-info router))
 (def path      (partial ring.routing/path      router))

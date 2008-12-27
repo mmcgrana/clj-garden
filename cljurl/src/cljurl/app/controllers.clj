@@ -20,21 +20,21 @@
 
 (defn page-not-found
   "Render a not found error page."
-  [request]
+  [& [request]]
   (not-found (v/not-found)))
 
-(defn- find-shortening
+(defn find-shortening
   "Find the shortening pased on the slug in the request"
-  [request]
-  (stash/find-one m/+shortening+ {:where [:slug := (params request :slug)]}))
+  [params]
+  (stash/find-one m/+shortening+ {:where [:slug := (get params :slug)]}))
 
 (defmacro with-shortening
   "Execute the body with the shortening found or render a not found page if
   no shortening was found."
-  [[shortening-sym request-sym] & body]
-  `(if-let [~shortening-sym (find-shortening ~request-sym)]
+  [[shortening-sym params-form] & body]
+  `(if-let [~shortening-sym (find-shortening ~params-form)]
      (do ~@body)
-     (page-not-found ~request-sym)))
+     (page-not-found)))
 
 (defn index
   "Render a page listing recent shortenings."

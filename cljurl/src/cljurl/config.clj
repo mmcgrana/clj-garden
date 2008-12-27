@@ -1,6 +1,6 @@
 (ns cljurl.config)
 
-(def *app-host* "localhost:8000")
+(def +app-host+ "localhost:8000")
 
 (def +data-source+
   (doto (org.postgresql.ds.PGPoolingDataSource.)
@@ -11,9 +11,10 @@
 (def +public-dir+
   (java.io.File. "public"))
 
-(def +environment+ :dev)
+(def +env+ :dev)
 
-(defn dev?  [] (= +environment+ :dev))
-(defn test? [] (= +environment+ :test))
+(defn dev?  [] (= +env+ :dev))
+(defn test? [] (= +env+ :test))
+(defn prod? [] (= +env+ :prod))
 
-(defn show-exceptions? [] (or dev? test?))
+(defn show-exceptions? [] (or (dev?) (test?)))
