@@ -78,16 +78,28 @@
       {}
       uncast-attrs)))
 
+(defn update-attrs*
+  "Like update-attrs, but bypasses mass-assignment protection."
+  [instance attrs]
+  (merge instance (cast-attrs (instance-model instance) attrs)))
+
 (defn update-attrs
   "Returns a new instance based on the given instance but reflecting any
   attribute values in attrs. Does not touch the databse."
   [instance attrs]
-  (merge instance (cast-attrs (instance-model instance) attrs)))
+  (limit-keys attrs (accessible-attrs (instance-model instance)))
+  (update-attrs* instance attrs))
+
+(defn init*
+  "Like init, but bypasses mass-assignment protection."
+  [model & [attrs]]
+  (update-attrs (with-meta {:id (gen-uuid)} {:model model :new true}) attrs))
 
 (defn init
   "Returns an instance of the model with the given attrs having new status."
   [model & [attrs]]
-  (update-attrs (with-meta {:id (gen-uuid)} {:model model :new true}) attrs))
+  (limit-keys attrs (accessible-attrs model))
+  (init* model attrs))
 
 (defn instantiate
   "Returns an instance based on unparsed versions of the given quoted attrs 
@@ -131,11 +143,17 @@
                       [as-instance as?] (run-named-callbacks s-instance as-name)]
                   as-instance)))))))))
 
+(defn create*
+  "Like create, but bypasses mass-assignment protection."
+  [model & [attrs]]
+  (save (init model attrs)))
+
 (defn create
   "Creates an instance of the model with the attrs. Validations and validations
   and create callbacks."
-  [model attrs]
-  (save (init model attrs)))
+  [model & [attrs]]
+  (limit-keys attrs (accessible-attrs model))
+  (create* model attrs))
 
 (defn destroy
   "Deletes the instance, running before- and after- destroy callbacks.

@@ -1,8 +1,5 @@
-Blocking  
-- mass assignment protection, esp for id
-  - then update-attrs* for no-protection perhaps.
-
 Later
+- rethink, test attr protection
 - datetime caster
 - migrations
   - create, rename, drop table

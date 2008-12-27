@@ -64,6 +64,11 @@
   [model]
   (:callbacks model))
 
+(defn accessible-attrs
+  "Returns a seq of keyword column names eligible for mass-assignement."
+  [model]
+  (:accessible-attrs model))
+
 
 ;; Initialization-time compilation helpers
 
@@ -152,8 +157,13 @@
      :after-destroy
        (get cb-map :after-destroy)}))
 
+(defn- checked-accessible-attrs
+  [model-map]
+  (:accessible-attrs model-map))
+
 (def- recognized-model-keys
-  #{:table-name :data-source :columns :callbacks :validations :extensions})
+  #{:table-name :data-source :columns :callbacks :validations
+    :accessible-attrs :extensions})
 
 (defn- checked-model-map
   "Returns the given model map provided that it contains only valid keys,
@@ -180,6 +190,7 @@
        :casters-by-name      (compiled-mappers-by-name type-caster column-defs)
        :validators           (compiled-validators model-map)
        :callbacks            (compiled-callbacks model-map)
+       :accessible-attrs     (checked-accessible-attrs model-map)
        :model-map            model-map})))
 
 (defn- define-accessors

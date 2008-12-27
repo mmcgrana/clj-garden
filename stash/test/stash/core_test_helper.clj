@@ -33,7 +33,9 @@
      [:float    :float]
      [:double   :double]
      [:string   :string]
-     [:datetime :datetime]]})
+     [:datetime :datetime]]
+   :accessible-attrs
+    [:uuid :boolean :integer :long :float :double :string :datetime]})
 
 (def empty-schmorg
   (init +schmorg+ {}))
@@ -45,7 +47,9 @@
     [[:title      :string]
      [:view_count :integer]
      [:posted_at  :datetime]
-     [:special    :boolean]]})
+     [:special    :boolean]]
+   :accessible-attrs
+    [:title :view_count :posted_at :special]})
 
 (def +post+ (compiled-model +post-map+))
 
