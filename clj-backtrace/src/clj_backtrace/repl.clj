@@ -25,17 +25,23 @@
     (doseq [[src meth] (zip sources methods)]
       (println (str " " (rjust (+ src-width 3) src) " " meth)))))
 
+(defn trim-redundant-elems
+  [causer-elems caused-elems]
+  (loop [rcauser-elems (reverse causer-elems)
+         rcaused-elems (reverse caused-elems)]
+    (if-let [rcauser-bottom (first rcauser-elems)]
+      (if (= rcauser-bottom (first rcaused-elems))
+        (recur (rest rcauser-elems) (rest rcaused-elems))
+        (reverse rcauser-elems)))))
+
 (defn- ppe-cause
   "Print a pretty stack trace for an exception in a causal chain."
   [e-causer e-caused]
   (println (str "Caused by: " e-causer))
-  (let [causer-elems  (.getStackTrace e-causer)
-        caused-elems  (.getStackTrace e-causer)
-        rziped-pairs  (map list (reverse causer-elems) (reverse caused-elems))
-        rdiff-pairs   (drop-while (fn [elems] (apply = elems)) rziped-pairs)]
-    (print-trace (filter identity (reverse (map first rdiff-pairs))))
-    (if-let [next-cause (.getCause e-causer)]
-      (ppe-cause next-cause e-causer))))
+  (print-trace (trim-redundant-elems (.getStackTrace e-causer)
+                                     (.getStackTrace e-caused)))
+  (if-let [next-cause (.getCause e-causer)]
+    (ppe-cause next-cause e-causer)))
 
 (defn ppe
   "Print a pretty stack trace for an exception, by default *e."
