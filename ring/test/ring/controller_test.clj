@@ -1,5 +1,5 @@
 (ns ring.controller-test
-  (:use clj-unit.core ring.controller))
+  (:use clj-unit.core ring.controller clj-scrape.core))
 
 (deftest "not-found"
   (assert= [404 {"Content-Type" "text/html"} "hello"]

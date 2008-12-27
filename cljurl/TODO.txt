@@ -40,6 +40,9 @@ fast and pp json encoders that don't suck
 errors rack tool (IN DEV)
 failsafe middleware, configurable with canned response. (IN PROD)
 
+css selector to clj-scrape compiler
+let {:foo "bar"} be used as a literal filter shortcut like :p
+
 merb-like error handling based on types of errros
 
 (ns cljurl.app.controllers-test

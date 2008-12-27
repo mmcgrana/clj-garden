@@ -35,6 +35,7 @@
 (def attr        zfxml/attr)
 (def attr=       zfxml/attr=)
 (def text        zfxml/text)
+(def text=       zfxml/text=)
 
 (defn class= [target-name]
   "Returns a query predicate that matches a node when has a class named

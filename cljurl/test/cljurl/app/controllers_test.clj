@@ -1,6 +1,6 @@
 (ns cljurl.app.controllers-test
   (require cljurl.config)
-  (use clj-unit.core clojure.contrib.except
+  (use clj-unit.core clojure.contrib.except clj-scrape.core
        cljurl.routing cljurl.app
        (cljurl.app models controllers controllers-test-helper)))
 
@@ -34,23 +34,21 @@
   (with-fixtures
     (let [[status _ body] (request app (path :index))]
       (assert-status 200 status)
-      ; new shortening link
-      (assert-selector body)
-      ; recent shortening header
-      (assert-selector body)
-      ; shortening listing
-      (assert-selector body)
-      )))
+      (assert-selector
+        (desc :a (attr= :href "/new") (text= "new shortening")) body)
+      (assert-selector
+        (desc :h3 (text= "Recent Shortenings")) body)
+      (assert-selector
+        (desc :p (text-match? #" => ")) body))))
 
 (deftest "new"
   (with-fixtures
     (let [[status _ body] (request app (path :new))]
       (assert-status 200 status)
-      ; enter url
-      (assert-selector body)
-      ; form
-      (assert-selector body)
-      ; url field
-      (assert-selecor body)
-      )))
-
+      (assert-selector
+        (desc :form :p (text-match? #"Enter url:")) body)
+      (assert-selector
+        (desc :form (attr= :action "/") (attr= :method "post")) body)
+      (assert-selector
+        (desc :form :input (attr= :type "text") (attr= :name "shortening[url]"))
+        body))))
