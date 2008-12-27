@@ -15,10 +15,12 @@
      ~@body))
 
 (defn request
-  "TODOC"
-  [app path]
+  "Returns the response of app to mock request build according to the method,
+  path and optional params."
+  [app [method path] & [params]]
   (let [env {:uri path}
-        env (assoc env :request-method :get)]
+        env (assoc env :request-method method)
+        env (assoc env :query-string   (serialize ))]
     (app env)))
 
 (defmacro assert-status

@@ -1,3 +1,2 @@
 finish show-exceptions
-linter
-proper handler
+proper handlers

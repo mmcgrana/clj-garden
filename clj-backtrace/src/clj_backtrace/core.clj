@@ -2,12 +2,15 @@
   (:use clojure.contrib.str-utils)
   (:use clj-backtrace.utils))
 
-(defn- clojure-elem? [class-name file]
+(defn- clojure-elem?
   "Returns true if the filename is non-null and indicates a clj source file."
+  [class-name file]
   (or (re-match? #"^user" class-name)
       (and file (re-match? #"\.clj$" file))))
 
-(defn- clojure-ns [class-name]
+(defn- clojure-ns
+  "Returns the clojure namespace name implied by the bytecode class name."
+  [class-name]
   (let [base-name (re-get #"([^$]+)\$" class-name 1)
         hyph-name (re-gsub #"_" "-" base-name)]
     hyph-name))
@@ -16,8 +19,15 @@
   "Returns the clojure function name implied by the bytecode class name."
   [class-name]
   (let [base-name (re-without #"(^[^$]+\$)|(__\d+(\$[^$]+)*$)" class-name)
-        punc-name (re-sub #"_QMARK_" "?" base-name)
-        hyph-name (re-gsub #"_" "-" punc-name)]
+        punc-name (re-gsub #"_QMARK_" "?" base-name)
+        punc-name (re-gsub #"_BANG_"  "!" punc-name)
+        punc-name (re-gsub #"_PLUS_"  "+" punc-name)
+        punc-name (re-gsub #"_GT_"    ">" punc-name)
+        punc-name (re-gsub #"_LT_"    "<" punc-name)
+        punc-name (re-gsub #"_EQ_"    "=" punc-name)
+        punc-name (re-gsub #"_STAR_"  "*" punc-name)
+        punc-name (re-gsub #"_SLASH_" "/" punc-name)
+        hyph-name (re-gsub #"_"       "-" punc-name)]
     hyph-name))
 
 (defn- clojure-annon-fn?

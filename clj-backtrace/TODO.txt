@@ -3,6 +3,4 @@ perhaps array of arrays
 
 truncate duplicate elems in causes printing
 
-core$-SLASH-
-args passed to: core$--GT- (repl-1:7)
 (check clojure source for more of these)

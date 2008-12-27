@@ -32,7 +32,7 @@
 
 (deftest "index"
   (with-fixtures
-    (let [[status _ body] (request app (path :index))]
+    (let [[status _ body] (request app (path-info :index))]
       (assert-status 200 status)
       (assert-selector
         (desc :a (attr= :href "/new") (text= "new shortening")) body)
@@ -43,7 +43,7 @@
 
 (deftest "new"
   (with-fixtures
-    (let [[status _ body] (request app (path :new))]
+    (let [[status _ body] (request app (path-info :new))]
       (assert-status 200 status)
       (assert-selector
         (desc :form :p (text-match? #"Enter url:")) body)
@@ -52,3 +52,34 @@
       (assert-selector
         (desc :form :input (attr= :type "text") (attr= :name "shortening[url]"))
         body))))
+
+(def valid-params
+  {:shortening {:url "http://amazon.com"}})
+
+(deftest "create: valid shortening"
+  (with-fixtures
+    (let [response (request app (path-info :create) valid-params)
+          [status headers body] response
+          shortening (stash/find-one +shortening+ {:order [:created_at :desc]})]
+      (assert-redirect (path :show shortening) response))))
+
+(deftest invalid-params
+  {:shortening {:url "foo"}})
+
+(deftest "create: invalid shortening"
+  (with-fixtures
+    (let [[_ _ body] (request app (path-info :create) invalid-params)]
+      (assert-selector
+        (desc :p (text-match? #"valid-url")) body)
+      (assert-selector
+        (desc :form (attr= :action "/") (attr= :method "post")) body)
+      (assert-selector
+        (desc :form :input (attr= :value "foo"))))))
+
+(deftest "show: found shortening")
+
+(deftest "show: missing shortening")
+
+(deftest "expand: found shortening")
+
+(deftest "expand: missing shortening")

@@ -1,7 +1,6 @@
 (ns ring.http-utils
-  (:use clojure.contrib.def
-        clojure.contrib.str-utils
-        clojure.contrib.except))
+  (:use (clojure.contrib def str-utils except)
+        ring.utils))
 
 (defn url-escape
   "Returns a url-escaped representation of the given String."
@@ -12,7 +11,6 @@
   "Returns a url-unescaped representation of the given String."
   [escaped]
   (java.net.URLDecoder/decode escaped "UTF-8"))
-
 
 
 (defvar- after-initial-key-pat #"^([^\[]*)(\[.*)$"
@@ -93,3 +91,36 @@
   header string, or nil if the given value is nil."
   [cookie-string]
   (querylike-parse #";\s*" cookie-string))
+
+
+(defn query-unparse-line
+  [line]
+  (let [first-key (first line)
+        rest-keys (butlast (rest line))
+        value     (last (rest line))]
+    (str (url-escape (name first-key))
+         (str-cat (map (fn [key]
+                         (if (= key []) "[]"
+                           (str "[" (url-escape (name key)) "]")))
+                       rest-keys))
+         "=" (url-escape (str value)))))
+
+(defn query-unparse-lines
+  [lines]
+  (str-join "&" (map query-unparse-line lines)))
+
+(defn params-as-lines
+  [params head]
+  (cond
+    (map? params)
+      (mapcat (fn [[key value]] (params-as-lines value (conj head key))) params)
+    (coll? params)
+      (mapcat (fn [elem] (params-as-lines elem (conj head []))) params)
+    :else
+      [(conj head params)]))
+
+(defn query-unparse
+  "The opposite of query-parse, converts a nested data structure into a query
+  string."
+  [params]
+  (query-unparse-lines (params-as-lines params [])))

@@ -24,3 +24,8 @@
   value, and returns the new associative structure."
   [m k f & args]
   (assoc m k (apply f (get m k) args)))
+
+(defn str-cat
+  "Concat the given strings into a single string. Like (str-join \"\" strs)."
+  [strs]
+  (apply str strs))
