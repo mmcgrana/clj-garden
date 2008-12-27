@@ -17,4 +17,4 @@
 (defn test? [] (= +env+ :test))
 (defn prod? [] (= +env+ :prod))
 
-(defn show-exceptions? [] (or (dev?) (test?)))
+(defn show-exceptions? [] (dev?))

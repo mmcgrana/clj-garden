@@ -1,6 +1,9 @@
 figure out what to do with caused-by exceptions, definetely a prob at repl (/)
 perhaps array of arrays
 
+java.lang.IllegalArgumentException: Wrong number of args passed to: show-exceptions$wrap--1741$fn
+(we can clean up this fn name like we do in trace elems)
+
 truncate duplicate elems in causes printing
 
 (check clojure source for more of these)

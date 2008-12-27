@@ -1,5 +1,6 @@
 (ns cljurl.app.controllers-test
-  (require cljurl.config)
+  (require cljurl.config
+           [stash.core :as stash])
   (use clj-unit.core clojure.contrib.except clj-scrape.core
        cljurl.routing cljurl.app
        (cljurl.app models controllers controllers-test-helper)))
@@ -11,7 +12,7 @@
       (assert-match #"something went wrong" body))))
 
 (deftest "page-not-found"
-  (let [[status _ body] (request app "/foo/bar")]
+  (let [[status _ body] (request app [:get "/foo/bar"])]
     (assert-status 404 status)
     (assert-match #"we could not find that" body)))
 
@@ -63,7 +64,7 @@
           shortening (stash/find-one +shortening+ {:order [:created_at :desc]})]
       (assert-redirect (path :show shortening) response))))
 
-(deftest invalid-params
+(def invalid-params
   {:shortening {:url "foo"}})
 
 (deftest "create: invalid shortening"
@@ -74,9 +75,11 @@
       (assert-selector
         (desc :form (attr= :action "/") (attr= :method "post")) body)
       (assert-selector
-        (desc :form :input (attr= :value "foo"))))))
+        (desc :form :input (attr= :value "foo")) body))))
 
-(deftest "show: found shortening")
+(deftest "show: found shortening"
+  (with-fixtures
+    (let [[_ _ body] (request app (path-info :create))])))
 
 (deftest "show: missing shortening")
 

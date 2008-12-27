@@ -1,5 +1,6 @@
 (ns cljurl.app.controllers-test-helper
-  (require [stash.core :as stash])
+  (require [stash.core      :as stash]
+           [ring.http-utils :as http-utils])
   (use clj-unit.core cljurl.app.models clj-time.core clj-scrape.core))
 
 (def shortening-map1 {:slug "short1" :url "http://google.com" :created_at (now)})
@@ -18,10 +19,9 @@
   "Returns the response of app to mock request build according to the method,
   path and optional params."
   [app [method path] & [params]]
-  (let [env {:uri path}
-        env (assoc env :request-method method)
-        env (assoc env :query-string   (serialize ))]
-    (app env)))
+  (app {:uri path
+        :request-method method
+        :query-string (http-utils/query-unparse (or params {}))}))
 
 (defmacro assert-status
   "TODOC"
@@ -30,6 +30,16 @@
      (assert-that (= ~expected-status actual-status#)
        (format "Expected status of %s, but got %s"
          ~expected-status actual-status#))))
+
+(defmacro assert-redirect
+  "TODOC"
+  [expected-path response-form]
+  `(let [[status# headers# body#] ~response-form
+         location#                (get headers# "Location")]
+     (assert-that (and (and (>= status# 300) (< status# 400))
+                       (= ~expected-path location#))
+       (format "Expecting redirect status and Location of %s, but got %s and %s."
+         ~expected-path status# location#))))
 
 (defmacro assert-selector
   "TODOC"
