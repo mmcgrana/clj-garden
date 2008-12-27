@@ -1,9 +1,7 @@
 (ns cwsg.core
-  (:import (javax.servlet.http HttpServlet
-                               HttpServletRequest
-                               HttpServletResponse)
+  (:import (javax.servlet.http HttpServletRequest HttpServletResponse)
+           (org.mortbay.jetty.handler AbstractHandler)
            (org.mortbay.jetty Server)
-           (org.mortbay.jetty.servlet Context ServletHolder)
            (java.io File FileInputStream InputStream OutputStream)
            (org.apache.commons.io IOUtils))
   (:use clojure.contrib.fcase clojure.contrib.except))
@@ -60,23 +58,23 @@
             (.flush out))))
     (throwf "Unreceognized body: %s" body)))
 
-(defn- proxy-servlet
-  "Returns an HttpServlet implementation for the given app."
+(defn- proxy-handler
+  "Returns an Handler implementation for the given app."
   [app]
-  (proxy [HttpServlet] []
-    (service [request response]
+  (proxy [AbstractHandler] []
+    (handle [target request response dispatch]
       (let [env   (env-map request)
             tuple (app env)]
-        (apply-response-tuple response tuple)))))
+        (apply-response-tuple response tuple)
+        (.setHandled request true)))))
 
 (defn serve
   "Serve the given app according to the given options.
   Options must at least include :port, and int."
   [options app]
-  (let [#^HttpServlet servlet (proxy-servlet app)
-        port    (or (:port options) (throwf ":port missing from options"))
+  (let [port    (or (:port options) (throwf ":port missing from options"))
         server  (doto (Server. port) (.setSendDateHeader true))
-        context (Context. server "/" false false)]
-    (.addServlet context (ServletHolder. servlet) "/")
+        handler (proxy-handler app)]
+    (.setHandler server handler)
     (.start server)
     (.join  server)))
