@@ -1,73 +1,16 @@
 show exception class?
 
-- running unit tests without reboot for better speed
+perhaps symbol instead of string names to allow choice
 
-counts is messed up w/ multiple namespaces
-
-NOTE: should be clj_unit.utils/re-match?
-java.lang.ClassCastException: java.lang.String
-     utils.clj:13 clj_unit.utils/re
- core_test.clj:38 clj_jdbc.core_test/fn[fn]
-
+running unit tests without reboot for better speed
 
 per-assertion file and line numbers
 
 nested tests
-per-function tests
-  attached to tests
-System.exit(0/1)
-line numbers
-(assert= +macro-post+ (compiled-model +post-map+)) outside of test gives nonhelpful error about *reporter* not being bound
 
-Time taken for tests (perhaps even each one, to identify slow tests)
+per-function tests, attached to function
 
 perhaps allow some sort of error message input to assertions so that you know what went wrong, as in ruby's test/unit
 
-Alternate for assert-truth -is -does -that (need to rename other -that)
-FAIL: defmodel throws on unrecognized callback names
-  Expected message "wat" got "Expecting throw, got none"
-
-recursive diff on associative structures
-
-
-  ; deftest
-  ; assert=
-  ; assert-is
-  ; assert-not
-  ; assert-nil
-  ; pending
-
-  ; test-ns
-
-  ; print results
-
-  ; assert [1 2 3] (comp + 1) [2 3 4]
-
-  ; return value based or not???
-  ; perhaps if can return an assertion or a seq-able of assertions
-
-  ; possibilities
-  ; * compile-time error
-  ; * exception before assertion
-  ; * exception in inner assertion forms
-  ; * returns non-assertion
-  ; * returns a failing assertion
-  ; * returns a passing assertion
-
-  ; do we defintely need non-return value based assertions, can we get away with
-  ; not having those??
-  ; transaction testing
-  ; convience w/ many asserts
-  ; story-type tests
-  ; would really like a way around this.
-  ; 2 big cases: lots of assertions, and dealing with stateful systems (webapps)
-
-  ; (deftest "transaction"
-  ;   (in-trans
-  ;     (make-change)
-  ;     (assert-changed)
-  ;     (rollback))
-  ;   (assert-gone))
-
-  ; note current problem with failing - it doesn't stop after 2 examples if 2
-  ; of 3 fails. note that escaped exception works as desired.
+Perhaps use assert-truth for current assert-that, then expose assert-that as
+user-facing assertion.
