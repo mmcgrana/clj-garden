@@ -1,4 +1,5 @@
-(ns cwsg.utils)
+(ns cwsg.utils
+  (:use clojure.contrib.str-utils))
 
 (defn url-decode
   "Returns the form-url-decoded version of the given string."
@@ -14,3 +15,8 @@
   "Returns true iff the given string contains a match for the given pattern."
   [#^java.util.regex.Pattern pattern string]
   (.find (.matcher pattern string)))
+
+(defn re-without
+  "Returns a String with the given pattern re-gsub'd out the given string."
+  [pattern string]
+  (re-gsub pattern "" string))
