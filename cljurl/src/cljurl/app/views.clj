@@ -2,8 +2,7 @@
   (:use cljurl.routing
         (clj-html core helpers)
         cljurl.app.view-helpers
-        [stash.core :only (errors)])
-  (:load "view_helpers"))
+        [stash.core :only (errors)]))
 
 (defn layout
   "Layout shared by all templates."
@@ -58,14 +57,29 @@
       "Url shortened from " (h (:url shortening)) " to "
       (h (url :expand shortening))]))
 
+(defn expand-api
+  "Render a shortening expansion JSON string."
+  [shortening]
+  (str-json {:url (:url shortening)}))
+
 (defn not-found
-  "404 Not Found page."
+  "404 page."
   []
   (with-layout
-    "Were sorry - we could not find that."))
+    "We're sorry, we could not find that."))
+
+(defn not-found-api
+  "404 JSON for api."
+  []
+  (str-json {:error "404 Not Found"}))
 
 (defn internal-error
-  "500 Internal Error page"
+  "500 reponse page."
   []
   (with-layout
-    "Were sorry - something went wrong."))
+    "We're sorry, something went wrong."))
+
+(defn internal-error-api
+  "500 Response body for api."
+  []
+  (str-json {:error "500 Internal Error"}))

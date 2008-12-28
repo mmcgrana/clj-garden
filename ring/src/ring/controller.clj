@@ -1,33 +1,40 @@
 (ns ring.controller
+  (:use ring.utils)
   (:import (org.apache.commons.io FilenameUtils)))
 
-(defn not-found
-  "Reterns a tuple for a 400 html response with the given html content."
-  [content]
-  [404 {"Content-Type" "text/html"} content])
+(defn respond
+  "Most general function for returning a response tupel.
+  For opts, :status defaults to 200 and :content-type to text/html."
+  [body & [opts]]
+  [(get opts :status 200)
+   {"Content-Type" (get opts :content-type "text/html")}
+   body])
 
-(defn internal-error
-  [content]
-  [500 {"Content-Type" "text/html"} content])
+(defn respond-404
+  "Returns a tuple for a 404 response, with other options as specified by
+  respond."
+  [body & [opts]]
+  (respond body (assoc opts :status 404)))
 
-(defn render
-  "Returns a tuple for a 200 html reponse with the given html content."
-  [content]
-  [200 {"Content-Type" "text/html"} content])
+(defn respond-500
+  "Returns a tuple for a 500 reponse, with other options as specified by
+  respond."
+  [body & [opts]]
+  (respond body (assoc opts :status 500)))
 
 (defn redirect
-  "Returns a tuple for a redirect. Status is from :status in options or by
-  default 302."
-  [url & [options]]
-  [(get options :status 302)
+  "Returns a tuple for a redirect. 
+  For opts, :status is from :status defaults to 302."
+  [url & [opts]]
+  [(get opts :status 302)
    {"Location" url}
    (str "You are being <a href=\"" url "\">redirected</a>.")])
 
 (defn send-file
   "Returns a response tuple that will cause the client to download the given
   file."
-  [file & [options]]
-  (let [filename (get options :filename (FilenameUtils/getName (.getPath file)))]
+  [file & [opts]]
+  (let [filename (get-or opts :filename (FilenameUtils/getName (.getPath file)))]
     [200
      {"Content-Transfer-Encoding" "binary"
       "Content-Disposition"       (str "attachment; filename=" filename)}

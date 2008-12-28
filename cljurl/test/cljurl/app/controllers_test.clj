@@ -7,7 +7,7 @@
 
 (deftest "with-filters"
   (binding [cljurl.config/+handle-exceptions+ true]
-    (let [[status _ body] (with-filters (throwf "o noews"))]
+    (let [[status _ body] (with-filters false (throwf "o noews"))]
       (assert-status 500 status)
       (assert-match #"something went wrong" body))))
 
@@ -24,11 +24,11 @@
 (deftest "with-shortening: when found"
   (with-fixtures [fx]
     (assert= (get-in fx [:shortenings :1 :url])
-      (with-shortening [shortening (get-in fx [:shortenings :1 :slug])]
+      (with-shortening false [shortening (get-in fx [:shortenings :1 :slug])]
         (:url shortening)))))
 
 (deftest "with-shortening: when not found"
-  (let [[status _ _] (with-shortening [_ "missing"])]
+  (let [[status _ _] (with-shortening false [_ "missing"])]
     (assert-status 404 status)))
 
 (deftest "index"

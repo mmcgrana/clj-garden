@@ -1,7 +1,8 @@
 (ns cljurl.app.controllers
   (:use ring.controller
         ring.request
-        cljurl.routing)
+        cljurl.routing
+        cljurl.app.controller_helpers)
   (:require [cljurl.app.models :as m]
             [cljurl.app.views  :as v]
             [cljurl.config     :as config]
@@ -10,18 +11,25 @@
 (defmacro with-filters
   "Wrap all action code in a try catch that will either show exception details
   or present an error page to the user, as appropriate."
-  [& body]
+  [api-action & body]
   `(try
      ~@body
      (catch Exception e#
        (if (config/handle-exceptions?)
-         (internal-error (v/internal-error))
+         (if ~api-action
+           (respond-json-500 (v/internal-error-api))
+           (respond-500 (v/internal-error)))
          (throw e#)))))
 
-(defn page-not-found
+(defn not-found
   "Render a not found error page."
   [& [request]]
-  (not-found (v/not-found)))
+  (respond-404 (v/not-found)))
+
+(defn not-found-api
+  "Render a not found error response for api requests."
+  [& [request]]
+  (respond-json-404 (v/not-found-api)))
 
 (defn find-shortening
   "Find the shortening based on a slug."
@@ -31,45 +39,64 @@
 (defmacro with-shortening
   "Execute the body with the shortening found or render a not found page if
   no shortening was found."
-  [[shortening-sym slug-form] & body]
+  [api-action [shortening-sym slug-form] & body]
   `(if-let [~shortening-sym (find-shortening ~slug-form)]
      (do ~@body)
-     (page-not-found)))
+     (if ~api-action (not-found-api) (not-found))))
 
 (defn index
   "Render a page listing recent shortenings."
   [request]
-  (with-filters
+  (with-filters false
     (let [shortenings (m/find-recent-shortenings 10)]
-      (render (v/index shortenings)))))
+      (respond (v/index shortenings)))))
 
 (defn new
   "Renders a form for creating a new shortening."
   [request]
-  (with-filters
-    (render (v/new (stash/init m/+shortening+)))))
+  (with-filters false
+    (respond (v/new (stash/init m/+shortening+)))))
 
 (defn create
   "Consume a url given by the user, find its shortening, and redirect to the
   shortening show page."
   [request]
-  (with-filters
+  (with-filters false
     (let [shortening (stash/create m/+shortening+ (params request :shortening))]
       (if (stash/valid? shortening)
         (redirect (path :show shortening))
-        (render (v/new shortening))))))
+        (respond (v/new shortening))))))
 
 (defn show
   "Show the known expansion of a url."
   [request]
-  (with-filters
-    (with-shortening [shortening (params request :slug)]
-      (render (v/show shortening)))))
+  (with-filters false
+    (with-shortening false [shortening (params request :slug)]
+      (respond (v/show shortening)))))
 
 (defn expand
   "Redirect a user from a slug to its url expansion."
   [request]
-  (with-filters
-    (with-shortening [shortening (params request :slug)]
+  (with-filters false
+    (with-shortening false [shortening (params request :slug)]
       (m/hit-shortening shortening (remote-ip request))
       (redirect (:url shortening)))))
+
+(defn expand-api
+  "Show the url expansion of url"
+  [request]
+  (with-filters true
+    (with-shortening true [shortening (params request :slug)]
+       (respond-json (v/expand-api shortening)))))
+
+; new features
+; - html only actions
+;   - html 404 on wrong content type
+;   - (or just throw html back regardless now)
+; - html/json actions
+;   - static .js route differentiation => no content negotation
+;   - render html/json as appriopriate if no errors (sep acitons or handled)
+;   - render usefull error messages for each type (sep actions or handled)
+; - api not found page
+
+

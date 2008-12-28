@@ -4,12 +4,14 @@
 (def c 'cljurl.app.controllers)
 
 (def routes
-  [[c 'index          :index     :get  "/"                  ]
-   [c 'new            :new       :get  "/new"               ]
-   [c 'create         :create    :put  "/"                  ]
-   [c 'show           :show      :get  "/show/:slug"        ]
-   [c 'expand         :expand    :get  "/:slug"             ]
-   [c 'page-not-found :not-found :any  "/:path" {:path ".*"}]])
+  [[c 'index          :index         :get  "/"                     ]
+   [c 'new            :new           :get  "/new"                  ]
+   [c 'create         :create        :put  "/"                     ]
+   [c 'show           :show          :get  "/show/:slug"           ]
+   [c 'expand         :expand        :get  "/:slug"                ]
+   [c 'expand-api     :expand-api    :get  "/:slug.js"             ]
+   [c 'not-found-api  :not-found-api :any  "/:path.js" {:path ".*"}]
+   [c 'not-found      :not-found     :any  "/:path"    {:path ".*"}]])
 
 (def router (ring.routing/compiled-router routes config/+app-host+))
 

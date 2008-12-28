@@ -1,22 +1,23 @@
 (ns ring.controller-test
   (:use clj-unit.core ring.controller clj-scrape.core))
 
-(deftest "not-found"
-  (assert= [404 {"Content-Type" "text/html"} "hello"]
-    (not-found "hello")))
-
-(deftest "internal-error"
-  (assert= [500 {"Content-Type" "text/html"} "o no"]
-    (internal-error "o no")))
-
-(deftest "render"
+(deftest "respond"
   (assert=
     [200 {"Content-Type" "text/html"} "hello"]
-    (render "hello")))
+    (respond "hello")))
+
+(deftest "respond-404"
+  (assert= [404 {"Content-Type" "text/html"} "hello"]
+    (respond-404 "hello")))
+
+(deftest "respond-500"
+  (assert= [500 {"Content-Type" "text/html"} "o no"]
+    (respond-500 "o no")))
 
 (def base-redirect
-  [302 {"Location" "http://google.com"}
-    "You are being <a href=\"http://google.com\">redirected</a>."])
+  [302
+   {"Location" "http://google.com"}
+  "You are being <a href=\"http://google.com\">redirected</a>."])
 
 (deftest "redirect"
   (assert= base-redirect (redirect "http://google.com"))

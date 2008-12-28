@@ -1,5 +1,11 @@
 (ns cljurl.app.view-helpers
+  (:require (org.danlarkin [json :as json]))
   (:use (clj-html core helpers)))
+
+(defn str-json
+  "Encode the Clojure data structure as a JSON string with 2 spaces of indent."
+  [data]
+  (json/encode-to-str data :indent 2))
 
 (defn hstr
   "Returns an html-escaped string representation of val. Like (h (str val))."
