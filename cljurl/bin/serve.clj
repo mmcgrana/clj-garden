@@ -1,5 +1,3 @@
-(set! *warn-on-reflection* true)
+(require 'cwsg.handlers.jetty 'cljurl.app)
 
-(require 'cwsg.core 'cljurl.app)
-
-(cwsg.core/serve {:port 8000} cljurl.app/app)
+(cwsg.handlers.jetty/run cljurl.app/app {:port 8000})

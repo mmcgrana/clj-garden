@@ -1,5 +1,5 @@
 (ns cwsg.apps.dump
-  (:use clj-html.core clj-html.helpers)
+  (:use (clj-html core helpers))
   (:import (org.apache.commons.io IOUtils)))
 
 (defn- template

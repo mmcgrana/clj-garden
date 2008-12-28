@@ -1,10 +1,10 @@
-(ns cwsg.core
+(ns cwsg.handlers.jetty
   (:import (javax.servlet.http HttpServletRequest HttpServletResponse)
            (org.mortbay.jetty.handler AbstractHandler)
            (org.mortbay.jetty Server)
            (java.io File FileInputStream InputStream OutputStream)
            (org.apache.commons.io IOUtils))
-  (:use clojure.contrib.fcase clojure.contrib.except))
+  (:use (clojure.contrib fcase except)))
 
 (defn- env-map
   "Returns a map representing the given request, to be passed as the env
@@ -68,10 +68,10 @@
         (apply-response-tuple response tuple)
         (.setHandled request true)))))
 
-(defn serve
+(defn run
   "Serve the given app according to the given options.
-  Options must at least include :port, and int."
-  [options app]
+  Options currently consists only of :port, an integer."
+  [app options]
   (let [port    (or (:port options) (throwf ":port missing from options"))
         server  (doto (Server. port) (.setSendDateHeader true))
         handler (proxy-handler app)]

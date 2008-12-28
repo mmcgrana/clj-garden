@@ -1,4 +1,4 @@
-(require 'cwsg.core
+(require 'cwsg.handlers.jetty
          'cwsg.middleware.show-exceptions
          'cwsg.middleware.file-content-info
          'cwsg.middleware.string-content-length
@@ -7,9 +7,11 @@
 
 (import '(java.io File))
 
-(cwsg.core/serve {:port 8000}
+(def app
   (cwsg.middleware.show-exceptions/wrap
     (cwsg.middleware.file-content-info/wrap
       (cwsg.middleware.string-content-length/wrap
         (cwsg.middleware.static/wrap (File. "public")
           cwsg.apps.dump/app)))))
+
+(cwsg.handlers.jetty/run app {:port 8000})
