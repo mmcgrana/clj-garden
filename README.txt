@@ -4,7 +4,7 @@ Nothing here is ready for general public use, but if anything intrigues you let 
 
 * clj-backtrace: Better Clojure backtraces
 * clj-http-client: HTTP client wrapping Commons HttpClient
-* clj-jdbc: High-level, ORM agnostic API for interacting with JDBC databases
+* clj-jdbc: High-level interface to JDBC databases
 * clj-rome: Universal RSS/Atom Feed parser wrapping Rome
 * clj-routing: Core of URL router for use in web frameworks
 * clj-scrape: Bundling of various clojure libraries to facilitate HTML scraping

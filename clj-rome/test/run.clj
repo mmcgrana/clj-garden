@@ -1,3 +1,4 @@
+(use 'clj-unit.core)
 (require 'clj-rome.parser-test)
 
-(clj-unit.core/run-tests 'clj-rome.parser-test)
+(run-tests '(clj-rome.parser-test))
