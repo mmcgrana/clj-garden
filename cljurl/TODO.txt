@@ -1,5 +1,3 @@
-get views working, then passing tests
-
 something for (domap-str [foo foos] (html body))
 partials (domap-html)
 

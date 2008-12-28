@@ -1,32 +1,12 @@
 (ns clj-scrape.core-test
   (use clj-unit.core clj-scrape.core))
 
-(defn asset-input-stream [name]
-  (let [cl     (clojure.lang.RT/ROOT_CLASSLOADER)
-        url    (.getResource cl name)
-        path   (.getPath url)]
-    (java.io.FileInputStream. path)))
-
-(defn string-input-stream [string]
-  (java.io.StringReader. string))
-
-(defn asset-dom [name]
-  (dom (asset-input-stream name)))
-
 (defn string-dom [string]
-  (dom (string-input-stream string)))
+  (dom (java.io.StringReader. string)))
 
 (def simple-dom
   (string-dom
     "<html><body><p id='a' custom='no' class='1'>one</p><p id='b' unique='yes' custom='yes' class='2'>two</p></body></html>"))
-
-; (deftest "xml->"
-;   (assert= '("one" "two")
-;     (xml-> simple-dom :body :p text)))
-; 
-; (deftest "xml1->"
-;   (assert= "one"
-;     (xml1-> simple-dom :body :p text)))
 
 (deftest "class="
   (assert= "two"
