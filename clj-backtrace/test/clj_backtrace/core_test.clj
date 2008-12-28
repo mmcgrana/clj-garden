@@ -50,4 +50,12 @@
 (deftest "parse-trace"
   (assert= (map second cases) (parse-trace (map first cases))))
 
+(deftest "trim-redundant-elems"
+  (assert= '(d c) (trim-redundant-elems '(d c b a) '(f e b a)))
+  (assert= '(c)   (trim-redundant-elems '(c b a)   '(f e b a)))
+  (assert= '(d c) (trim-redundant-elems '(d c b a) '(e b a))))
 
+(deftest "parse-exception"
+  (try
+    (eval '(/))
+    (catch Exception e (parse-exception e))))

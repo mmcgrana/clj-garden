@@ -58,3 +58,37 @@
   trace elements."
   [elems]
   (map parse-elem elems))
+
+(defn trim-redundant-elems
+  "Returns the portion of causer-elems that is not duplicated in caused-elems."
+  [causer-elems caused-elems]
+  (loop [rcauser-elems (reverse causer-elems)
+         rcaused-elems (reverse caused-elems)]
+    (if-let [rcauser-bottom (first rcauser-elems)]
+      (if (= rcauser-bottom (first rcaused-elems))
+        (recur (rest rcauser-elems) (rest rcaused-elems))
+        (reverse rcauser-elems)))))
+
+(defn- parse-cause-exception
+  "Like parse-exception, but for causing exceptions."
+  [causer-e caused-elems]
+  (let [trace-elems (parse-trace (.getStackTrace causer-e))
+        base {:class         (class causer-e)
+              :message       (.getMessage causer-e)
+              :trace-elems   trace-elems
+              :trimmed-elems (trim-redundant-elems trace-elems caused-elems)}]
+    (if-let [cause (.getCause causer-e)]
+      (assoc base :cause (parse-cause-exception cause trace-elems))
+      base)))
+
+(defn parse-exception
+  "Returns a Clojure data structure providing usefull informaiton about the
+  exception, its stack trace elements, and its causes."
+  [e]
+  (let [trace-elems (parse-trace (.getStackTrace e))
+        base {:class       (class e)
+              :message     (.getMessage e)
+              :trace-elems trace-elems}]
+    (if-let [cause (.getCause e)]
+      (assoc base :cause (parse-cause-exception cause trace-elems))
+      base)))

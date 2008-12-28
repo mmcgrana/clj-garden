@@ -32,7 +32,7 @@ table.trace td.method {
 ")
 
 (defn- exception-name [class]
-  (re-sub #"^class\s(java\.lang\.)?" "" (str class)))
+  (re-without #"^class " (str class)))
 
 (defn source-str [parsed]
   (if (and (:file parsed) (:line parsed))

@@ -16,38 +16,39 @@
   (if (:java parsed) (java-method-str parsed) (clojure-method-str parsed)))
 
 (defn print-trace
-  "Print a pretty stack trace for the elems."
-  [elems]
-  (let [parsed    (parse-trace elems)
-        sources   (map source-str parsed)
-        methods   (map method-str parsed)
-        src-width (high (map (memfn length) sources))]
-    (doseq [[src meth] (zip sources methods)]
-      (println (str " " (rjust (+ src-width 3) src) " " meth)))))
-
-(defn trim-redundant-elems
-  [causer-elems caused-elems]
-  (loop [rcauser-elems (reverse causer-elems)
-         rcaused-elems (reverse caused-elems)]
-    (if-let [rcauser-bottom (first rcauser-elems)]
-      (if (= rcauser-bottom (first rcaused-elems))
-        (recur (rest rcauser-elems) (rest rcaused-elems))
-        (reverse rcauser-elems)))))
+  "Print a pretty stack trace for the parsed elems."
+  [elems & [source-width]]
+  (let [print-width
+          (+ 3 (or source-width
+                   (high (map (memfn length) (map source-str elems)))))]
+    (doseq [elem elems]
+      (println
+        (str (rjust print-width (source-str elem)) " " (method-str elem))))))
 
 (defn- ppe-cause
-  "Print a pretty stack trace for an exception in a causal chain."
-  [e-causer e-caused]
-  (println (str "Caused by: " e-causer))
-  (print-trace (trim-redundant-elems (.getStackTrace e-causer)
-                                     (.getStackTrace e-caused)))
-  (if-let [next-cause (.getCause e-causer)]
-    (ppe-cause next-cause e-causer)))
+  "Print a pretty stack trace for a parsed exception in a causal chain."
+  [exec source-width]
+  (println (str "Caused by: " (:message exec)))
+  (print-trace (:trimmed-elems exec) source-width)
+  (if-let [cause (:cause exec)]
+    (ppe-cause cause source-width)))
+
+(defn- find-source-width
+  "Returns the width of the longest source-string among all trace elems of the 
+  excp and its causes."
+  [excp]
+    (let [this-source-width
+            (high (map (memfn length) (map source-str (:trace-elems excp))))]
+      (if-let [cause (:cause excp)]
+        (max this-source-width (find-source-width cause))
+        this-source-width)))
 
 (defn ppe
   "Print a pretty stack trace for an exception, by default *e."
   [& [e]]
-  (let [exc (or e *e)]
-    (println (str exc))
-    (print-trace (.getStackTrace exc))
-    (if-let [cause (.getCause exc)]
-      (ppe-cause cause exc))))
+  (let [exec      (parse-exception (or e *e))
+        source-width (find-source-width exec)]
+    (println (:message exec))
+    (print-trace (:trace-elems exec) source-width)
+    (if-let [cause (:cause exec)]
+      (ppe-cause cause source-width))))
