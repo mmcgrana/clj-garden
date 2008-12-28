@@ -95,8 +95,8 @@
   [request]
   (let [env     (request :env)
         headers (env :headers)]
-    (or (headers "x-forwarded-host")
-        (headers "host")
+    (or (get headers "x-forwarded-host")
+        (get headers "host")
         (str (env :server-name) ":" (env :server-port)))))
 
 (defn full-uri
@@ -138,13 +138,13 @@
   user."
   [request]
   (let [env     (request :env)
-        headers (request :headers)]
-    (or (headers "client-ip")
-        (if-let [forwarded (headers "x-forwarded-for")]
+        headers (env :headers)]
+    (or (get headers "client-ip")
+        (if-let [forwarded (get headers "x-forwarded-for")]
           (let [all-ips       (re-split #"," forwarded)
                 remote-ips (remove #(re-match? +local-ip-re+ %) all-ips)]
             (if (not (empty? remote-ips)) (.trim (first remote-ips)))))
-        (env "remote-addr"))))
+        (env :remote-addr))))
 
 (defn referrer
   "Returns a String for the http refer(r)er"

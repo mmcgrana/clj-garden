@@ -6,7 +6,7 @@
        (cljurl.app models controllers controllers-test-helper)))
 
 (deftest "with-filters"
-  (binding [cljurl.config/+env+ :prod]
+  (binding [cljurl.config/+handle-exceptions+ true]
     (let [[status _ body] (with-filters (throwf "o noews"))]
       (assert-status 500 status)
       (assert-match #"something went wrong" body))))
@@ -57,7 +57,7 @@
   {:shortening {:url "http://amazon.com"}})
 
 (deftest "create: valid shortening"
-  (let [response (request app (path-info :create) valid-params)
+  (let [response (request app (path-info :create) {:params valid-params})
         [status headers body] response
         shortening (stash/find-one +shortening+ {:order [:created_at :desc]})]
     (assert-redirect (path :show shortening) response)))
@@ -66,7 +66,7 @@
   {:shortening {:url "foo"}})
 
 (deftest "create: invalid shortening"
-  (let [[_ _ body] (request app (path-info :create) invalid-params)]
+  (let [[_ _ body] (request app (path-info :create) {:params invalid-params})]
     (assert-selector
       (desc :p (text-match? #"valid-url")) body)
     (assert-selector
@@ -85,14 +85,15 @@
   (let [[status _ _] (request app (path-info :show {:slug "missing"}))]
     (assert-status 404 status)))
 
-(deftest "expand: found shortening"
+(deftest "expand: found shortening, existing ip"
   (with-fixtures [fx]
-    (let [shortening (get-in fx [:shortenings :1])
-          response (request app (path-info :expand shortening))]
-    (assert-redirect (:url shortening) response)
-    (assert= (inc (:hit_count shortening))
-      (:hit_count (stash/find-one +shortening+
-                    {:where [:slug := (:slug shortening)]}))))))
+    (let [sh (get-in fx [:shortenings :1])
+          ht (get-in fx [:hits :on-1])
+          response (request app (path-info :expand sh) {:remote-addr (:ip ht)})]
+    (assert-redirect (:url sh) response)
+    (assert= (inc (:hit_count ht))
+      (:hit_count (stash/find-one +hit+
+        {:where [:id := (:id ht)]}))))))
 
 (deftest "expand: missing shortening"
   (let [[status _ _] (request app (path-info :expand {:slug "missing"}))]

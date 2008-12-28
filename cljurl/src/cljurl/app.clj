@@ -10,7 +10,7 @@
     cljurl.app.controllers))
 
 (def app
-  (show-exceptions/wrap
+  (show-exceptions/wrap #(config/show-exceptions?)
     (file-content-info/wrap
       (string-content-length/wrap
         (static/wrap config/+public-dir+

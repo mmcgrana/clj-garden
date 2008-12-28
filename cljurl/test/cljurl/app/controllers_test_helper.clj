@@ -3,8 +3,9 @@
            [ring.http-utils :as http-utils])
   (use clj-unit.core cljurl.app.models clj-time.core clj-scrape.core))
 
-(def shortening-map1 {:slug "short1" :url "http://google.com" :hit_count 0 :created_at (now)})
-(def shortening-map2 {:slug "short2" :url "http://amazon.com" :hit_count 0 :created_at (now)})
+(def shortening-map1 {:slug "short1" :url "http://google.com" :created_at (now)})
+(def shortening-map2 {:slug "short2" :url "http://amazon.com" :created_at (now)})
+(def hit-map1        {:ip "auserip" :created_at (now) :updated_at (now) :hit_count 3})
 
 (defmacro with-fixtures
   "TODOC"
@@ -13,16 +14,19 @@
      (stash/delete-all +shortening+)
      (let [s1# (stash/persist-insert (stash/init* +shortening+ shortening-map1))
            s2# (stash/persist-insert (stash/init* +shortening+ shortening-map2))
-           ~binding-sym {:shortenings {:1 s1# :2 s2#}}]
+           h1# (stash/persist-insert (stash/init* +hit+ (assoc hit-map1 :shortening_id (:id s1#))))
+           ~binding-sym {:shortenings {:1 s1# :2 s2#} :hits {:on-1 h1#}}]
        ~@body)))
 
 (defn request
   "Returns the response of app to mock request build according to the method,
-  path and optional params."
-  [app [method path] & [params]]
+  path and options."
+  [app [method path] & [options]]
   (app {:uri path
         :request-method method
-        :query-string (http-utils/query-unparse (or params {}))}))
+        :query-string (if-let [params (get options :params)]
+                        (http-utils/query-unparse params))
+        :remote-addr  (get options :remote-addr)}))
 
 (defmacro assert-status
   "TODOC"

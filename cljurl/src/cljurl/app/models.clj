@@ -14,35 +14,45 @@
   (let [slug (str-cat (take +slug-length+ (map choice (repeat +slug-chars+))))]
     [(assoc shortening :slug slug) true]))
 
-(defn zero-hit-count
-  [shortening]
-  [(assoc shortening :hit_count 0) true])
-
 (defmodel +shortening+
   {:data-source config/+data-source+
    :table-name  :shortenings
    :columns
      [[:slug       :string]
       [:url        :string]
-      [:hit_count  :integer]
       [:created_at :datetime]]
    :accessible-attrs
      [:url]
    :validations
      [[:url valid-url]]
    :callbacks
-     {:before-create [timestamp-create generate-slug zero-hit-count]}})
+     {:before-create [timestamp-create generate-slug]}})
 
 (defn find-recent-shortenings
   "Returns the n most recently created shortenings."
   [n]
   (find-all +shortening+ {:limit n :order [:created_at :desc]}))
 
+(defmodel +hit+
+  {:data-source config/+data-source+
+   :table-name :hits
+   :columns
+     [[:shortening_id :uuid]
+      [:ip            :string]
+      [:created_at    :datetime]
+      [:updated_at    :datetime]
+      [:hit_count     :integer]]
+   :callbacks
+     {:before-create [timestamp-create]
+      :before-update [timestamp-update]}})
+
 (defn inc-attr [instance attr-name]
   (update instance attr-name inc))
 
-(defn hit-shortening [shortening]
+(defn hit-shortening [shortening ip]
   "Increment the hit count for the shortening and save the change to the DB."
-  (save (inc-attr shortening :hit_count)))
-
-
+  (if-let [hit (find-one +hit+
+                 {:where [:and [:shortening_id := (:id shortening)]
+                               [:ip := ip]]})]
+    (save (inc-attr hit :hit_count))
+    (create* +hit+ {:shortening_id (:id shortening) :ip ip :hit_count 1})))

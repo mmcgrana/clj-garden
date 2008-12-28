@@ -14,9 +14,9 @@
   `(try
      ~@body
      (catch Exception e#
-       (if (config/show-exceptions?)
-         (throw e#)
-         (internal-error (v/internal-error))))))
+       (if (config/handle-exceptions?)
+         (internal-error (v/internal-error))
+         (throw e#)))))
 
 (defn page-not-found
   "Render a not found error page."
@@ -71,5 +71,5 @@
   [request]
   (with-filters
     (with-shortening [shortening (params request :slug)]
-      (m/hit-shortening shortening)
+      (m/hit-shortening shortening (remote-ip request))
       (redirect (:url shortening)))))
