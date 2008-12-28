@@ -1,5 +1,3 @@
-naive hit tracking
-ip-based hits tracking
 API 
   - need json and xml parser and pretty-printers
 nicer views

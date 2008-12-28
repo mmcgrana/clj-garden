@@ -95,6 +95,14 @@
       (:hit_count (stash/find-one +hit+
         {:where [:id := (:id ht)]}))))))
 
+(deftest "expand: found shortening, new ip"
+  (with-fixtures [fx]
+    (let [sh (get-in fx [:shortenings :1])
+          response (request app (path-info :expand sh) {:remote-addr "new"})
+          ht (stash/find-one +hit+ {:where [:ip := "new"]})]
+      (assert-redirect (:url sh) response)
+      (assert= 1 (:hit_count ht)))))
+
 (deftest "expand: missing shortening"
   (let [[status _ _] (request app (path-info :expand {:slug "missing"}))]
     (assert-status 404 status)))
