@@ -2,13 +2,8 @@
   (:use clojure.contrib.except clj-jdbc.utils)
   (:import (java.sql Connection Statement ResultSet)))
 
-(def *connections* {})
-(def *t-levels* {})
-
-(defn require-driver
-  "Ensure that the driver corresponding to the given class name is loaded."
-  [classname]
-  (Class/forName classname))
+(def *connection* nil)
+(def *level*      nil)
 
 (defmacro with-connection
   "Evaluates body in the context of a new connection to a database from the
@@ -16,15 +11,14 @@
   has an existing connection to the datasource, that one will be provided
   instead of opening a new one."
   [[binding-sym #^DataSource data-source-form] & body]
-  `(let [data-source# ~data-source-form]
-     (if-let [existing-conn# (get *connections* data-source#)]
-       (let [~binding-sym existing-conn#]
-         ~@body)
-       (with-open [new-conn# (.getConnection data-source#)]
-         (binding [*connections* (assoc *connections* data-source# new-conn#)
-                   *t-levels*    (assoc *t-levels* new-conn# 0)]
-           (let [~binding-sym new-conn#]
-              ~@body))))))
+  `(if *connection*
+     (let [~binding-sym *connection*]
+       ~@body)
+     (with-open [new-conn# (.getConnection ~data-source-form)]
+       (binding [*connection* new-conn#
+                 *level*      0]
+         (let [~binding-sym new-conn#]
+            ~@body)))))
 
 (defmacro in-transaction
   "Evaluates body as in transaction on the connection. Updates
@@ -32,8 +26,8 @@
   after an uncaught exception. Supports nested transactions."
   [conn-sym & body]
   `(do
-    (let [level# (*t-levels* ~conn-sym)]
-      (binding [*t-levels* (assoc *t-levels* ~conn-sym (inc level#))]
+    (let [level# *level*]
+      (binding [*level* (inc *level*)]
         (when (zero? level#)
           (.setAutoCommit ~conn-sym false))
         (try

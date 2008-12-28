@@ -1,2 +1,2 @@
-think carefully about conn-pasing business, may want to just use bindings
+more abstraction than DataSource
 research proper connection pooling
