@@ -71,4 +71,5 @@
   [request]
   (with-filters
     (with-shortening [shortening (params request :slug)]
+      (m/hit-shortening shortening)
       (redirect (:url shortening)))))

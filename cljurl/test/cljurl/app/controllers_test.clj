@@ -87,10 +87,12 @@
 
 (deftest "expand: found shortening"
   (with-fixtures [fx]
-    (let [response (request app
-                     (path-info :expand
-                       {:slug (get-in fx [:shortenings :1 :slug])}))]
-    (assert-redirect (get-in fx [:shortenings :1 :url]) response))))
+    (let [shortening (get-in fx [:shortenings :1])
+          response (request app (path-info :expand shortening))]
+    (assert-redirect (:url shortening) response)
+    (assert= (inc (:hit_count shortening))
+      (:hit_count (stash/find-one +shortening+
+                    {:where [:slug := (:slug shortening)]}))))))
 
 (deftest "expand: missing shortening"
   (let [[status _ _] (request app (path-info :expand {:slug "missing"}))]

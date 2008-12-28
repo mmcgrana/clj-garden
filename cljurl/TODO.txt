@@ -9,3 +9,8 @@ logging in general
   - framework: params, routing, timing.
   - exceptions
   - (def *logger* (clj-logger/to-path "log/development.log"))
+
+(get-in fx [:shortenings :1 :slug])
+(fx :shortengins :1 :slug)
+
+unique constraint on slug

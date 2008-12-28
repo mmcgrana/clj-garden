@@ -1,5 +1,6 @@
 (ns clj-unit.console-reporter
-  (:use clj-unit.utils clj-backtrace.repl clojure.contrib.str-utils))
+  (:use clj-unit.utils clojure.contrib.str-utils
+        (clj-backtrace core repl)))
 
 ; composed of tests
 ; a test may be pending or not pending
@@ -29,7 +30,7 @@
                      (re-match? #"clj_unit.core\$run_tests" (.getClassName m)))
         user-elems (take-while #(not (ours? %)) elems)]
     (println (str e))
-    (print-trace user-elems)))
+    (print-trace (parse-trace user-elems))))
 
 (def +console-reporter+
   {:init

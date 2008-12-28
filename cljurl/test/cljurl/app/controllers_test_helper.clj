@@ -3,16 +3,16 @@
            [ring.http-utils :as http-utils])
   (use clj-unit.core cljurl.app.models clj-time.core clj-scrape.core))
 
-(def shortening-map1 {:slug "short1" :url "http://google.com" :created_at (now)})
-(def shortening-map2 {:slug "short2" :url "http://amazon.com" :created_at (now)})
+(def shortening-map1 {:slug "short1" :url "http://google.com" :hit_count 0 :created_at (now)})
+(def shortening-map2 {:slug "short2" :url "http://amazon.com" :hit_count 0 :created_at (now)})
 
 (defmacro with-fixtures
   "TODOC"
   [[binding-sym] & body]
   `(do
      (stash/delete-all +shortening+)
-     (let [s1# (stash/persist-insert (stash/init +shortening+ shortening-map1))
-           s2# (stash/persist-insert (stash/init +shortening+ shortening-map1))
+     (let [s1# (stash/persist-insert (stash/init* +shortening+ shortening-map1))
+           s2# (stash/persist-insert (stash/init* +shortening+ shortening-map2))
            ~binding-sym {:shortenings {:1 s1# :2 s2#}}]
        ~@body)))
 

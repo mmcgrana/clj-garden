@@ -93,7 +93,7 @@
 (defn init*
   "Like init, but bypasses mass-assignment protection."
   [model & [attrs]]
-  (update-attrs (with-meta {:id (gen-uuid)} {:model model :new true}) attrs))
+  (update-attrs* (with-meta {:id (gen-uuid)} {:model model :new true}) attrs))
 
 (defn init
   "Returns an instance of the model with the given attrs having new status."
@@ -146,7 +146,7 @@
 (defn create*
   "Like create, but bypasses mass-assignment protection."
   [model & [attrs]]
-  (save (init model attrs)))
+  (save (init* model attrs)))
 
 (defn create
   "Creates an instance of the model with the attrs. Validations and validations
