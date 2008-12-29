@@ -89,12 +89,7 @@
     (with-shortening true [shortening (params request :slug)]
        (respond-json (v/expand-api shortening)))))
 
-; new features
-; - html only actions
-;   - html 404 on wrong content type
-;   - (or just throw html back regardless now)
 ; - html/json actions
-;   - static .js route differentiation => no content negotation
 ;   - render html/json as appriopriate if no errors (sep acitons or handled)
 ;   - render usefull error messages for each type (sep actions or handled)
 ; - api not found page
