@@ -34,7 +34,7 @@
 (defn assert-status
   "TODOC"
   [expected-status actual-status]
-  (assert-that (= expected-status actual-status)
+  (assert-truth (= expected-status actual-status)
     (format "Expected status of %s, but got %s"
       expected-status actual-status)))
 
@@ -43,7 +43,7 @@
   [expected-path actual-response]
   (let [[status headers body] actual-response
          location             (get headers "Location")]
-     (assert-that (and (and (>= status 300) (< status 400))
+     (assert-truth (and (and (>= status 300) (< status 400))
                        (= expected-path location))
        (format "Expecting redirect status and Location of %s, but got %s and %s."
          expected-path status location))))
@@ -52,7 +52,7 @@
   "TODOC"
   [expected-selector actual-body]
   `(let [actual-dom# (dom (java.io.StringReader. ~actual-body))]
-     (assert-that (xml1-> actual-dom# ~@(cons 'desc expected-selector))
+     (assert-truth (xml1-> actual-dom# ~@(cons 'desc expected-selector))
        (format "Expecting body matching %s, but did not.",
          '~expected-selector))))
 
@@ -60,13 +60,13 @@
   "TODOC"
   [expected-type actual-headers]
   (let [actual-type (get actual-headers "Content-Type")]
-    (assert-that (= expected-type actual-type)
+    (assert-truth (= expected-type actual-type)
       (format "Expecting Content-Type %s, but got %s"
         expected-type actual-type))))
 
 (defn assert-json
   "TODOC"
   [expected-data actual-body]
-  (assert-that (= expected-data (json/decode-from-str actual-body))
+  (assert-truth (= expected-data (json/decode-from-str actual-body))
     (format "Expecting JSON parsing to %s, but got %s"
       (prn-str expected-data) (prn-str actual-body))))

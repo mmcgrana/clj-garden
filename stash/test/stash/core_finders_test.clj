@@ -83,10 +83,10 @@
 (deftest-db "exist?"
   (assert-not (exist? +post+))
   (persist-insert complete-post)
-  (assert-truth (exist? +post+))
+  (assert-that (exist? +post+))
   (assert-not (exist? +post+ {:where [:id := (:id complete-post-2)]}))
   (persist-insert complete-post-2)
-  (assert-truth (exist? +post+ {:where [:id := (:id complete-post-2)]})))
+  (assert-that (exist? +post+ {:where [:id := (:id complete-post-2)]})))
 
 (deftest-db "count-all"
   (assert= 0 (count-all +post+))

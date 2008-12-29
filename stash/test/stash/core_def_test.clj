@@ -22,6 +22,6 @@
   (assert-nil (title (init +post-with-accessors+)))
   (assert= "foo" (title (title= (init +post-with-accessors+) "foo")))
   (assert-not (title? (init +post-with-accessors+)))
-  (assert-truth (title? (title= (init +post-with-accessors+) "foo"))))
+  (assert-that (title? (title= (init +post-with-accessors+) "foo"))))
 
 ; TODO: test rest

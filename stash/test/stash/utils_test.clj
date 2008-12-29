@@ -29,7 +29,7 @@
       :biz (memfn toUpperCase))))
 
 (deftest "def-"
-  (assert-truth (:private (meta (def- foo "bar")))))
+  (assert-that (:private (meta (def- foo "bar")))))
 
 (deftest "get-or"
   (assert= :bar (get-or {:foo :bar} :foo (throw (Exception. "fail"))))
@@ -46,6 +46,6 @@
   (assert= "foo" (the-str "foo")))
 
 (deftest "re-match?"
-  (assert-truth (re-match? #"f.o" "foo"))
-  (assert-truth (re-match? #"f.o" "foobar"))
+  (assert-that (re-match? #"f.o" "foo"))
+  (assert-that (re-match? #"f.o" "foobar"))
   (assert-not   (re-match? #"b.r" "foo")))

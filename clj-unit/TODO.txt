@@ -1,6 +1,3 @@
 per-assertion file and line numbers
 
 perhaps allow some sort of error message input to assertions so that you know what went wrong, as in ruby's test/unit
-
-Perhaps use assert-truth for current assert-that, then expose assert-that as
-user-facing assertion.

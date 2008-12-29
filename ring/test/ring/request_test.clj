@@ -79,7 +79,7 @@
 
 (deftest "ssl?"
   (assert-not   (ssl? (request-with {:scheme "http"})))
-  (assert-truth (ssl? (request-with {:scheme "https"}))))
+  (assert-that (ssl? (request-with {:scheme "https"}))))
 
 (deftest "server-port"
   (assert= 80
@@ -112,7 +112,7 @@
     (user-agent (request-with {:headers {"user-agent" "browser"}}))))
 
 (deftest "ajax?"
-  (assert-truth
+  (assert-that
     (ajax? (request-with {:headers {"x-requested-with" "XMLHttpRequest"}})))
   (assert-not
     (ajax? (request-with {}))))

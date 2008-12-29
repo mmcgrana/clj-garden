@@ -30,7 +30,7 @@
   (let [post (init +post-with-callbacks+
                {:special true :title "test" :view_count 0})]
     (let [[cb-post passed] (run-named-callbacks post :after-update)]
-      (assert-truth passed)
+      (assert-that passed)
       (assert= "TEST" (:title cb-post))
       (assert= 1 (:view_count cb-post)))))
 

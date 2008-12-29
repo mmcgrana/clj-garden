@@ -30,10 +30,10 @@
 (deftest-db "delete: deletes the record for the instance, returns as deleted"
   (let [deleted (delete (persist-insert complete-post))]
     (assert-not   (new? deleted))
-    (assert-truth (deleted? deleted))))
+    (assert-that (deleted? deleted))))
 
 (deftest "init: returns instance marked as new"
-  (assert-truth (new? complete-post))
+  (assert-that (new? complete-post))
   (assert= complete-post-map (dissoc complete-post :id)))
 
 (deftest "init: casts attrs"
@@ -55,7 +55,7 @@
 (deftest-db "save: new instance"
   (let [saved    (save (init +post-with-save-callbacks+ complete-post-map))]
     (assert-not (new? saved))
-    (assert-truth (find-one +post+ {:where [:id := (:id saved)]}))
+    (assert-that (find-one +post+ {:where [:id := (:id saved)]}))
     (assert= [:before-v :after-v :before-c :after-c] (:track saved))))
 
 (deftest-db "save: non-new instance"
@@ -64,7 +64,7 @@
 (deftest-db "create, new?"
   (let [created (create +post+ complete-post-map)]
     (assert-not (new? created))
-    (assert-truth (find-one +post+ {:where [:id := (:id created)]}))))
+    (assert-that (find-one +post+ {:where [:id := (:id created)]}))))
 
 (deftest-db "create: casts attrs"
   (assert= 7
@@ -84,6 +84,6 @@
 (deftest-db "destroy, deleted?"
   (let [destroyed (destroy (create +post-with-destroy-cbs+ complete-post-map))]
     (assert-not   (new? destroyed))
-    (assert-truth (deleted? destroyed))
+    (assert-that (deleted? destroyed))
     (assert-not   (find-one +post+ {:where [:id := (:id destroyed)]}))
     (assert= [:before :after] (:track destroyed))))

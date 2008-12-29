@@ -4,7 +4,7 @@
 (deftest "generate-slug"
   (let [[shortening success] (generate-slug {})]
     (assert-match #"[abcdefghijk12345]{5}" (:slug shortening))
-    (assert-truth success)))
+    (assert-that success)))
 
 (deftest "find-shortenings"
   (doseq [i (range 5)]

@@ -7,8 +7,8 @@
   (assert= "foobat" (re-without #"\d*" "foo123bat")))
 
 (deftest "re-match?"
-  (assert-truth (re-match? #"foo" "foo"))
-  (assert-truth (re-match? #"o"   "foo"))
+  (assert-that (re-match? #"foo" "foo"))
+  (assert-that (re-match? #"o"   "foo"))
   (assert-not   (re-match? #"bar" "foo")))
 
 (deftest "take-last"
