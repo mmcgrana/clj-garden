@@ -1,2 +1,0 @@
-more abstraction than DataSource
-research proper connection pooling
