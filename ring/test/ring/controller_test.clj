@@ -1,5 +1,5 @@
 (ns ring.controller-test
-  (:use clj-unit.core ring.controller clj-scrape.core))
+  (:use clj-unit.core clj-scrape.core (ring controller test-helpers)))
 
 (deftest "respond"
   (assert=

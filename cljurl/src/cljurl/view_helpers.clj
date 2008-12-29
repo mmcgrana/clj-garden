@@ -1,4 +1,4 @@
-(ns cljurl.app.view-helpers
+(ns cljurl.view-helpers
   (:require (org.danlarkin [json :as json]))
   (:use (clj-html core helpers)))
 

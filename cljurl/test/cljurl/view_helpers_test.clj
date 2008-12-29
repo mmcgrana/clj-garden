@@ -1,5 +1,5 @@
-(ns cljurl.app.view-helpers-test
-  (:use clj-unit.core cljurl.app.view-helpers))
+(ns cljurl.view-helpers-test
+  (:use clj-unit.core cljurl.view-helpers))
 
 (deftest "hstr"
   (assert= ":foo&amp;" (hstr :foo&)))

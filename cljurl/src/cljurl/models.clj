@@ -1,7 +1,7 @@
-(ns cljurl.app.models
+(ns cljurl.models
   (:use    stash.core
            stash.timestamps stash.validators
-           cljurl.utils)
+           (cljurl utils model-helpers))
   (:require [cljurl.config :as config]))
 
 
@@ -45,9 +45,6 @@
    :callbacks
      {:before-create [timestamp-create]
       :before-update [timestamp-update]}})
-
-(defn inc-attr [instance attr-name]
-  (update instance attr-name inc))
 
 (defn hit-shortening [shortening ip]
   "Increment the hit count for the shortening and save the change to the DB."

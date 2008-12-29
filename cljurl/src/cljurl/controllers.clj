@@ -1,10 +1,10 @@
-(ns cljurl.app.controllers
+(ns cljurl.controllers
   (:use ring.controller
         ring.request
         cljurl.routing
-        cljurl.app.controller_helpers)
-  (:require [cljurl.app.models :as m]
-            [cljurl.app.views  :as v]
+        cljurl.controller_helpers)
+  (:require [cljurl.models :as m]
+            [cljurl.views  :as v]
             [cljurl.config     :as config]
             [stash.core        :as stash]))
 
@@ -88,10 +88,3 @@
   (with-filters true
     (with-shortening true [shortening (params request :slug)]
        (respond-json (v/expand-api shortening)))))
-
-; - html/json actions
-;   - render html/json as appriopriate if no errors (sep acitons or handled)
-;   - render usefull error messages for each type (sep actions or handled)
-; - api not found page
-
-

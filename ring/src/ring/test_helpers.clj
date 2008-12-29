@@ -1,25 +1,7 @@
-(ns cljurl.app.controllers-test-helper
-  (require [stash.core         :as stash]
-           [ring.http-utils    :as http-utils]
-           [org.danlarkin.json :as json])
-  (use clj-unit.core cljurl.app.models clj-time.core clj-scrape.core
-       [cljurl.app.view-helpers :only (str-json)]))
-
-(def shortening-map1 {:slug "short1" :url "http://google.com" :created_at (now)})
-(def shortening-map2 {:slug "short2" :url "http://amazon.com" :created_at (now)})
-(def hit-map1        {:ip "auserip" :created_at (now) :updated_at (now) :hit_count 3})
-
-(defmacro with-fixtures
-  "TODOC"
-  [[binding-sym] & body]
-  `(do
-     (stash/delete-all +shortening+)
-     (let [s1# (stash/persist-insert (stash/init* +shortening+ shortening-map1))
-           s2# (stash/persist-insert (stash/init* +shortening+ shortening-map2))
-           h1# (stash/persist-insert (stash/init* +hit+ (assoc hit-map1 :shortening_id (:id s1#))))
-           fixtures# {:shortenings {:1 s1# :2 s2#} :hits {:on-1 h1#}}
-           ~binding-sym (fn [& path#] (get-in fixtures# path#))]
-       ~@body)))
+(ns ring.test-helpers
+  (:require [ring.http-utils    :as http-utils]
+            [org.danlarkin.json :as json])
+  (:use clj-unit.core clj-scrape.core))
 
 (defn request
   "Returns the response of app to mock request build according to the method,

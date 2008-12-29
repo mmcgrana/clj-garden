@@ -1,7 +1,7 @@
 (ns cljurl.routing
   (:require ring.routing [cljurl.config :as config]))
 
-(def c 'cljurl.app.controllers)
+(def c 'cljurl.controllers)
 
 (def routes
   [[c 'index          :index         :get  "/"                     ]

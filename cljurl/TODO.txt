@@ -7,5 +7,4 @@ logging in general
   - (def *logger* (clj-logger/to-path "log/development.log"))
   - all clojure prns
 
- 
-
+flash for new url as driver for session store

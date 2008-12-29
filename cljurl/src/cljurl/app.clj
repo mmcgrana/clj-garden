@@ -6,7 +6,7 @@
     ring.app
     cljurl.routing
     [cljurl.config :as config]
-    cljurl.app.controllers))
+    cljurl.controllers))
 
 (def app
   (show-exceptions/wrap #(config/show-exceptions?)

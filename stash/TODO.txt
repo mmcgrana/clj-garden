@@ -19,3 +19,5 @@ Later
 - identity map
 - double check escaping
 - multi-repository, sharding
+- ordered GUIDs
+  - http://www.informit.com/articles/printerfriendly.aspx?p=25862

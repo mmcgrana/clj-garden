@@ -1,4 +1,4 @@
-(ns cljurl.app.controller_helpers
+(ns cljurl.controller_helpers
   (:use ring.controller))
 
 (defn respond-json

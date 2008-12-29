@@ -1,13 +1,13 @@
-(ns cljurl.app.controllers-test
-  (require cljurl.config
-           [stash.core :as stash])
-  (use clj-unit.core clojure.contrib.except clj-scrape.core
+(ns cljurl.requests-test
+  (require [stash.core :as stash])
+  (use clj-unit.core clj-scrape.core
        cljurl.routing cljurl.app
-       (cljurl.app models controllers controllers-test-helper)))
+       (cljurl models controllers test-helpers)
+       ring.test-helpers))
 
 (deftest "with-filters"
   (binding [cljurl.config/+handle-exceptions+ true]
-    (let [[status _ body] (with-filters false (throwf "o noews"))]
+    (let [[status _ body] (with-filters false (throw (Exception. "o noews")))]
       (assert-status 500 status)
       (assert-match #"something went wrong" body))))
 

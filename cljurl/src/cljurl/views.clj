@@ -1,7 +1,7 @@
-(ns cljurl.app.views
+(ns cljurl.views
   (:use cljurl.routing
         (clj-html core helpers)
-        cljurl.app.view-helpers
+        cljurl.view-helpers
         [stash.core :only (errors)]))
 
 (defn layout
