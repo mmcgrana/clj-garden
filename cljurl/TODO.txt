@@ -1,5 +1,3 @@
-API 
-  - need json and xml parser and pretty-printers
 nicer views
 error messages
 logging in general

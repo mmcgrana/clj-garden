@@ -53,3 +53,16 @@
      (assert-that (xml1-> actual-dom# ~@expected-selector)
        (format "Expecting body matching %s, but did not.",
          '~expected-selector))))
+
+(defmacro assert-content-type
+  "TODOC"
+  [expected-type-form actual-headers-form]
+  `(let [expected-type# ~expected-type-form
+         actual-type# (get ~actual-headers-form "Content-Type")]
+     (assert-that (= expected-type# actual-type#)
+       (format "Expecting Content-Type %s, but got %s"
+         expected-type# actual-type#))))
+
+(defmacro assert-json
+  "TODOC"
+  [a b])

@@ -11,10 +11,15 @@
       (assert-status 500 status)
       (assert-match #"something went wrong" body))))
 
-(deftest "page-not-found"
+(deftest "not-found"
   (let [[status _ body] (request app [:get "/foo/bar"])]
     (assert-status 404 status)
     (assert-match #"we could not find that" body)))
+
+(deftest "not-found-api"
+  (let [[status _ body] (request app [:get "/foo/bar.js"])]
+    (assert-status 404 status)
+    (assert-match #"404 Not Found" body)))
 
 (deftest "find-shortening"
   (with-fixtures [fx]
@@ -106,3 +111,17 @@
 (deftest "expand: missing shortening"
   (let [[status _ _] (request app (path-info :expand {:slug "missing"}))]
     (assert-status 404 status)))
+
+(deftest "expand-api: found shortening"
+  (with-fixtures [fx]
+    (let [sh (get-in fx [:shortenings :1])
+          [status headers body] (request app (path-info :expand-api sh)
+                                  {:remote-addr "new"})
+          ht (stash/find-one +hit+ {:where [:ip := "new"]})]
+      (assert-status 200 status)
+      (assert-json {:url (:url sh)} body))))
+
+(deftest "expand-api: missing shortening"
+  (let [[status headers _] (request app (path-info :expand-api {:slug "missing"}))]
+    (assert-status 404 status)
+    (assert-content-type "text/javascript" headers)))
