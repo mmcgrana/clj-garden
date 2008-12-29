@@ -16,6 +16,10 @@
   (assert= "two"
     (xml1-> simple-dom desc (id= "b") text)))
 
+(deftest "attrs="
+  (assert= "two"
+    (xml1-> simple-dom desc {:id "b" :unique "yes"} text)))
+
 (deftest "attr?"
   (assert= "two"
     (xml1-> simple-dom desc (attr? :unique) text)))

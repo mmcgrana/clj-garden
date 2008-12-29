@@ -1,2 +1,0 @@
-css selector to clj-scrape compiler
-let {:foo "bar"} be used as a literal filter shortcut like :p

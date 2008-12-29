@@ -40,23 +40,16 @@
   (with-fixtures [_]
     (let [[status _ body] (request app (path-info :index))]
       (assert-status 200 status)
-      (assert-selector
-        (desc :a (attr= :href "/new") (text= "new shortening")) body)
-      (assert-selector
-        (desc :h3 (text= "Recent Shortenings")) body)
-      (assert-selector
-        (desc :p (text-match? #" => ")) body))))
+      (assert-selector (:a {:href "/new"} "new shortening") body)
+      (assert-selector (:h3 "Recent Shortenings") body)
+      (assert-selector (:p #" => ") body))))
 
 (deftest "new"
   (let [[status _ body] (request app (path-info :new))]
     (assert-status 200 status)
-    (assert-selector
-      (desc :form :p (text-match? #"Enter url:")) body)
-    (assert-selector
-      (desc :form (attr= :action "/") (attr= :method "post")) body)
-    (assert-selector
-      (desc :form :input (attr= :type "text") (attr= :name "shortening[url]"))
-      body)))
+    (assert-selector (:form :p #"Enter url:") body)
+    (assert-selector (:form {:action "/" :method "post"}) body)
+    (assert-selector (:form :input {:type "text" :name "shortening[url]"}) body)))
 
 (def valid-params
   {:shortening {:url "http://amazon.com"}})
@@ -72,19 +65,15 @@
 
 (deftest "create: invalid shortening"
   (let [[_ _ body] (request app (path-info :create) {:params invalid-params})]
-    (assert-selector
-      (desc :p (text-match? #"valid-url")) body)
-    (assert-selector
-      (desc :form (attr= :action "/") (attr= :method "post")) body)
-    (assert-selector
-      (desc :form :input (attr= :value "foo")) body)))
+    (assert-selector (:p #"valid-url") body)
+    (assert-selector (:form {:action "/" :method "post"}) body)
+    (assert-selector (:form :input {:value "foo"}) body)))
 
 (deftest "show: found shortening"
   (with-fixtures [fx]
     (let [[_ _ body] (request app
             (path-info :show {:slug (fx :shortenings :1 :slug)}))]
-      (assert-selector
-        (desc :p (text-match? #"Url shortened")) body))))
+      (assert-selector (:p #"Url shortened") body))))
 
 (deftest "show: missing shortening"
   (let [[status _ _] (request app (path-info :show {:slug "missing"}))]

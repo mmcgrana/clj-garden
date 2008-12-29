@@ -51,7 +51,7 @@
   "TODOC"
   [expected-selector actual-body]
   `(let [actual-dom# (dom (java.io.StringReader. ~actual-body))]
-     (assert-that (xml1-> actual-dom# ~@expected-selector)
+     (assert-that (xml1-> actual-dom# ~@(cons 'desc expected-selector))
        (format "Expecting body matching %s, but did not.",
          '~expected-selector))))
 

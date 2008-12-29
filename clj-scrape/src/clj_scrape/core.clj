@@ -24,14 +24,13 @@
   (zip/xml-zip
     (xml/parse (org.xml.sax.InputSource. stream) startparse-tagsoup)))
 
-(def xml->       zfxml/xml->)
-(def xml1->      zfxml/xml1->)
 (def rightmost?  zf/leftmost?)
 (def rightmost?  zf/rightmost?)
 (def desc        zf/descendants)
 (def ansc        zf/ancestors)
 (def children    zf/children)
 (def node        zip/node)
+(def tag=        zfxml/tag=)
 (def attr        zfxml/attr)
 (def attr=       zfxml/attr=)
 (def text        zfxml/text)
@@ -49,6 +48,12 @@
   (fn [loc]
     (when-let [id (zfxml/attr loc :id)]
       (= id target-id))))
+
+(defn attrs= [attrs-map]
+  "Returns a query predicate like attr= but that works on multiple attr 
+  name/value pairs."
+  (let [conditions (map (fn [[name val]] (attr= name val)) attrs-map)]
+    (fn [loc] (every? #(% loc) conditions))))
 
 (defn attr? [attrname]
   "Returns a query predicate that matches a node when it has the attribute
@@ -71,3 +76,17 @@
   the re."
   [re]
   (fn [loc] (re-match? re (text loc))))
+
+; patched version of xml-> from contrib adding literal attr and text matching.
+(defn xml->
+  [loc & preds]
+  (zf/mapcat-chain loc preds
+                   #(cond (keyword? %) (tag= %)
+                          (string?  %) (text= %)
+                          (pattern? %) (text-match? %)
+                          (vector?  %) (zfxml/seq-test %)
+                          (map?     %) (attrs= %))))
+
+(defn xml1->
+  [loc & preds]
+  (first (apply xml-> loc preds)))
