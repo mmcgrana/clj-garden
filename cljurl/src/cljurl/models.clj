@@ -28,6 +28,11 @@
    :callbacks
      {:before-create [timestamp-create generate-slug]}})
 
+(defn find-shortening
+  "Find the shortening based on a slug."
+  [slug]
+  (find-one +shortening+ {:where [:slug := slug]}))
+
 (defn find-recent-shortenings
   "Returns the n most recently created shortenings."
   [n]

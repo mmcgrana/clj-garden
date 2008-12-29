@@ -1,12 +1,8 @@
 (ns cljurl.controllers
-  (:use ring.controller
-        ring.request
-        cljurl.routing
-        cljurl.controller_helpers)
-  (:require [cljurl.models :as m]
-            [cljurl.views  :as v]
-            [cljurl.config     :as config]
-            [stash.core        :as stash]))
+  (:use (ring controller request)
+        (cljurl routing controller_helpers))
+  (:require (cljurl [models :as m] [views  :as v] [config :as config])
+            [stash.core :as stash]))
 
 (defmacro with-filters
   "Wrap all action code in a try catch that will either show exception details
@@ -31,16 +27,11 @@
   [& [request]]
   (respond-json-404 (v/not-found-api)))
 
-(defn find-shortening
-  "Find the shortening based on a slug."
-  [slug]
-  (stash/find-one m/+shortening+ {:where [:slug := slug]}))
-
 (defmacro with-shortening
   "Execute the body with the shortening found or render a not found page if
   no shortening was found."
   [api-action [shortening-sym slug-form] & body]
-  `(if-let [~shortening-sym (find-shortening ~slug-form)]
+  `(if-let [~shortening-sym (m/find-shortening ~slug-form)]
      (do ~@body)
      (if ~api-action (not-found-api) (not-found))))
 

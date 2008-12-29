@@ -7,7 +7,12 @@
     (assert-match #"[abcdefghijk12345]{5}" (:slug shortening))
     (assert-that success)))
 
-(deftest "find-shortenings"
+(deftest "find-shortening"
+  (with-fixtures [fx]
+    (let [sh (fx :shortenings :1)]
+      (assert= (:url sh) (:url (find-shortening (:slug sh)))))))
+
+(deftest "find-recent-shortenings"
   (doseq [i (range 5)]
     (create +shortening+ {:url "http://google.com"}))
   (assert= 2 (count (find-recent-shortenings 2))))

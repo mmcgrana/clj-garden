@@ -1,8 +1,7 @@
 (ns cljurl.requests-test
   (require [stash.core :as stash])
   (use clj-unit.core clj-scrape.core
-       cljurl.routing cljurl.app
-       (cljurl models controllers test-helpers)
+       (cljurl routing app models model-helpers controllers test-helpers)
        ring.test-helpers))
 
 (deftest "with-filters"
@@ -21,16 +20,12 @@
     (assert-status 404 status)
     (assert-match #"404 Not Found" body)))
 
-(deftest "find-shortening"
-  (with-fixtures [fx]
-    (assert= (fx :shortenings :1 :url)
-      (:url (find-shortening (fx :shortenings :1 :slug))))))
-
 (deftest "with-shortening: when found"
   (with-fixtures [fx]
-    (assert= (fx :shortenings :1 :url)
-      (with-shortening false [shortening (fx :shortenings :1 :slug)]
-        (:url shortening)))))
+    (let [sh (fx :shortenings :1)]
+      (assert= (:url sh)
+        (with-shortening false [shortening (:slug sh)]
+          (:url shortening))))))
 
 (deftest "with-shortening: when not found"
   (let [[status _ _] (with-shortening false [_ "missing"])]
@@ -71,8 +66,8 @@
 
 (deftest "show: found shortening"
   (with-fixtures [fx]
-    (let [[_ _ body] (request app
-            (path-info :show {:slug (fx :shortenings :1 :slug)}))]
+    (let [sh (fx :shortenings :1)
+          [_ _ body] (request app (path-info :show sh))]
       (assert-selector (:p #"Url shortened") body))))
 
 (deftest "show: missing shortening"
@@ -84,18 +79,8 @@
     (let [sh (fx :shortenings :1)
           ht (fx :hits :on-1)
           response (request app (path-info :expand sh) {:remote-addr (:ip ht)})]
-    (assert-redirect (:url sh) response)
-    (assert= (inc (:hit_count ht))
-      (:hit_count (stash/find-one +hit+
-        {:where [:id := (:id ht)]}))))))
-
-(deftest "expand: found shortening, new ip"
-  (with-fixtures [fx]
-    (let [sh (fx :shortenings :1)
-          response (request app (path-info :expand sh) {:remote-addr "new"})
-          ht (stash/find-one +hit+ {:where [:ip := "new"]})]
       (assert-redirect (:url sh) response)
-      (assert= 1 (:hit_count ht)))))
+      (assert= (inc (:hit_count ht)) (:hit_count (reload ht))))))
 
 (deftest "expand: missing shortening"
   (let [[status _ _] (request app (path-info :expand {:slug "missing"}))]
@@ -104,9 +89,7 @@
 (deftest "expand-api: found shortening"
   (with-fixtures [fx]
     (let [sh (fx :shortenings :1)
-          [status headers body] (request app (path-info :expand-api sh)
-                                  {:remote-addr "new"})
-          ht (stash/find-one +hit+ {:where [:ip := "new"]})]
+          [status headers body] (request app (path-info :expand-api sh))]
       (assert-status 200 status)
       (assert-json {:url (:url sh)} body))))
 
