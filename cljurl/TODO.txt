@@ -1,10 +1,11 @@
-nicer views
-error messages
+presentable views
+presenable error messages
 logging in general
   - sql
   - framework: params, routing, timing.
   - exceptions
   - (def *logger* (clj-logger/to-path "log/development.log"))
+  - all clojure prns
 
  
 

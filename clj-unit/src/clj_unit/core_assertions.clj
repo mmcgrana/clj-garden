@@ -1,99 +1,83 @@
 (in-ns 'clj-unit.core)
 
-(defmacro assert-that
+(defn assert-that
   "Encapsulates the common pattern of reporting success if some value is
   logically true or reporting failure with a message otherwise."
-  [condition-form message-form]
-  `(if ~condition-form (success) (failure ~message-form)))
+  [condition message]
+  (if condition (success) (failure message)))
 
-(defmacro flunk
+(defn flunk
   "Always fail, optionally with the given message"
   [& [message]]
-    `(failure (or ~message "flunk")))
+  (failure (or message "flunk")))
 
-(defmacro assert=
+(defn assert=
   "Assert that two values are equal according to =."
-  [expected-form actual-form]
-  `(let [expected# ~expected-form
-         actual#   ~actual-form]
-     (assert-that (= expected# actual#)
-       (format "Expected %s, got %s" (pr-str expected#) (pr-str actual#)))))
+  [expected actual]
+  (assert-that (= expected actual)
+    (format "Expected %s, got %s" (pr-str expected) (pr-str actual))))
 
-(defmacro assert-in-delta
+(defn assert-in-delta
   "Assert that a value is +-delta of another value"
-  [expected-form delta-form actual-form]
-  `(let [expected# ~expected-form
-         delta#    ~delta-form
-         actual#   ~actual-form]
-    (assert-that (and (> (- expected# delta#) actual#)
-                      (< actual# (+ expected# delta#)))
-      (format "Expected %s +-%s, got %s" expected# delta# actual#))))
+  [expected actual delta]
+  (assert-that (and (> (- expected delta) actual)
+                    (< actual (+ expected delta)))
+    (format "Expected %s +-%s, got %s" expected delta actual)))
 
-(defmacro assert-truth
+(defn assert-truth
   "Assert that a value is logically true - i.e. not nil or false."
-  [form]
-  `(let [val# ~form]
-     (assert-that val#
-       (format "Expected logical truth, got %s" val#))))
+  [val]
+  (assert-that val (format "Expected logical truth, got %s" val)))
 
-(defmacro assert-not
+(defn assert-not
   "Assert that a value is logically false - i.e. either nil or false."
-  [form]
-  `(let [val# ~form]
-     (assert-that (not val#)
-       (format "Expected logical false, got %s" val#))))
+  [val]
+  (assert-that (not val)
+    (format "Expected logical false, got %s" val)))
 
-(defmacro assert-nil
+(defn assert-nil
   "Assert that a value is nil."
-  [form]
-  `(let [val# ~form]
-     (assert-that (nil? val#)
-       (format "Expected nil, got %s" val#))))
+  [val]
+  (assert-that (nil? val) (format "Expected nil, got %s" val)))
 
-(defmacro assert-fn
+(defn assert-fn
   "Assert that a function returns logical truth when given a val."
-  [pred-form val-form]
-  `(let [val# ~val-form]
-     (assert-that (~pred-form val#)
-       (format "Expected pred to return logical truth for %s, but it did not."
-         val#))))
+  [pred val]
+  (assert-that (pred val)
+    (format "Expected pred to return logical truth for %s, but it did not."
+      val)))
 
-(defmacro assert-not-fn
+(defn assert-not-fn
   "Assert that a function returns logical false when given a val."
-  [pred-form val-form]
-  `(let [val# ~val-form]
-     (assert-that (not (~pred-form val#))
-       (format "Expected pred to return logical false for %s, but it did not."
-         val#))))
+  [pred val]
+  (assert-that (not (pred val))
+    (format "Expected pred to return logical false for %s, but it did not."
+      val)))
 
-(defmacro assert-instance
+(defn assert-instance
   "Assert that an object is an instance of a class according to instance?"
-  [expected-class-form actual-instance-form]
-  `(let [expected# ~expected-class-form
-         actual#   ~actual-instance-form]
-     (assert-that (instance? expected# actual#)
-       (format "Expected an instance of %s, but %s is not."
-         expected# actual#))))
+  [expected-class actual-instance]
+  (assert-that (instance? expected-class actual-instance)
+    (format "Expected an instance of %s, but %s is not."
+      expected-class actual-instance)))
 
-(defmacro assert-isa
+(defn assert-isa
   "Assert that an object is a child of a parent according to isa?"
-  [expected-parent-form actual-child-form]
-  `(let [expected# ~expected-parent-form
-         actual#   ~actual-child-form]
-     (assert-that (isa? actual# expected#)
-       (format "Expected a child of %s, but %s is not." expected# actual#))))
+  [expected-parent actual-child]
+  (assert-that (isa? actual-child expected-parent)
+    (format "Expected a child of %s, but %s is not."
+      expected-parent actual-child)))
 
-(defmacro assert-match
+(defn assert-match
   "Asserts that a String matches a pattern"
-  [expected-pattern-form actual-string-form]
-  `(let [expected# ~expected-pattern-form
-         actual#   ~actual-string-form]
-     (assert-that (re-find expected# actual#)
+  [expected-pattern actual-string]
+     (assert-that (re-find expected-pattern actual-string)
        (format "Expected a string matching %s, but %s does not"
-         (pr-str expected#) (pr-str actual#)))))
+         (pr-str expected-pattern) (pr-str actual-string))))
 
 (defmacro assert-throws
-  "Assert that a form throws."
+  "Assert that a form throws. Note that unlike all other assertions, which are
+  functions, assert-throws is macro."
   ([form]            (assert-throws Exception nil        form))
   ([message-re form] (assert-throws Exception message-re form))
   ([klass message-re form]

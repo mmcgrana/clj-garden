@@ -1,14 +1,4 @@
-show exception class?
-
-perhaps symbol instead of string names to allow choice
-
-running unit tests without reboot for better speed
-
 per-assertion file and line numbers
-
-nested tests
-
-per-function tests, attached to function
 
 perhaps allow some sort of error message input to assertions so that you know what went wrong, as in ruby's test/unit
 

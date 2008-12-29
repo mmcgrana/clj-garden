@@ -1,7 +1,9 @@
 (ns cljurl.app.controllers-test-helper
-  (require [stash.core      :as stash]
-           [ring.http-utils :as http-utils])
-  (use clj-unit.core cljurl.app.models clj-time.core clj-scrape.core))
+  (require [stash.core         :as stash]
+           [ring.http-utils    :as http-utils]
+           [org.danlarkin.json :as json])
+  (use clj-unit.core cljurl.app.models clj-time.core clj-scrape.core
+       [cljurl.app.view-helpers :only (str-json)]))
 
 (def shortening-map1 {:slug "short1" :url "http://google.com" :created_at (now)})
 (def shortening-map2 {:slug "short2" :url "http://amazon.com" :created_at (now)})
@@ -29,23 +31,22 @@
                         (http-utils/query-unparse params))
         :remote-addr  (get options :remote-addr)}))
 
-(defmacro assert-status
+(defn assert-status
   "TODOC"
-  [expected-status actual-status-form]
-  `(let [actual-status# ~actual-status-form]
-     (assert-that (= ~expected-status actual-status#)
-       (format "Expected status of %s, but got %s"
-         ~expected-status actual-status#))))
+  [expected-status actual-status]
+  (assert-that (= expected-status actual-status)
+    (format "Expected status of %s, but got %s"
+      expected-status actual-status)))
 
-(defmacro assert-redirect
+(defn assert-redirect
   "TODOC"
-  [expected-path response-form]
-  `(let [[status# headers# body#] ~response-form
-         location#                (get headers# "Location")]
-     (assert-that (and (and (>= status# 300) (< status# 400))
-                       (= ~expected-path location#))
+  [expected-path actual-response]
+  (let [[status headers body] actual-response
+         location             (get headers "Location")]
+     (assert-that (and (and (>= status 300) (< status 400))
+                       (= expected-path location))
        (format "Expecting redirect status and Location of %s, but got %s and %s."
-         ~expected-path status# location#))))
+         expected-path status location))))
 
 (defmacro assert-selector
   "TODOC"
@@ -55,15 +56,17 @@
        (format "Expecting body matching %s, but did not.",
          '~expected-selector))))
 
-(defmacro assert-content-type
+(defn assert-content-type
   "TODOC"
-  [expected-type-form actual-headers-form]
-  `(let [expected-type# ~expected-type-form
-         actual-type# (get ~actual-headers-form "Content-Type")]
-     (assert-that (= expected-type# actual-type#)
-       (format "Expecting Content-Type %s, but got %s"
-         expected-type# actual-type#))))
+  [expected-type actual-headers]
+  (let [actual-type (get actual-headers "Content-Type")]
+    (assert-that (= expected-type actual-type)
+      (format "Expecting Content-Type %s, but got %s"
+        expected-type actual-type))))
 
-(defmacro assert-json
+(defn assert-json
   "TODOC"
-  [a b])
+  [expected-data actual-body]
+  (assert-that (= expected-data (json/decode-from-str actual-body))
+    (format "Expecting JSON parsing to %s, but got %s"
+      (prn-str expected-data) (prn-str actual-body))))
