@@ -1,4 +1,0 @@
-clean up fn name in error str
-  - "Wrong number of args passed to: show-exceptions$wrap--1741$fn"
-  
-completely separate printing from prettifying

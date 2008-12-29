@@ -6,21 +6,5 @@ logging in general
   - exceptions
   - (def *logger* (clj-logger/to-path "log/development.log"))
 
-(get-in fx [:shortenings :1 :slug])
-(fx :shortengins :1 :slug)
-
-unique constraint on slug
-
-      show-errors   catch-errors
-dev   yes           yes
-test  no            no    (unless bound otherwise)
-prod  no            yes
-
-note that you must be catching errors to show them
-
-
-none   - throw to propogate outside of app
-show   - throw to propogate out to show-exceptions handler
-handle - render "something went wrong" page
  
 
