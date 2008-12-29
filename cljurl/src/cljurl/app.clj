@@ -12,4 +12,4 @@
   (show-exceptions/wrap #(config/show-exceptions?)
     (file-content-info/wrap
       (static/wrap config/+public-dir+
-        (ring.app/spawn-app cljurl.routing/router))))))
+        (ring.app/spawn-app cljurl.routing/router)))))

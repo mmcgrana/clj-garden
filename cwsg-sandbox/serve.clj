@@ -10,6 +10,6 @@
   (cwsg.middleware.show-exceptions/wrap (fn [] true)
     (cwsg.middleware.file-content-info/wrap
       (cwsg.middleware.static/wrap (File. "public")
-        cwsg.apps.dump/app)))))
+        cwsg.apps.dump/app))))
 
 (cwsg.handlers.jetty/run app {:port 8000})

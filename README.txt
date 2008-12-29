@@ -15,4 +15,4 @@ Nothing here is ready for general public use, but if anything intrigues you let 
 * cwsg-sandbox: Sample cwsg app ready to run
 * ring: Functional web framework
 * stash: Function ORM
-* stash-pagination: Page stash find results 
+* stash-pagination: Paginate stash find results 
