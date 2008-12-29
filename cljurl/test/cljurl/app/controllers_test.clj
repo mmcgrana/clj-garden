@@ -23,13 +23,13 @@
 
 (deftest "find-shortening"
   (with-fixtures [fx]
-    (assert= (get-in fx [:shortenings :1 :url])
-      (:url (find-shortening (get-in fx [:shortenings :1 :slug]))))))
+    (assert= (fx :shortenings :1 :url)
+      (:url (find-shortening (fx :shortenings :1 :slug))))))
 
 (deftest "with-shortening: when found"
   (with-fixtures [fx]
-    (assert= (get-in fx [:shortenings :1 :url])
-      (with-shortening false [shortening (get-in fx [:shortenings :1 :slug])]
+    (assert= (fx :shortenings :1 :url)
+      (with-shortening false [shortening (fx :shortenings :1 :slug)]
         (:url shortening)))))
 
 (deftest "with-shortening: when not found"
@@ -37,7 +37,7 @@
     (assert-status 404 status)))
 
 (deftest "index"
-  (with-fixtures [fx]
+  (with-fixtures [_]
     (let [[status _ body] (request app (path-info :index))]
       (assert-status 200 status)
       (assert-selector
@@ -82,7 +82,7 @@
 (deftest "show: found shortening"
   (with-fixtures [fx]
     (let [[_ _ body] (request app
-            (path-info :show {:slug (get-in fx [:shortenings :1 :slug])}))]
+            (path-info :show {:slug (fx :shortenings :1 :slug)}))]
       (assert-selector
         (desc :p (text-match? #"Url shortened")) body))))
 
@@ -92,8 +92,8 @@
 
 (deftest "expand: found shortening, existing ip"
   (with-fixtures [fx]
-    (let [sh (get-in fx [:shortenings :1])
-          ht (get-in fx [:hits :on-1])
+    (let [sh (fx :shortenings :1)
+          ht (fx :hits :on-1)
           response (request app (path-info :expand sh) {:remote-addr (:ip ht)})]
     (assert-redirect (:url sh) response)
     (assert= (inc (:hit_count ht))
@@ -102,7 +102,7 @@
 
 (deftest "expand: found shortening, new ip"
   (with-fixtures [fx]
-    (let [sh (get-in fx [:shortenings :1])
+    (let [sh (fx :shortenings :1)
           response (request app (path-info :expand sh) {:remote-addr "new"})
           ht (stash/find-one +hit+ {:where [:ip := "new"]})]
       (assert-redirect (:url sh) response)
@@ -114,7 +114,7 @@
 
 (deftest "expand-api: found shortening"
   (with-fixtures [fx]
-    (let [sh (get-in fx [:shortenings :1])
+    (let [sh (fx :shortenings :1)
           [status headers body] (request app (path-info :expand-api sh)
                                   {:remote-addr "new"})
           ht (stash/find-one +hit+ {:where [:ip := "new"]})]

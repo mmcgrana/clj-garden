@@ -15,7 +15,8 @@
      (let [s1# (stash/persist-insert (stash/init* +shortening+ shortening-map1))
            s2# (stash/persist-insert (stash/init* +shortening+ shortening-map2))
            h1# (stash/persist-insert (stash/init* +hit+ (assoc hit-map1 :shortening_id (:id s1#))))
-           ~binding-sym {:shortenings {:1 s1# :2 s2#} :hits {:on-1 h1#}}]
+           fixtures# {:shortenings {:1 s1# :2 s2#} :hits {:on-1 h1#}}
+           ~binding-sym (fn [& path#] (get-in fixtures# path#))]
        ~@body)))
 
 (defn request
