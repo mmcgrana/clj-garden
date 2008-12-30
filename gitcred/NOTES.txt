@@ -8,3 +8,7 @@ views
 
 deployment
   post static html on mmcgrana.github.com
+  or dynamic site
+    - top ranking users, with gitcred
+    - gitcred, rank of arbitrary users
+    - gitcred, rank by language 

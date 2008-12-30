@@ -1,11 +1,10 @@
 Later
-- rethink attr functions (wait until real need)
-- rethink, test attr protection
-- datetime caster
-- migrations
-  - create, rename, drop table
-  - add, rename, drop column
-  - add, drop index
+* migrations
+  * create, rename, drop table
+  * add, rename, drop column
+  * add, drop index
+- rethink, test attr protection, foo* situation
+- datetime caster 
 - more validators
 - key-based window pagination
 - select-except
