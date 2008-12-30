@@ -73,10 +73,10 @@
   [from-user]
   (save (assoc from-user :last_scraped_at (now))))
 
-(defn keep-scraping?
-  "Returns true if we should continue scraping, false if we should stop."
+(defn count-unscraped-users
+  "Returns the number of unscraped users."
   []
-  (exist? +user+ {:where [:last_scraped_at := nil]}))
+  (count-all +user+ {:where [:last_scraped_at := nil]}))
 
 (defn next-user
   "Returns the next user from which we should scrape1."
@@ -97,18 +97,20 @@
     (ensure-usernames to-usernames)
     (log "alligning followers")
     (allign-follows from-user to-usernames)
-    (update-scraped-at from-user)
-    (log "user scrape complete\n")))
+    (update-scraped-at from-user)))
 
 (defn scrape
   "Breadth-first scrape the users/follows graph while keep-scraping?."
   [from-user]
   (loop [from-user from-user]
-    (if (keep-scraping?)
-      (do (scrape1 from-user)
+    (let [left (count-unscraped-users)]
+      (if (> left 0)
+        (do
+          (scrape1 from-user)
+          (log (str left " users unscraped\n"))
           (Thread/sleep 10000)
           (recur (next-user)))
-      (log "done scraping"))))
+        (log "done scraping")))))
 
 (defn ensure-seed-user []
   (when-not (exist? +user+ {:where [:username := "mmcgrana"]})

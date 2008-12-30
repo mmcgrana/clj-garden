@@ -56,12 +56,9 @@
                                  [:to_username := "foo"]]}))))
 
 ;(deftest "last-scraped-at")
-;(deftest "keep-scraping")
+;(deftest "keep-scraping?")
 ;(deftest "next-user")
 ;(deftest "scrape1")
 ;(deftest "scrape")
 ;(deftest "ensure-seed-user")
 ;(deftest "run")
-
-;(deftest "all-users")
-;(deftest "user-follows")
