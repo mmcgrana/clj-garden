@@ -62,3 +62,6 @@
 ;(deftest "scrape")
 ;(deftest "ensure-seed-user")
 ;(deftest "run")
+
+;(deftest "all-users")
+;(deftest "user-follows")

@@ -1,5 +1,6 @@
 (ns gitcred.data
-  (:use stash.core
+  (:use gitcred.utils
+        stash.core
         clj-http-client.core clj-time.core clj-scrape.core
         clojure.set))
 
@@ -85,9 +86,6 @@
       (find-one +user+ {:where [:last_scraped_at :not= nil]
                         :order [:last_scraped_at :asc]})))
 
-(defn log [message]
-  (println message))
-
 (defn scrape1
   "Scrape 1 user. Ensures that all followed users exist in the db, that the
   follows from the user are all reflected in the db, and updates the
@@ -113,9 +111,28 @@
       (log "done scraping"))))
 
 (defn ensure-seed-user []
-  (when-not (exist? +user+ {:where [:username := "mmcgrana"]}))
-  (create* +user+ {:username "mmcgrana" :discovered_at (now)}))
+  (when-not (exist? +user+ {:where [:username := "mmcgrana"]})
+    (create* +user+ {:username "mmcgrana" :discovered_at (now)})))
 
 (defn run []
   (ensure-seed-user)
   (scrape (next-user)))
+
+
+(defn all-graph-data []
+  (log "loading all graph data")
+  (mash
+    (fn [user]
+      [user (find-all +follow+ {:where [:from_username := (:username user)]})])
+    (find-all +user+)))
+
+(defn partial-graph-data []
+  (log "loading partial graph data")
+  (let [users     (find-all +user+ {:limit 500})
+        usernames (map :username users)]
+    (mash
+      (fn [user]
+        [user (find-all +follow+
+                {:where [:and [:from_username := (:username user)]
+                              [:to_username :in usernames]]})])
+      users)))

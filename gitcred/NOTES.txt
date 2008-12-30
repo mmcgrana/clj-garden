@@ -3,16 +3,8 @@
   pagerank computing
   output generation
 
-scraping
-  get mmcgrana
-  create mmcgrana
-  
-  loop from-user (choose-next-user)
-    scrape followed usernames
-    ensure each user exists
-    ensure followings from db align with those scraped
-    update from-user scrape time
-    unless (stop) recur (choose-next-user)    
+views
+  normalize gitcred: 0 -10
 
 deployment
   post static html on mmcgrana.github.com

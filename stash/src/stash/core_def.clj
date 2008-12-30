@@ -133,7 +133,7 @@
   the pk-column names."
   [column-names pk-column-names]
   (let [pk-cnames-set (set pk-column-names)]
-    (remove #(pk-cnames-set %) column-names)))
+    (remove pk-cnames-set column-names)))
 
 (defn- compiled-mappers-by-name
   "Returns a map of column name keywords to either quoter or parser fns,
