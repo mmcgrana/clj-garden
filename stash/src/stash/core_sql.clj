@@ -6,6 +6,9 @@
 (def- +where-operator-strings+
   {:= "=", :> ">", :>= ">=", :< "<", :<= "<=", :not= "<>"})
 
+(def- +where-nil-operator-strings+
+  {:= "IS", :not= "IS NOT"})
+
 (defn- where-conjunction-sql
   [conjunction]
   (or (+where-conjunction-strings+ conjunction)
@@ -15,6 +18,11 @@
   [operator]
   (or (+where-operator-strings+ operator)
       (throwf "invalid operator: %s" operator)))
+
+(defn- where-nil-operator-sql
+  [operator]
+  (or (+where-nil-operator-strings+ operator)
+      (throwf "invalid nil operator: %s" operator)))
 
 (defn- where-exp-sql
   [model where-exp]
@@ -41,7 +49,9 @@
     ; [:foo :> 20]
     :else
       (str "(" (name (where-exp 0)) " "
-               (where-operator-sql (where-exp 1)) " "
+               (if (nil? (where-exp 2))
+                 (where-nil-operator-sql (where-exp 1))
+                 (where-operator-sql (where-exp 1))) " "
                (((quoters-by-name model) (where-exp 0)) (where-exp 2)) ")")))
 
 (defn- where-sql
