@@ -17,8 +17,10 @@
 (defmodel +shortening+
   {:data-source config/+data-source+
    :table-name  :shortenings
+   :pk          :id
    :columns
-     [[:slug       :string]
+     [[:id         :uuid]
+      [:slug       :string]
       [:url        :string]
       [:created_at :datetime]]
    :accessible-attrs
@@ -41,8 +43,10 @@
 (defmodel +hit+
   {:data-source config/+data-source+
    :table-name :hits
+   :pk         :id
    :columns
-     [[:shortening_id :uuid]
+     [[:id            :uuid]
+      [:shortening_id :uuid]
       [:ip            :string]
       [:created_at    :datetime]
       [:updated_at    :datetime]

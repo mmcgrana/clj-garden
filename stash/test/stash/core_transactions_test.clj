@@ -3,7 +3,7 @@
 (deftest-db "transaction"
   (try
     (transaction +post+
-      (create +post+ complete-post-map)
+      (create +post+ +complete-post-map+)
       (throwf "o noes"))
     (catch Exception e))
   (assert= 0 (count-all +post+)))

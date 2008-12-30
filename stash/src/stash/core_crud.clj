@@ -12,23 +12,36 @@
          "(" (str-join ", "
                (map #((quoters %) (instance %)) column-names)) ")")))
 
+(defn- pk-where-condition
+  "Reterns the sql where clause that identifies the instance row, based on its
+  pks."
+  [instance]
+  (let [model    (instance-model instance)
+        pk-names (pk-column-names model)]
+    (where-sql model
+      (if (= 1 (count pk-names))
+        [(first pk-names) := (instance (first pk-names))]
+        (reduce
+          #(conj %1 [%2 := (instance %2)])
+          [:and]
+          (pk-column-names model))))))
+
 (defn update-sql
   "Returns the update sql for the instance."
   [instance]
   (let [model        (instance-model instance)
-        column-names (column-names-sans-id model)
+        column-names (non-pk-column-names model)
         quoters      (quoters-by-name model)]
     (str "UPDATE " (table-name-str model) " SET "
          (str-join ", "
            (map #(str (name %) " = " ((quoters %) (instance %))) column-names))
-           " WHERE id = " ((quoters :id) (instance :id)))))
+         (pk-where-condition instance))))
 
 (defn delete-sql
   "Returns the delete sql for the instance."
   [instance]
   (let [model (instance-model instance)]
-    (str "DELETE FROM " (table-name-str model) " "
-         "WHERE id = '" (:id instance) "'")))
+    (str "DELETE FROM " (table-name-str model) (pk-where-condition instance))))
 
 (defn persist-insert
   "Persists the new instance to the database, returns an instance
@@ -93,7 +106,8 @@
 (defn init*
   "Like init, but bypasses mass-assignment protection."
   [model & [attrs]]
-  (update-attrs* (with-meta {:id (gen-uuid)} {:model model :new true}) attrs))
+  (let [pk-attrs (if-let [init-fn (pk-init model)] (init-fn) {})]
+    (update-attrs* (with-meta pk-attrs {:model model :new true}) attrs)))
 
 (defn init
   "Returns an instance of the model with the given attrs having new status."

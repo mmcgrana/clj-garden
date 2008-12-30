@@ -36,13 +36,14 @@
   :datetime  {nil nil a-datetime a-datetime}})
 
 (doseq [[type values] quote-cast-test-cases]
-  (doseq [val values]
-    (deftest-db (str type " quote and parse round trips: " val)
-      (let [schmor (assoc empty-schmorg type val)]
-        (persist-insert schmor)
-        (assert=
-          (get schmor type)
-          (get (find-one +schmorg+) type))))))
+  (let [cname (keyword (str "a_" (name type)))]
+    (doseq [val values]
+      (deftest-db (str type " quote and parse round trips: " val)
+        (let [schmor (assoc +empty-schmorg+ cname val)]
+          (persist-insert schmor)
+          (assert=
+            (get schmor cname)
+            (get (find-one +schmorg+) cname)))))))
 
 (doseq [[type cases] parse-test-cases]
   (doseq [[unparsed parsed] cases]

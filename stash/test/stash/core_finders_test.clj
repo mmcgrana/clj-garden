@@ -39,74 +39,84 @@
     (delete-all-sql +post+ {:where [:id := "foo"]})))
 
 (deftest-db "find-value-by-sql"
-  (persist-insert complete-post)
+  (persist-insert +complete-post+)
   (assert=
     (doto (org.postgresql.util.PGobject.)
-       (.setValue (:id complete-post)))
+       (.setValue (:id +complete-post+)))
     (find-value-by-sql +post+ "select id from posts")))
 
 (deftest-db "find-one-by-sql returns an instance"
-  (persist-insert complete-post)
-  (assert= (:posted_at complete-post)
+  (persist-insert +complete-post+)
+  (assert= (:posted_at +complete-post+)
     (:posted_at (find-one-by-sql +post+
-      (str "SELECT * FROM posts WHERE (id = '" (:id complete-post) "')")))))
+      (str "SELECT * FROM posts WHERE (id = '" (:id +complete-post+) "')")))))
 
 (deftest-db "find-all-by-sql"
-  (persist-insert complete-post)
-  (persist-insert complete-post-2)
+  (persist-insert +complete-post+)
+  (persist-insert +complete-post-2+)
   (assert=
-    (set [complete-post complete-post-2])
+    (set [+complete-post+ +complete-post-2+])
     (set (find-all-by-sql +post+ "SELECT * FROM posts"))))
 
 (deftest-db "find-one"
-  (persist-insert complete-post)
+  (persist-insert +complete-post+)
   (assert=
-    complete-post
-    (find-one +post+ {:where [:id := (:id complete-post)]})))
+    +complete-post+
+    (find-one +post+ {:where [:id := (:id +complete-post+)]})))
 
 (deftest-db "find-all"
-  (persist-insert complete-post)
-  (persist-insert complete-post-2)
+  (persist-insert +complete-post+)
+  (persist-insert +complete-post-2+)
   (assert=
-    (set [complete-post complete-post-2])
+    (set [+complete-post+ +complete-post-2+])
     (set (find-all +post+)))
   (assert=
-    (list complete-post)
-    (find-all +post+ {:where [:id := (:id complete-post)]})))
+    (list +complete-post+)
+    (find-all +post+ {:where [:id := (:id +complete-post+)]})))
 
 (deftest-db "delete-all-by-sql"
-  (persist-insert complete-post)
-  (persist-insert complete-post-2)
+  (persist-insert +complete-post+)
+  (persist-insert +complete-post-2+)
   (delete-all-by-sql +post+ "DELETE FROM posts")
   (assert= 0 (count-all +post+)))
 
-(deftest-db "exist?"
+(deftest-db "exist?: single pk"
   (assert-not (exist? +post+))
-  (persist-insert complete-post)
+  (persist-insert +complete-post+)
   (assert-that (exist? +post+))
-  (assert-not (exist? +post+ {:where [:id := (:id complete-post-2)]}))
-  (persist-insert complete-post-2)
-  (assert-that (exist? +post+ {:where [:id := (:id complete-post-2)]})))
+  (assert-not  (exist? +post+
+                 {:where [:id := (:id (gen-uuid))]}))
+  (assert-that (exist? +post+
+                 {:where [:id := (:id +complete-post+)]})))
+
+(deftest-db "exist?: multiple pk"
+  (assert-not (exist? +schmorg+))
+  (persist-insert +simple-schmorg+)
+  (assert-that (exist? +schmorg+))
+  (assert-not  (exist? +schmorg+
+                 {:where [:a_integer := 456]}))
+  (assert-that (exist? +schmorg+
+                 {:where [:a_integer := (:a_integer +simple-schmorg+)]})))
 
 (deftest-db "count-all"
   (assert= 0 (count-all +post+))
-  (persist-insert complete-post)
-  (persist-insert complete-post-2)
+  (persist-insert +complete-post+)
+  (persist-insert +complete-post-2+)
   (assert= 2 (count-all +post+))
-  (assert= 1 (count-all +post+ {:where [:id := (:id complete-post)]})))
+  (assert= 1 (count-all +post+ {:where [:id := (:id +complete-post+)]})))
 
 (deftest-db "minimum, maximum"
-  (persist-insert complete-post)
-  (persist-insert complete-post-2)
+  (persist-insert +complete-post+)
+  (persist-insert +complete-post-2+)
   (assert= 3 (minimum +post+ :view_count))
   (assert= 7 (maximum +post+ :view_count))
   (assert= 7 (minimum +post+ :view_count
-               {:where [:id := (:id complete-post-2)]}))
+               {:where [:id := (:id +complete-post-2+)]}))
   (assert= 3 (maximum +post+ :view_count
-               {:where [:id := (:id complete-post)]})))
+               {:where [:id := (:id +complete-post+)]})))
 
 (deftest-db "delete-all-by-sql"
-  (persist-insert complete-post)
-  (persist-insert complete-post-2)
+  (persist-insert +complete-post+)
+  (persist-insert +complete-post-2+)
   (delete-all +post+)
   (assert= 0 (count-all +post+)))

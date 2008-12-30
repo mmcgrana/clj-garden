@@ -29,15 +29,26 @@
   [model]
   (name (:table-name model)))
 
+(defn pk-init
+  "Returns, if applicable, a function returning a map of initialized primary
+  key name/value pairs"
+  [model]
+  (:pk-init model))
+
 (defn column-names
-  "Returns as a seq of keywords the column names for the model, including :id."
+  "Returns as a seq of keywords the column names for the model, including pks."
   [model]
   (:column-names model))
 
-(defn column-names-sans-id
-  "Returns as a seq of keywords the column names for the model, excluding :id."
+(defn non-pk-column-names
+  "Returns as a seq of keywords the column names for the model, excluding pks."
   [model]
-  (:column-names-sans-id model))
+  (:non-pk-column-names model))
+
+(defn pk-column-names
+  "Returns as a seq of keywords the pk column names for the model."
+  [model]
+  (:pk-column-names model))
 
 (defn quoters-by-name
   "Returns a map of keyword column names to a quoter fn for the column."
@@ -85,30 +96,52 @@
   (get-or model-map :table-name
     (throwf ":table-name not provided in model map")))
 
+(defn- checked-pk-init
+  "Returns a fn for pk initialization specified by model-map, or throws if
+  it is present but is not a proper function."
+  [model-map]
+  (if-let [init-fn (get model-map :pk-init)]
+    (if-not (fn? init-fn)
+      (throwf ":init-fn given but not a function")
+      init-fn)))
+
 (defn- checked-column-defs
   "Returns a validated seq of column defs specified by model-map."
   [model-map]
   (get-or model-map :columns
     (throwf ":columns not provided in model map")))
 
-(defn- compiled-column-names-sans-id
-  "Returns a seq of non-:id column names based on column-defs."
+(defn- compiled-column-names
+  "Returns a seq of column names based on column-defs that includes all column
+  names."
   [column-defs]
   (map first column-defs))
 
-(defn- compiled-column-names
-  "Returns a seq of column names based on column-defs that additionally
-  includes :id."
-  [column-defs]
-  (cons :id (compiled-column-names-sans-id column-defs)))
+(defn- compiled-pk-column-names
+  "Returns a seq of pk column names based on model-map."
+  [model-map]
+  (let [pk  (get model-map :pk)
+        pks (get model-map :pks)]
+    (cond
+      (and pk pks)      (throwf "Both :pk and :pks provided in model map.")
+      (not (or pk pks)) (throwf "Missing both :pk and :pks")
+      pk                (if (keyword? pk) [pk] (throwf "pk must be a keyword."))
+      pks               (if (coll? pks) pks (throwf "pks must be a coll.")))))
+
+(defn- compiled-non-pk-column-names
+  "Returns a seq of non-pk column names based on a seq of all column name and of
+  the pk-column names."
+  [column-names pk-column-names]
+  (let [pk-cnames-set (set pk-column-names)]
+    (remove #(pk-cnames-set %) column-names)))
 
 (defn- compiled-mappers-by-name
   "Returns a map of column name keywords to either quoter or parser fns,
   where which is specified by the mapper-finder fn."
   [mapper-finder column-defs]
-  (assoc
-    (mash (fn [[name type]] [name (mapper-finder type)]) column-defs)
-    :id (mapper-finder :uuid)))
+  (mash
+    (fn [[name type]] [name (mapper-finder type)])
+    column-defs))
 
 (defn- compiled-validators
   "Returns a seq of validator fns corresponding to the model's validations."
@@ -162,7 +195,7 @@
   (:accessible-attrs model-map))
 
 (def- recognized-model-keys
-  #{:table-name :data-source :columns :callbacks :validations
+  #{:table-name :data-source :pk :pks :pk-init :columns :callbacks :validations
     :accessible-attrs :extensions})
 
 (defn- checked-model-map
@@ -180,30 +213,22 @@
             (fn [m extension] (checked-model-map (extension m)))
             (checked-model-map unextended-model-map)
             (:extensions unextended-model-map))]
-    (let [column-defs (checked-column-defs model-map)]
-      {:table-name           (checked-table-name model-map)
-       :data-source          (checked-data-source model-map)
-       :column-names-sans-id (compiled-column-names-sans-id column-defs)
-       :column-names         (compiled-column-names column-defs)
-       :quoters-by-name      (compiled-mappers-by-name type-quoter column-defs)
-       :parsers-by-name      (compiled-mappers-by-name type-parser column-defs)
-       :casters-by-name      (compiled-mappers-by-name type-caster column-defs)
-       :validators           (compiled-validators model-map)
-       :callbacks            (compiled-callbacks model-map)
-       :accessible-attrs     (checked-accessible-attrs model-map)
-       :model-map            model-map})))
-
-(defn- define-accessors
-  "Define attrname, attrname=, and attrname? accessors for every column of
-  model."
-  [model]
-  (doseq [cname (column-names-sans-id model)]
-    (eval `(defn ~(symbol (name cname)) [instance#]
-             (get instance# ~cname)))
-    (eval `(defn ~(symbol (str (name cname) "=")) [instance# val#]
-             (assoc instance# ~cname val#)))
-    (eval `(defn ~(symbol (str (name cname) "?")) [instance#]
-             (get instance# ~cname)))))
+    (let [column-defs         (checked-column-defs model-map)
+          column-names        (compiled-column-names column-defs)
+          pk-column-names     (compiled-pk-column-names model-map)]
+      {:table-name          (checked-table-name model-map)
+       :data-source         (checked-data-source model-map)
+       :pk-init             (checked-pk-init model-map)
+       :column-names        column-names
+       :pk-column-names     pk-column-names
+       :non-pk-column-names (compiled-non-pk-column-names column-names pk-column-names)
+       :quoters-by-name     (compiled-mappers-by-name type-quoter column-defs)
+       :parsers-by-name     (compiled-mappers-by-name type-parser column-defs)
+       :casters-by-name     (compiled-mappers-by-name type-caster column-defs)
+       :validators          (compiled-validators model-map)
+       :callbacks           (compiled-callbacks model-map)
+       :accessible-attrs    (checked-accessible-attrs model-map)
+       :model-map           model-map})))
 
 (defmacro defmodel
   "Short for (def name (compiled-model model-map))"

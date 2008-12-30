@@ -9,9 +9,9 @@
 (defmacro with-clean-db
   [& body]
   `(try
-    (delete-all +post+)
-    (delete-all +schmorg+)
-     ~@body
+     (delete-all +post+)
+     (delete-all +schmorg+)
+      ~@body
     (finally
       (delete-all +post+)
       (delete-all +schmorg+))))
@@ -23,27 +23,38 @@
 
 (defmodel +schmorg+
   {:data-source +data-source+
-   :table-name :schmorgs
+   :table-name  :schmorgs
+   :pks         [:a_uuid :a_integer]
    :columns
-    [[:uuid     :uuid]
-     [:boolean  :boolean]
-     [:integer  :integer]
-     [:long     :long]
-     [:float    :float]
-     [:double   :double]
-     [:string   :string]
-     [:datetime :datetime]]
+     [[:a_uuid     :uuid]
+      [:a_integer  :integer]
+      [:a_boolean  :boolean]
+      [:a_long     :long]
+      [:a_float    :float]
+      [:a_double   :double]
+      [:a_string   :string]
+      [:a_datetime :datetime]]
    :accessible-attrs
-    [:uuid :boolean :integer :long :float :double :string :datetime]})
+     [:uuid :boolean :integer :long :float :double :string :datetime]})
 
-(def empty-schmorg
+(def +empty-schmorg+
   (init +schmorg+ {}))
+
+(def +simple-schmorg-map+
+  {:a_uuid "5260eb5e-3871-42db-ae94-25f1cdff055e"
+   :a_integer 3 :a_boolean true})
+
+(def +simple-schmorg+
+  (init* +schmorg+ +simple-schmorg-map+))
 
 (def +post-map+
   {:data-source +data-source+
-   :table-name :posts
+   :table-name  :posts
+   :pk          :id
+   :pk-init     a-uuid
    :columns
-    [[:title      :string]
+    [[:id         :uuid]
+     [:title      :string]
      [:view_count :integer]
      [:posted_at  :datetime]
      [:special    :boolean]]
@@ -52,17 +63,17 @@
 
 (def +post+ (compiled-model +post-map+))
 
-(def simple-post
+(def +simple-post+
   (init +post+ {:title "f'oo"}))
 
-(def complete-post-map
+(def +complete-post-map+
   {:title "foo" :view_count 3 :posted_at (now) :special true})
 
-(def complete-post-2-map
+(def +complete-post-2-map+
   {:title "biz" :view_count 7 :posted_at (now) :special false})
 
-(def complete-post
-  (init +post+ complete-post-map))
+(def +complete-post+
+  (init +post+ +complete-post-map+))
 
-(def complete-post-2
-  (init +post+ complete-post-2-map))
+(def +complete-post-2+
+  (init +post+ +complete-post-2-map+))
