@@ -108,7 +108,7 @@
         (do
           (scrape1 from-user)
           (log (str left " users unscraped\n"))
-          (Thread/sleep 10000)
+          ;(Thread/sleep 10000)
           (recur (next-user)))
         (log "done scraping")))))
 

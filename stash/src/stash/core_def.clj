@@ -119,14 +119,9 @@
 
 (defn- compiled-pk-column-names
   "Returns a seq of pk column names based on model-map."
-  [model-map]
-  (let [pk  (get model-map :pk)
-        pks (get model-map :pks)]
-    (cond
-      (and pk pks)      (throwf "Both :pk and :pks provided in model map.")
-      (not (or pk pks)) (throwf "Missing both :pk and :pks")
-      pk                (if (keyword? pk) [pk] (throwf "pk must be a keyword."))
-      pks               (if (coll? pks) pks (throwf "pks must be a coll.")))))
+  [column-defs]
+  (or (map first (filter #(get-in % [2 :pk]) column-defs))
+      (throwf "no column defs include the :pk option")))
 
 (defn- compiled-non-pk-column-names
   "Returns a seq of non-pk column names based on a seq of all column name and of
@@ -215,7 +210,7 @@
             (:extensions unextended-model-map))]
     (let [column-defs         (checked-column-defs model-map)
           column-names        (compiled-column-names column-defs)
-          pk-column-names     (compiled-pk-column-names model-map)]
+          pk-column-names     (compiled-pk-column-names column-defs)]
       {:table-name          (checked-table-name model-map)
        :data-source         (checked-data-source model-map)
        :pk-init             (checked-pk-init model-map)

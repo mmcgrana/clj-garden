@@ -24,10 +24,9 @@
 (defmodel +schmorg+
   {:data-source +data-source+
    :table-name  :schmorgs
-   :pks         [:a_uuid :a_integer]
    :columns
-     [[:a_uuid     :uuid]
-      [:a_integer  :integer]
+     [[:a_uuid     :uuid    {:pk true}]
+      [:a_integer  :integer {:pk true}]
       [:a_boolean  :boolean]
       [:a_long     :long]
       [:a_float    :float]
@@ -50,10 +49,9 @@
 (def +post-map+
   {:data-source +data-source+
    :table-name  :posts
-   :pk          :id
    :pk-init     a-uuid
    :columns
-    [[:id         :uuid]
+    [[:id         :uuid     {:pk true}]
      [:title      :string]
      [:view_count :integer]
      [:posted_at  :datetime]

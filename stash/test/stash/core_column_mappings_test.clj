@@ -50,5 +50,5 @@
     (deftest (str type " casting " unparsed " to " parsed)
       (assert= parsed ((type-caster type) unparsed)))))
 
-
-
+(deftest "type-db-type"
+  (assert= "varchar" (type-db-type :string)))

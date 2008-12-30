@@ -87,11 +87,17 @@
   (mash
     (fn [[type {:keys [clj-type db-type quoter parser caster]}]]
       [type
-       {:quoter #(if (nil? %) "NULL" (quoter %))
-        :parser #(if (nil? %) nil    (parser %))
-        :caster #(if-not (nil? %)
-                   (if (instance? clj-type %) % (caster %)))}])
+       {:db-type db-type
+        :quoter  #(if (nil? %) "NULL" (quoter %))
+        :parser  #(if (nil? %) nil    (parser %))
+        :caster  #(if-not (nil? %)
+                    (if (instance? clj-type %) % (caster %)))}])
     undecorated-column-mappers))
+
+(defn type-db-type
+  "Returns a String for the Postgres column type corresponding to the type."
+  [type]
+  (get-in column-mappers [type :db-type]))
 
 (defn type-quoter
   "Returns the quoter fn corresponding to the type."
