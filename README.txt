@@ -1,7 +1,5 @@
 Various Clojure libraries and apps I'm working on.
 
-Nothing here is ready for general public use, but if anything intrigues you let me know.
-
 * clj-backtrace: Better Clojure backtraces
 * clj-http-client: HTTP client wrapping Commons HttpClient
 * clj-jdbc: High-level interface to JDBC databases
