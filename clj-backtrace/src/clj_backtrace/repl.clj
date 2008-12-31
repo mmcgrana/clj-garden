@@ -52,3 +52,11 @@
     (print-trace (:trace-elems exec) source-width)
     (if-let [cause (:cause exec)]
       (ppe-cause cause source-width))))
+
+(defmacro with-ppe
+  "Wrap code in a guard that will print pretty stack traces instead of default
+  Java traces on exceptions"
+  [& body]
+  `(try
+     ~@body
+     (catch Exception e# (ppe e#))))
