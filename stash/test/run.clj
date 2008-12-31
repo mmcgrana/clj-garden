@@ -3,7 +3,6 @@
 
 (clj-unit.core/run-tests '(
   stash.core-test
-  ;stash.utils-test
-  ;stash.timestamps-test
-  ;stash.validators-test
+  stash.utils-test
+  stash.validators-test
 ))

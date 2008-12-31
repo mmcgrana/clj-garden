@@ -1,0 +1,17 @@
+<project name="stash-timestamps" default="jar">
+  <description>Pack all sources into a JAR.</description>
+
+  <property name="jarfile" location="stash-timestamps.jar"/>
+
+  <target name="clean"
+          description="Remove generated files and directories.">
+    <delete file="${jarfile}"/>
+  </target>
+
+  <target name="jar"
+          description="Create jar file.">
+    <jar jarfile="${jarfile}">
+      <fileset dir="./src" includes="stash_timestamps/**/*.clj"/>
+    </jar>
+  </target>
+</project>
