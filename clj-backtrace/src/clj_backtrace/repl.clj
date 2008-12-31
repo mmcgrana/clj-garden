@@ -19,19 +19,19 @@
   "Print a pretty stack trace for the parsed elems."
   [elems & [source-width]]
   (let [print-width
-          (+ 3 (or source-width
+          (+ 6 (or source-width
                    (high (map (memfn length) (map source-str elems)))))]
     (doseq [elem elems]
       (println
         (str (rjust print-width (source-str elem)) " " (method-str elem))))))
 
-(defn- ppe-cause
+(defn- pst-cause
   "Print a pretty stack trace for a parsed exception in a causal chain."
   [exec source-width]
   (println (str "Caused by: " (:message exec)))
   (print-trace (:trimmed-elems exec) source-width)
   (if-let [cause (:cause exec)]
-    (ppe-cause cause source-width)))
+    (pst-cause cause source-width)))
 
 (defn- find-source-width
   "Returns the width of the longest source-string among all trace elems of the 
@@ -43,7 +43,7 @@
         (max this-source-width (find-source-width cause))
         this-source-width)))
 
-(defn ppe
+(defn pst
   "Print a pretty stack trace for an exception, by default *e."
   [& [e]]
   (let [exec      (parse-exception (or e *e))
@@ -51,12 +51,12 @@
     (println (:message exec))
     (print-trace (:trace-elems exec) source-width)
     (if-let [cause (:cause exec)]
-      (ppe-cause cause source-width))))
+      (pst-cause cause source-width))))
 
-(defmacro with-ppe
+(defmacro with-pst
   "Wrap code in a guard that will print pretty stack traces instead of default
   Java traces on exceptions"
   [& body]
   `(try
      ~@body
-     (catch Exception e# (ppe e#))))
+     (catch Exception e# (pst e#))))

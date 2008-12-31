@@ -47,13 +47,13 @@
   (doseq [[elem parsed] cases]
     (assert= parsed (parse-elem elem))))
 
-(deftest "parse-trace"
-  (assert= (map second cases) (parse-trace (map first cases))))
+(deftest "parse-trace-elems"
+  (assert= (map second cases) (parse-trace-elems (map first cases))))
 
-(deftest "trim-redundant-elems"
-  (assert= '(d c) (trim-redundant-elems '(d c b a) '(f e b a)))
-  (assert= '(c)   (trim-redundant-elems '(c b a)   '(f e b a)))
-  (assert= '(d c) (trim-redundant-elems '(d c b a) '(e b a))))
+(deftest "trim-redundant"
+  (assert= '(d c) (trim-redundant '(d c b a) '(f e b a)))
+  (assert= '(c)   (trim-redundant '(c b a)   '(f e b a)))
+  (assert= '(d c) (trim-redundant '(d c b a) '(e b a))))
 
 (deftest "parse-exception"
   (try

@@ -2,47 +2,54 @@
   (:use clojure.contrib.str-utils)
   (:use clj-backtrace.utils))
 
-(defn- clojure-elem?
+(defn- clojure-code?
   "Returns true if the filename is non-null and indicates a clj source file."
   [class-name file]
-  (or (re-match? #"^user" class-name)
-      (and file (re-match? #"\.clj$" file))))
+  (or (re-match? #"^user" class-name) (and file (re-match? #"\.clj$" file))))
 
 (defn- clojure-ns
   "Returns the clojure namespace name implied by the bytecode class name."
   [class-name]
-  (let [base-name (re-get #"([^$]+)\$" class-name 1)
-        hyph-name (re-gsub #"_" "-" base-name)]
-    hyph-name))
+  (re-gsub #"_" "-" (re-get #"([^$]+)\$" class-name 1)))
+
+(def alpha-punc-subs
+  [[#"_QMARK_" "?"]
+   [#"_BANG_"  "!"]
+   [#"_PLUS_"  "+"]
+   [#"_GT_"    ">"]
+   [#"_LT_"    "<"]
+   [#"_EQ_"    "="]
+   [#"_STAR_"  "*"]
+   [#"_SLASH_" "/"]
+   [#"_"       "-"]])
 
 (defn- clojure-fn
   "Returns the clojure function name implied by the bytecode class name."
   [class-name]
-  (let [base-name (re-without #"(^[^$]+\$)|(__\d+(\$[^$]+)*$)" class-name)
-        punc-name (re-gsub #"_QMARK_" "?" base-name)
-        punc-name (re-gsub #"_BANG_"  "!" punc-name)
-        punc-name (re-gsub #"_PLUS_"  "+" punc-name)
-        punc-name (re-gsub #"_GT_"    ">" punc-name)
-        punc-name (re-gsub #"_LT_"    "<" punc-name)
-        punc-name (re-gsub #"_EQ_"    "=" punc-name)
-        punc-name (re-gsub #"_STAR_"  "*" punc-name)
-        punc-name (re-gsub #"_SLASH_" "/" punc-name)
-        hyph-name (re-gsub #"_"       "-" punc-name)]
-    hyph-name))
+  (reduce
+    (fn [base-name [alpha-punc punc]] (re-gsub alpha-punc punc base-name))
+    (re-without #"(^[^$]+\$)|(__\d+(\$[^$]+)*$)" class-name)
+    alpha-punc-subs))
 
 (defn- clojure-annon-fn?
-  "Returns true if the bytecode class name implies an annon fn."
+  "Returns true if the bytecode class name implies an anonymous inner fn."
   [class-name]
   (re-match? #"\$fn__" class-name))
 
 (defn parse-elem
-  "Returns a map of information about the trace element."
+  "Returns a map of information about the java trace element.
+  For all elements:
+  {:file <source file name> :line <source line>}
+  Additionally for elements from Java code:
+  {:java true :class <class-name> :method <method-name>}
+  Additionally for elements from Clojure code:
+  {:clojure true :ns <ns-name> :fn <fn name> :annon-fn <true|false>}"
   [elem]
   (let [class-name (.getClassName elem)
         file       (.getFileName  elem)
         line       (let [l (.getLineNumber elem)] (if (> l 0) l))
         parsed     {:file file :line line}]
-    (if (clojure-elem? class-name file)
+    (if (clojure-code? class-name file)
       (assoc parsed
         :clojure true
         :ns       (clojure-ns class-name)
@@ -53,42 +60,44 @@
         :class class-name
         :method (.getMethodName elem)))))
 
-(defn parse-trace
-  "Returns a seq of maps providing usefull information about the stack
+(defn parse-trace-elems
+  "Returns a seq of maps providing usefull information about the java stack
   trace elements."
   [elems]
   (map parse-elem elems))
 
-(defn trim-redundant-elems
-  "Returns the portion of causer-elems that is not duplicated in caused-elems."
-  [causer-elems caused-elems]
-  (loop [rcauser-elems (reverse causer-elems)
-         rcaused-elems (reverse caused-elems)]
-    (if-let [rcauser-bottom (first rcauser-elems)]
-      (if (= rcauser-bottom (first rcaused-elems))
-        (recur (rest rcauser-elems) (rest rcaused-elems))
-        (reverse rcauser-elems)))))
+(defn trim-redundant
+  "Returns the portion of the tail of causer-elems that is not duplicated in 
+  the tail of caused-elems. This corresponds to the \"...26 more\" that you
+  see at the bottom of regular trace dumps."
+  [causer-parsed-elems caused-parsed-elems]
+  (loop [rcauser-parsed-elems (reverse causer-parsed-elems)
+         rcaused-parsed-elems (reverse caused-parsed-elems)]
+    (if-let [rcauser-bottom (first rcauser-parsed-elems)]
+      (if (= rcauser-bottom (first rcaused-parsed-elems))
+        (recur (rest rcauser-parsed-elems) (rest rcaused-parsed-elems))
+        (reverse rcauser-parsed-elems)))))
 
 (defn- parse-cause-exception
   "Like parse-exception, but for causing exceptions."
-  [causer-e caused-elems]
-  (let [trace-elems (parse-trace (.getStackTrace causer-e))
+  [causer-e caused-parsed-elems]
+  (let [parsed-elems (parse-trace-elems (.getStackTrace causer-e))
         base {:class         (class causer-e)
               :message       (.getMessage causer-e)
-              :trace-elems   trace-elems
-              :trimmed-elems (trim-redundant-elems trace-elems caused-elems)}]
+              :trace-elems   parsed-elems
+              :trimmed-elems (trim-redundant parsed-elems caused-parsed-elems)}]
     (if-let [cause (.getCause causer-e)]
-      (assoc base :cause (parse-cause-exception cause trace-elems))
+      (assoc base :cause (parse-cause-exception cause parsed-elems))
       base)))
 
 (defn parse-exception
   "Returns a Clojure data structure providing usefull informaiton about the
   exception, its stack trace elements, and its causes."
   [e]
-  (let [trace-elems (parse-trace (.getStackTrace e))
+  (let [parsed-elems (parse-trace-elems (.getStackTrace e))
         base {:class       (class e)
               :message     (.getMessage e)
-              :trace-elems trace-elems}]
+              :trace-elems parsed-elems}]
     (if-let [cause (.getCause e)]
-      (assoc base :cause (parse-cause-exception cause trace-elems))
+      (assoc base :cause (parse-cause-exception cause parsed-elems))
       base)))

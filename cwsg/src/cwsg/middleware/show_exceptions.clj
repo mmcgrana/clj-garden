@@ -59,8 +59,6 @@ table.trace td.source {
 (defn java-elem-str [parsed]
   (str (:class parsed) "." (:method parsed)))
 
-(defn clojure-source [parsed]
-  (get-source (symbol (str (:ns parsed) "/" (:fn parsed)))))
 
 (defn- exceptions-response
   "Returns a response showing debugging information about the exception."
