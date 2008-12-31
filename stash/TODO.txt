@@ -1,8 +1,4 @@
 Later
-* migrations
-  * create, rename, drop table
-  * add, rename, drop column
-  * add, drop index
 - rethink, test attr protection, foo* situation
 - datetime caster 
 - more validators
