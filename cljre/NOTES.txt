@@ -1,0 +1,30 @@
+; cljre
+; Clojure regular exressions editor
+; pattern box
+; string box
+; results box
+
+(let [pattern #"[text-field]"
+      string   "[text-field]"]
+  (re-seq pattern string))
+
+nil
+("foo")
+
+
+(comment
+
+#"foo"
+"foo"           ("foo")
+"xxxfooxxx"     ("foo")
+"fooxxfooxxfoo" ("foo foo foo")
+
+#"..(foo).."
+"xxfooxx"              (["xxfooxx" "foo"])
+"xxxxfooxxxx"          (["xxfooxx" "foo"])
+"xxxxfooxxxxxxfooxxxx" (["xxfooxx" "foo"] ["xxfooxx" "foo"])
+
+#"foo(bar(bat)?)"
+"foobarbat"             (["foobarbat" "barbat" "bat"])
+"xxfoobarbatxx"         (["foobarbat" "barbat" "bat"])
+"xxfoobarbatxxfoobarxx" (["foobarbat" "barbat" "bat"] ["foobar" "bar" nil])

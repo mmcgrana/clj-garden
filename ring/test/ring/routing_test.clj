@@ -10,7 +10,7 @@
    [c 'show           :show      :get  "/show/:slug"        ]
    [c 'page-not-found :not-found :any  "/:path" {:path ".*"}]])
 
-(def router (compiled-router routes "host"))
+(def router ("host" compiled-router routes))
 
 (deftest "recognize"
   (let [[action-fn params] (recognize router :get "/show/foo")]
