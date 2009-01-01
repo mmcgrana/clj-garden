@@ -8,3 +8,32 @@ logging in general
   - all clojure prns
 
 flash for new url as driver for session store
+
+logging: development
+  - see sql queries and their times
+    (dedicated, optional sql logging)
+  - see how actions are routed
+    (test outside of request/response cycle)
+  - see response time breakdowns
+    (dedicated, optional request timing and profiling middleware)
+  
+logging: testing
+  - probably not useful
+
+logging: production
+  - see sql queries and their times
+    (buffered flat file dedicated to query times and queries)
+    (postgres features)
+  - see what requests are leading to 404s
+    (dedicated file for 404 request info)
+  - grep for long actions, common acitons
+    ()
+  - see exceptions
+    (perhaps good for logging here)
+  
+perhaps select-with-logging, modify-with-logging
+
+{:type :sql, :time 0.0023 "SELECT * FROM posts WHERE post_at > 12.23.2008"}
+{:type :req, :uri "/"}
+[req] 
+[res]
