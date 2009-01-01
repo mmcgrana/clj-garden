@@ -19,7 +19,7 @@
                      (re-match? #"clj_unit.core\$run_tests" (.getClassName m)))
         user-elems (take-while #(not (ours? %)) elems)]
     (println (str e))
-    (print-trace (parse-trace-elems user-elems))))
+    (print-trace-elems (parse-trace-elems user-elems))))
 
 (def +console-reporter+
   {:init

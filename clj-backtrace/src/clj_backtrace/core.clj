@@ -36,7 +36,7 @@
   [class-name]
   (re-match? #"\$fn__" class-name))
 
-(defn parse-elem
+(defn parse-trace-elem
   "Returns a map of information about the java trace element.
   For all elements:
   {:file <source file name> :line <source line>}
@@ -64,7 +64,7 @@
   "Returns a seq of maps providing usefull information about the java stack
   trace elements."
   [elems]
-  (map parse-elem elems))
+  (map parse-trace-elem elems))
 
 (defn trim-redundant
   "Returns the portion of the tail of causer-elems that is not duplicated in 

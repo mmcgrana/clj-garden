@@ -43,9 +43,9 @@
     (fn [[c m f l p]] [(StackTraceElement. c m f l) p])
     cases-data))
 
-(deftest "parse-elem"
+(deftest "parse-trace-elem"
   (doseq [[elem parsed] cases]
-    (assert= parsed (parse-elem elem))))
+    (assert= parsed (parse-trace-elem elem))))
 
 (deftest "parse-trace-elems"
   (assert= (map second cases) (parse-trace-elems (map first cases))))

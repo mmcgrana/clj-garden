@@ -15,21 +15,21 @@
 (defn- method-str [parsed]
   (if (:java parsed) (java-method-str parsed) (clojure-method-str parsed)))
 
-(defn print-trace
+(defn print-trace-elems
   "Print a pretty stack trace for the parsed elems."
-  [elems & [source-width]]
+  [parsed-elems & [source-width]]
   (let [print-width
           (+ 6 (or source-width
-                   (high (map (memfn length) (map source-str elems)))))]
-    (doseq [elem elems]
-      (println
-        (str (rjust print-width (source-str elem)) " " (method-str elem))))))
+                   (high (map (memfn length) (map source-str parsed-elems)))))]
+    (doseq [parsed-elem parsed-elems]
+      (println (str (rjust print-width (source-str parsed-elem))
+                    " " (method-str parsed-elem))))))
 
 (defn- pst-cause
   "Print a pretty stack trace for a parsed exception in a causal chain."
   [exec source-width]
   (println (str "Caused by: " (:message exec)))
-  (print-trace (:trimmed-elems exec) source-width)
+  (print-trace-elems (:trimmed-elems exec) source-width)
   (if-let [cause (:cause exec)]
     (pst-cause cause source-width)))
 
@@ -49,7 +49,7 @@
   (let [exec      (parse-exception (or e *e))
         source-width (find-source-width exec)]
     (println (:message exec))
-    (print-trace (:trace-elems exec) source-width)
+    (print-trace-elems (:trace-elems exec) source-width)
     (if-let [cause (:cause exec)]
       (pst-cause cause source-width))))
 
