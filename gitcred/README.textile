@@ -1,0 +1,16 @@
+h3. GitCred: PageRanking GitHub users
+
+GitCred attempts to measure the 'cred' of GitHub users. It works by scraping followers data from GitHub pages and then applying the classic PageRank algorithm to the resulting users/followers graph.
+
+You can find the results for a recent GitCred computation in RESULTS.txt. These values are logarithmically scaled and normalized so that they correspond to the familiar Google PageRank measure.
+
+h3. For Clojure programmers
+
+GitCred is implemented in Clojure, leveraging the Jung Java graph library to perform the actual PageRank computations and the following Clojure libraries to help with data gathering:
+
+* clj-http-client: pulling down the GitHub pages
+* clj-scrape: extracting the needed data from these pages
+* stash, clj-jdbc: ORM and supporting JDBC abstraction for persisting the data
+
+These Clojure libraries are not released yet, but the code is available for you perusal in the clj-garden incubator project in which GitCred is also located.
+

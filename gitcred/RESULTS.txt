@@ -1,3 +1,5 @@
+Username               GitCred
+==============================
 37signals              10.00
 imbriaco               9.76
 why                    8.74
