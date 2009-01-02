@@ -1,7 +1,7 @@
 (ns ring.routing
   (:use clj-routing.core ring.utils))
 
-(defn compiled-router [routes root]
+(defn compiled-router [root routes]
   "Returns a router object that can then be used in any of the routing functions
   below. TODO: doc routes format."
   {:symbolic-recognizer
