@@ -12,3 +12,8 @@
       (let [[k v] (f elem)]
         (assoc memo k v)))
     {} coll))
+
+(defn high
+  "Like max, but for collections."
+  [vals]
+  (apply max vals))

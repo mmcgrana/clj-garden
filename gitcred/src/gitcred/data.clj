@@ -12,20 +12,18 @@
 
 (defmodel +user+
   {:data-source +data-source+
-   :table-name :users
-   :pk         :username
+   :table-name  :users
    :columns
-     [[:username        :string]
+     [[:username        :string   {:pk true}]
       [:discovered_at   :datetime]
       [:last_scraped_at :datetime]]})
 
 (defmodel +follow+
   {:data-source +data-source+
-   :table-name :follows
-   :pks        [:from_username :to_username]
+   :table-name  :follows
    :columns
-     [[:from_username :string]
-      [:to_username   :string]]})
+     [[:from_username :string {:pk true}]
+      [:to_username   :string {:pk true}]]})
 
 (defn user-url
   "Returns the github url for the user."
@@ -44,14 +42,20 @@
   (http-get-stream (user-url user) {}
     (fn [s h b-stream] (parse-usernames b-stream))))
 
+(defn find-or-create-user-by-username
+  "Ensures that we have a user record for the given username."
+  [username]
+  (when-not (exist? +user+ {:where [:username := username]})
+    (create* +user+ {:username username :discovered_at (now)})))
+
 (defn ensure-usernames
   "Ensure that we have users for all usernames, creating such users if we dont."
   [usernames]
-  (doseq [username usernames]
-    (when-not (find-one +user+ {:where [:username := username]})
-      (create* +user+ {:username username :discovered_at (now)}))))
+  (doseq [username usernames] (find-or-create-user-by-username username)))
 
 (defn allign-follows
+  "Add and remove follows from from-user as appropriate to ensure that the
+  user's follows correspond to to-usernames."
   [from-user to-usernames]
   (let [to-usernames-set (set to-usernames)
         from-username    (:username from-user)
@@ -108,27 +112,32 @@
         (do
           (scrape1 from-user)
           (log (str left " users unscraped\n"))
-          ;(Thread/sleep 10000)
+          (Thread/sleep 10000)
           (recur (next-user)))
         (log "done scraping")))))
 
 (defn ensure-seed-user []
-  (when-not (exist? +user+ {:where [:username := "mmcgrana"]})
-    (create* +user+ {:username "mmcgrana" :discovered_at (now)})))
+  "Ensure that we have at least the seed user in the database so that the
+  scraper has somewhere to start."
+  (find-or-create-user-by-username "mmcgrana"))
 
 (defn run []
+  "Run the scraper."
   (ensure-seed-user)
   (scrape (next-user)))
 
-
-(defn all-graph-data []
+(defn all-graph-data
+  "Returns a map of all users to all of the follows from that user."
+  []
   (log "loading all graph data")
   (mash
     (fn [user]
       [user (find-all +follow+ {:where [:from_username := (:username user)]})])
     (find-all +user+)))
 
-(defn partial-graph-data []
+(defn partial-graph-data
+  "Returns a map like with all-graph-data, but only for 500 of the users."
+  []
   (log "loading partial graph data")
   (let [users     (find-all +user+ {:limit 500})
         usernames (map :username users)]

@@ -6,6 +6,9 @@
            edu.uci.ics.jung.algorithms.importance.PageRank))
 
 (defn compute-pagerank
+  "For given graph as returned by e.g. gitcred.data/all-graph-data, returns
+  a seq of 2-tuples, where the first element is the user and the second is
+  the users' un-normalized pagerank, sorted by pagerank."
   [users-to-followers]
   (log "building graph")
   (let [users (keys users-to-followers)
@@ -26,11 +29,7 @@
     (log "computing pagerank")
     (let [ranker (PageRank. g 0.15)]
       (.evaluate ranker)
-      (log "printing rankings")
       (let [rankings        (.getRankings ranker)
-            sorted-rankings (sort-by (fn [r] (.rankScore r)) rankings)]
-        (doseq [ranking sorted-rankings]
-          (let [user     (.getUserDatum (.vertex ranking) :user)
-                username (:username user)
-                score    (.rankScore ranking)]
-            (log (format "%s: %s" username score))))))))
+            sorted-rankings (sort-by (fn [r] (- (.rankScore r))) rankings)]
+        (map (fn [r] [(.getUserDatum (.vertex r) :user) (.rankScore r)])
+             sorted-rankings)))))
