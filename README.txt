@@ -1,6 +1,5 @@
 Various Clojure libraries and apps I'm working on.
 
-* clj-backtrace: Better Clojure backtraces
 * clj-http-client: HTTP client wrapping Commons HttpClient
 * clj-jdbc: High-level interface to JDBC databases
 * clj-rome: Universal RSS/Atom Feed parser wrapping Rome
@@ -11,6 +10,7 @@ Various Clojure libraries and apps I'm working on.
 * cljurl: Url shortening website, built with ring and stash
 * cwsg: WSGI/Rack for Clojure
 * cwsg-sandbox: Sample cwsg app ready to run
+* gitcred: PageRanking GitHub users
 * ring: Functional web framework
 * stash: Function ORM
 * stash-pagination: Paginate stash find results 
