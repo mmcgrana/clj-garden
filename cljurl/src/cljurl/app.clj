@@ -3,7 +3,7 @@
     [cwsg.middleware.show-exceptions       :as show-exceptions]
     [cwsg.middleware.file-content-info     :as file-content-info]
     [cwsg.middleware.static                :as static]
-    ring.app
+    (ring app)
     (cljurl config routing controllers)))
 
 (def app
