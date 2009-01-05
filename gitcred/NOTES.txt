@@ -1,14 +1,9 @@
-3 pieces
-  graph scraping
-  pagerank computing
-  output generation
-
-views
-  normalize gitcred: 0 -10
-
-deployment
-  post static html on mmcgrana.github.com
-  or dynamic site
-    - top ranking users, with gitcred
-    - gitcred, rank of arbitrary users
-    - gitcred, rank by language 
+include timestamps in data scrape
+automatic updater
+scrape project as well as user data
+scrape language data for projects
+  then do e.g. highest gitcred by language
+how to make cred measure robust over time
+make gitcred weighted average of incoming and pagerank, or perhaps log(incoming)
+create notion of project cred, incorporate project cred into user cred
+use forking by high-cred users as measure of project cred
