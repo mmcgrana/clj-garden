@@ -1,5 +1,6 @@
 (ns cljre.helpers
-  (:use clj-html.core ring.controller))
+  (:use clj-html.core ring.controller)
+  (:require (org.danlarkin [json :as json])))
 
 (defmacro defrouting
   [app-host routes]
@@ -12,6 +13,9 @@
 
 (defn respond-js [body]
   (respond body {"Content-Type" "text/javascript"}))
+
+(defn respond-json [data]
+  (respond-js (json/encode-to-str data :indent 2)))
 
 (defn browser-method?
   "Given a keyword an http method, returns true iff the method is implemented by
@@ -29,6 +33,15 @@
   [name & [opts]]
   (html [:input {:type "text" :name name
                  :value (get opts :value) :id (get opts :id)}]))
+
+(defn text-area-tag
+  "Returns and html snippet for a text area."
+  [name & [opts]]
+  (html [:textarea {:name name :id (get opts :id)
+                    :rows (get opts :rows) :cols (get opts :cols)
+                    :readonly (get opts :readonly)
+                    :spellcheck (get opts :spellcheck)}
+          (get opts :value)]))
 
 (defn hidden-field-tag
   "Returns html for a hidden field."

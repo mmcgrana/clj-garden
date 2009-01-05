@@ -1,7 +1,7 @@
 (ns cwsg.middleware.show-exceptions
   (:use (clj-html core helpers)
         clojure.contrib.str-utils
-        clj-backtrace.core
+        (clj-backtrace core repl)
         cwsg.utils
         clojure.contrib.repl-utils))
 
@@ -42,27 +42,15 @@ table.trace td.source {
 
 ")
 
-(defn class-str [class]
-  (re-without #"^class " (str class)))
-
 (defn header-str [parsed]
-  (str (class-str (:class parsed)) ": " (:message parsed)))
+  (str (re-without #"^class " (str (:class parsed))) ": " (:message parsed)))
 
-(defn source-str [parsed]
-  (if (and (:file parsed) (:line parsed))
-    (str (:file parsed) ":" (:line parsed))
-    "(Unknown Source)"))
+(defn- js-response [env e]
+  [500 {"Content-Type" "text/javascript"}
+    (with-out-str
+      (pst e))])
 
-(defn- clojure-elem-str [parsed]
-  (str (:ns parsed) "/" (:fn parsed) (if (:annon-fn parsed) "[fn]")))
-
-(defn java-elem-str [parsed]
-  (str (:class parsed) "." (:method parsed)))
-
-
-(defn- exceptions-response
-  "Returns a response showing debugging information about the exception."
-  [env e]
+(defn- html-reponse [env e]
   (let [excp (parse-exception e)]
     [500 {"Content-Type" "text/html"}
       (html
@@ -82,12 +70,20 @@ table.trace td.source {
                         (if (:clojure parsed)
                           (html
                             [:tr
-                              [:td.source (h (source-str       parsed))]
-                              [:td.method (h (clojure-elem-str parsed))]])
+                              [:td.source (h (source-str         parsed))]
+                              [:td.method (h (clojure-method-str parsed))]])
                           (html
                             [:tr
                               [:td.source (h (source-str    parsed))]
-                              [:td.method (h (java-elem-str parsed))]]))]))]]]]])]))
+                              [:td.method (h (java-method-str parsed))]]))]))]]]]])]))
+
+(defn- response
+  "Returns a response showing debugging information about the exception.
+  Currently supports delegation to either js or html exception views."
+  [env e]
+  (if (re-match? #"^text/javascript" (get-in env [:headers "accept"]))
+    (js-response env e)
+    (html-reponse env e)))
 
 (defn wrap
   "Returns an app corresponding to the given one but for which catches
@@ -101,5 +97,5 @@ table.trace td.source {
       (app env)
       (catch Exception e
         (if (show-test)
-          (exceptions-response env e)
+          (response env e)
           (throw e))))))
