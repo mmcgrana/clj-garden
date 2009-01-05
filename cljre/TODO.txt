@@ -14,5 +14,6 @@ permalink button eventually (no validation?) /regexs/(uuid/autoinc)
 keep record of regex/string combination, see if they can be datamined
 minified google jquery in production, regular local jquery in dev
 asset bundling
+perhaps {:foo "bar" :biz #"bat"} for assert-markup
 
 

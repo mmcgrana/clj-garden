@@ -44,7 +44,7 @@
          [:title "cljre: a Clojure Regex Editor"]]
        [:body ~@body]]))
 
-(defn vindex []
+(defn index-view []
   (with-layout
     [:div#container
       [:div#header
@@ -73,7 +73,7 @@
 
 ;; Controllers
 (defn index [req]
-  (respond (vindex)))
+  (respond (index-view)))
 
 (defn match [req]
   (respond-json (match-data (params req :string) (params req :pattern))))
