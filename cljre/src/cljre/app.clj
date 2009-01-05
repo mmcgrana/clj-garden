@@ -2,7 +2,7 @@
   (:use
     (ring app controller request)
     (clj-html core helpers)
-    (cljre helpers))
+    (cljre app-helpers))
   (:require
     ring.routing
     [cwsg.core                             :as cwsg]

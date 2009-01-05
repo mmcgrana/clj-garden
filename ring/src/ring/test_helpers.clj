@@ -14,14 +14,14 @@
         :remote-addr  (get options :remote-addr)}))
 
 (defn assert-status
-  "TODOC"
+  "Assert that a response status equals an expected status."
   [expected-status actual-status]
   (assert-truth (= expected-status actual-status)
     (format "Expected status of %s, but got %s"
       expected-status actual-status)))
 
 (defn assert-redirect
-  "TODOC"
+  "Assert that a response tuple indicates a redirect to an expected path."
   [expected-path actual-response]
   (let [[status headers body] actual-response
          location             (get headers "Location")]
@@ -30,16 +30,24 @@
        (format "Expecting redirect status and Location of %s, but got %s and %s."
          expected-path status location))))
 
-(defmacro assert-selector
-  "TODOC"
-  [expected-selector actual-body]
-  `(let [actual-dom# (dom (java.io.StringReader. ~actual-body))]
-     (assert-truth (xml1-> actual-dom# ~@(cons 'desc expected-selector))
-       (format "Expecting body matching %s, but did not.",
-         '~expected-selector))))
+; (defmacro assert-selector
+;   "TODOC"
+;   [expected-selector actual-body]
+;   `(let [actual-dom# (dom (java.io.StringReader. ~actual-body))]
+;      (assert-truth (xml1-> actual-dom# ~@(cons 'desc expected-selector))
+;        (format "Expecting body matching %s, but did not."
+;          '~expected-selector))))
+
+(defn assert-markup
+  "Assert that a response body matches an expected selector tuple."
+  [expected-selector-tuple actual-body]
+  (let [actual-dom (dom (java.io.StringReader. actual-body))]
+    (assert-truth (apply xml1-> actual-dom :desc expected-selector-tuple)
+      (format "Expecting body matching %s, but did not."
+        expected-selector-tuple))))
 
 (defn assert-content-type
-  "TODOC"
+  "Assert that response headers specify an expected content type."
   [expected-type actual-headers]
   (let [actual-type (get actual-headers "Content-Type")]
     (assert-truth (= expected-type actual-type)
@@ -47,7 +55,8 @@
         expected-type actual-type))))
 
 (defn assert-json
-  "TODOC"
+  "Assert that the json encoded in a response body corresponds to a given
+  hash/array data strucutre."
   [expected-data actual-body]
   (assert-truth (= expected-data (json/decode-from-str actual-body))
     (format "Expecting JSON parsing to %s, but got %s"

@@ -8,30 +8,29 @@
   (string-dom
     "<html><body><p id='a' custom='no' class='1'>one</p><p id='b' unique='yes' custom='yes' class='2'>two</p></body></html>"))
 
+(defn assert-xml1-> [expected & predicates]
+  (assert= expected (apply xml1-> simple-dom predicates)))
+
 (deftest "class="
-  (assert= "two"
-    (xml1-> simple-dom desc (class= "2") text)))
+  (assert-xml1-> "two" desc (class= "2") text))
 
 (deftest "id="
-  (assert= "two"
-    (xml1-> simple-dom desc (id= "b") text)))
+  (assert-xml1-> "two" desc (id= "b") text))
 
 (deftest "attrs="
-  (assert= "two"
-    (xml1-> simple-dom desc {:id "b" :unique "yes"} text)))
+  (assert-xml1-> "two" desc {:id "b" :unique "yes"} text))
 
 (deftest "attr?"
-  (assert= "two"
-    (xml1-> simple-dom desc (attr? :unique) text)))
+  (assert-xml1-> "two" desc (attr? :unique) text))
 
 (deftest "attr-match?"
-  (assert= "two"
-    (xml1-> simple-dom desc (attr-match? :custom #"ye.") text)))
+  (assert-xml1-> "two" desc (attr-match? :custom #"ye.") text))
 
 (deftest "nth-elem"
-  (assert= "two"
-    (xml1-> simple-dom desc :p (nth-elem 2) text)))
+  (assert-xml1-> "two" desc :p (nth-elem 2) text))
 
 (deftest "text-match?"
-  (assert= "two"
-    (xml1-> simple-dom desc :p (text-match? #"tw.") text)))
+  (assert-xml1-> "two" desc :p (text-match? #"tw.") text))
+
+(deftest "xml1->: :desc"
+  (assert-xml1-> "two" :desc (class= 2) text))

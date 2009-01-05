@@ -1,13 +1,13 @@
 (ns cljre.app-test
-  (:use clj-unit.core cljre.app))
+  (:use clj-unit.core (cljre app app-test-helpers)))
 
 (deftest "with-layout"
   (let [body (with-layout "inner")]
-    (assert-markup (:head :title #"cljre") body)))
+    (assert-markup [:head :title #"cljre"] body)))
 
 (deftest "index-view"
   (let [body (index-view)]
-    (assert-markup ({:id "header"} :h1 #"a Clojure Regex Editor") body)))
+    (assert-markup [{:id "header"} :h1 #"a Clojure Regex Editor"] body)))
 
 (deftest "match-data: syntax error"
   (assert=
