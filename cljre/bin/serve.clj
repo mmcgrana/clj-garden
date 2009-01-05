@@ -1,3 +1,4 @@
 (require 'cwsg.handlers.jetty 'cljre.app)
 
-(cwsg.handlers.jetty/run cljre.app/app {:port 8000})
+(cwsg.handlers.jetty/run {:port 8000}
+  cljre.app/app)
