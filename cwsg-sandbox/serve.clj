@@ -7,7 +7,7 @@
 (import '(java.io File))
 
 (def app
-  (cwsg.middleware.show-exceptions/wrap (fn [] true)
+  (cwsg.middleware.show-exceptions/wrap
     (cwsg.middleware.file-content-info/wrap
       (cwsg.middleware.static/wrap (File. "public")
         cwsg.apps.dump/app))))

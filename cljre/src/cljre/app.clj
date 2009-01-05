@@ -5,21 +5,28 @@
     (cljre helpers))
   (:require
     ring.routing
+    [cwsg.core                             :as cwsg]
     [cwsg.middleware.reloading             :as reloading]
     [cwsg.middleware.show-exceptions       :as show-exceptions]
     [cwsg.middleware.file-content-info     :as file-content-info]
     [cwsg.middleware.static                :as static]))
 
+
+;; Config
 (def +app-host+ "http://cljre.com")
-(def +show-exceptions+ true)
 (def +public-dir+ (java.io.File. "public"))
 
+(defn dev? []
+  true)
+
+;; Routing
 (defrouting
   +app-host+
   [['cljre.app 'index     :index     :get  "/"]
    ['cljre.app 'match     :match     :post "/match"]
    ['cljre.app 'not-found :not-found :any  "/:path" {:path ".*"}]])
 
+;; Views
 (defmacro with-layout
   "Layout shared by all templates."
   [& body]
@@ -54,9 +61,6 @@
             " Clojre app inspired by " [:a {:href "http://lovitt.net/" :title "Michael Lovitt"} "Michael Lovitt"] "'s "
             [:a {:href "http://rubular.com" :title "Rubular"} "Rubular"] "."]]]))
 
-(defn index [req]
-  (respond (vindex)))
-
 (defn match-data [string pattern-str]
   (try
     (let [pattern   (re-pattern pattern-str)
@@ -67,12 +71,20 @@
     (catch java.util.regex.PatternSyntaxException e
       {:status "syntax-error" :message (.getMessage e)})))
 
+;; Controllers
+(defn index [req]
+  (respond (vindex)))
+
 (defn match [req]
   (respond-json (match-data (params req :string) (params req :pattern))))
 
+
+;; CWSG app
+(def core-app
+  (file-content-info/wrap
+    (static/wrap +public-dir+
+      (reloading/wrap #(list 'cljre.app)
+        (spawn-app router)))))
+
 (def app
-  (show-exceptions/wrap #(identity +show-exceptions+)
-    (file-content-info/wrap
-      (static/wrap +public-dir+
-        (reloading/wrap #(list 'cljre.app)
-          (spawn-app router))))))
+  (if (dev?) (show-exceptions core-app) core-app))

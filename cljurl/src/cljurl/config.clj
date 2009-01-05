@@ -17,13 +17,7 @@
 (defn test? [] (= +env+ :test))
 (defn prod? [] (= +env+ :prod))
 
-(def +show-exceptions+ nil)
 (def +handle-exceptions+ nil)
-
-(defn show-exceptions? []
-  (if (nil? +show-exceptions+)
-    (dev?)
-    +show-exceptions))
 
 (defn handle-exceptions? []
   (if (nil? +handle-exceptions+)
