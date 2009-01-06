@@ -1,5 +1,5 @@
 (require 'cwsg.handlers.jetty 'cljre.app)
 
-(binding [cljre.app/+env+ (if (= "prod" (first *command-line-args*)) :prod :dev)]
-  (cwsg.handlers.jetty/run {:port 8000}
-    (cljre.app/build-app)))
+(let [env (if (= "prod" (first *command-line-args*)) :prod :dev)]
+  (cwsg.handlers.jetty/run {:port 8080}
+    (cljre.app/build-app env)))

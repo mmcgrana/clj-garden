@@ -3,7 +3,7 @@
         (ring test-helpers)
         (cljre app)))
 
-(def app (build-app))
+(def app (build-app :test))
 
 (deftest "with-layout"
   (let [body (with-layout "inner")]

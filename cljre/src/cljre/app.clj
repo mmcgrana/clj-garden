@@ -11,10 +11,8 @@
     [cwsg.middleware.static                :as static]))
 
 ;; Config
-(def +env+ nil)
 (def +app-host+ "http://cljre.com")
 (def +public-dir+ (java.io.File. "public"))
-(defn dev? [] (= +env+ :dev))
 
 ;; Routing
 (routing/defrouting
@@ -84,14 +82,14 @@
   (respond-404 (not-found-view)))
 
 ; CWSG app
-(defn- dev-only [wrapper core]
-  (if (dev?) (wrapper core) core))
+(defn- wrap-if [test wrapper core]
+  (if test (wrapper core) core))
 
-(defn build-app []
-  (dev-only
+(defn build-app [env]
+  (wrap-if (= env :dev)
     show-exceptions/wrap
     (file-content-info/wrap
       (static/wrap +public-dir+
-        (dev-only
+        (wrap-if (= env :dev)
           (partial reloading/wrap #(list 'cljre.app))
           (spawn-app router))))))
