@@ -1,5 +1,5 @@
-clean up app-helpers situation
-clj bin/serve.clj prod >& prod.log &
+deployment
+  clj bin/serve.clj prod >& prod.log &
       
 better styling
 permalink button eventually (no validation?) /regexs/(uuid/autoinc)

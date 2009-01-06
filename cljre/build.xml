@@ -1,0 +1,17 @@
+<project name="cljre" default="jar">
+  <description>Pack all sources into a JAR.</description>
+
+  <property name="jarfile" location="cljre.jar"/>
+
+  <target name="clean"
+          description="Remove generated files and directories.">
+    <delete file="${jarfile}"/>
+  </target>
+
+  <target name="jar"
+          description="Create jar file.">
+    <jar jarfile="${jarfile}">
+      <fileset dir="./src" includes="cljre/**/*.clj"/>
+    </jar>
+  </target>
+</project>
