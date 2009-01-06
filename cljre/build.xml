@@ -2,12 +2,12 @@
   <description>Pack all sources into a JAR.</description>
 
   <property name="jarfile" location="cljre.jar"/>
-  <property name="appjarfile" location="app-cljre.jar" />
+  <property name="depsjarfile" location="cljre-deps.jar" />
 
   <target name="clean"
           description="Remove generated files and directories.">
     <delete file="${jarfile}"/>
-    <delete file="${appjarfile}" />
+    <delete file="${depsjarfile}" />
   </target>
 
   <target name="jar"
@@ -17,9 +17,9 @@
     </jar>
   </target>
   
-  <target name="appjar"
-          description="Create jar file for app and deps.">
-    <jar destfile="${appjarfile}"
+  <target name="jardeps"
+          description="Create jar file for the app deps.">
+    <jar destfile="${depsjarfile}"
       filesetmanifest="merge">
       <zipgroupfileset dir="/Users/mmcgrana/Clojure/jars" includes="*.jar" />
     </jar>

@@ -1,7 +1,4 @@
-add favicon
-add not-found action
 deployment
-  clj bin/serve.clj prod >& prod.log &
       
 better styling
 permalink button eventually (no validation?) /regexs/(uuid/autoinc)

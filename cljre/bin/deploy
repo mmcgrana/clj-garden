@@ -1,0 +1,11 @@
+#! /bin/bash
+
+ant jar
+ant jardeps
+rsync -v cljre.jar deploy@208.75.87.97:/var/www/cljre.com/cljre.jar
+rsync -v cljre-deps.jar deploy@208.75.87.97:/var/www/cljre.com/cljre-deps.jar
+ant clean
+scp bin/serve.clj deploy@208.75.87.97:/var/www/cljre.com/serve.clj
+rsync -vr public/ deploy@208.75.87.97:/var/www/cljre.com/public/
+ssh deploy@208.75.87.97 "killall -e java"
+ssh deploy@208.75.87.97 "cd /var/www/cljre.com; java -cp cljre.jar:cljre-deps.jar clojure.main serve.clj prod <&- >> prod.log 2>&1 &"
