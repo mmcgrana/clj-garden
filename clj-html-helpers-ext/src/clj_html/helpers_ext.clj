@@ -1,5 +1,10 @@
 (ns clj-html.helpers-ext
-  (:use clj-html.core))
+  (:use (clj-html core helpers)))
+
+(defn hstr
+  "Returns an html-escaped string representation of val. Like (h (str val))."
+  [val]
+  (h (str val)))
 
 (defn browser-method?
   "Given a keyword an http method, returns true iff the method is implemented by

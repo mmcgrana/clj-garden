@@ -1,8 +1,13 @@
 (ns cljurl.views
   (:use cljurl.routing
-        (clj-html core helpers)
-        cljurl.view-helpers
-        [stash.core :only (errors)]))
+        (clj-html core helpers helpers-ext)
+        [stash.core :only (errors)])
+  (:require [org.danlarkin.json :as json]))
+
+(defn str-json
+   "Encode the Clojure data structure as a JSON string with 2 spaces of indent."
+   [data]
+   (json/encode-to-str data :indent 2))
 
 (defn layout
   "Layout shared by all templates."
@@ -46,7 +51,7 @@
     (form-to (path-info :create)
       (html
         [:p "Enter url:"]
-        (text-field-tag "shortening[url]" (:url shortening))
+        (text-field-tag "shortening[url]" {:value (:url shortening)})
         (submit-tag "Submit")))))
 
 (defn show

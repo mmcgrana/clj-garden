@@ -1,3 +1,4 @@
+test migrations by redoing local db to cljurl_dev, cljurl_test, cljurl_prod
 presentable views
 presenable error messages
 logging in general

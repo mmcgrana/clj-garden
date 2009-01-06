@@ -1,0 +1,4 @@
+unify val/opts situation
+add tests for new options
+test untested functions
+consider htmli

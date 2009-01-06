@@ -1,5 +1,7 @@
 (ns cljurl.routing
-  (:require ring.routing [cljurl.config :as config]))
+  (:require
+    [ring.routing  :as routing]
+    [cljurl.config :as config]))
 
 (def c 'cljurl.controllers)
 
@@ -13,9 +15,6 @@
    [c 'not-found-api  :not-found-api :any  "/:path.js" {:path ".*"}]
    [c 'not-found      :not-found     :any  "/:path"    {:path ".*"}]])
 
-(def router (ring.routing/compiled-router routes config/+app-host+))
-
-(def path-info (partial ring.routing/path-info router))
-(def path      (partial ring.routing/path      router))
-(def url-info  (partial ring.routing/url-info  router))
-(def url       (partial ring.routing/url       router))
+(routing/defrouting
+  config/+app-host+
+  routes)

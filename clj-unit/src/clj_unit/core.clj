@@ -68,6 +68,12 @@
           (report :no-tests ns-sym)))
       (report :end))))
 
+(defn require-and-run-tests
+  "Like run-tests, but require all namespaces before running all of the tests"
+  [ns-syms & [reporter]]
+  (doseq [ns-sym ns-syms] (require ns-sym))
+  (run-tests ns-syms reporter))
+
 (defn success
   "Report a successfull assertion."
   []

@@ -1,5 +1,5 @@
-(ns cljurl.view-helpers-test
-  (:use clj-unit.core cljurl.view-helpers))
+(ns clj-html.helpers-ext-test
+  (:use clj-unit.core clj-html.helpers-ext))
 
 (deftest "hstr"
   (assert= ":foo&amp;" (hstr :foo&)))
@@ -15,7 +15,7 @@
 
 (deftest "text-field-tag"
   (assert= "<input type=\"text\" name=\"foo[bar]\" value=\"3\" />"
-    (text-field-tag "foo[bar]" 3)))
+    (text-field-tag "foo[bar]" {:value 3})))
 
 (deftest "hidden-field-tag"
   (assert= "<input type=\"hidden\" name=\"foo[bar]\" value=\"3\" />"

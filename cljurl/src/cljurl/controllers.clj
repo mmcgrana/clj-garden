@@ -1,6 +1,6 @@
 (ns cljurl.controllers
   (:use (ring controller request)
-        (cljurl routing controller_helpers))
+        cljurl.routing)
   (:require (cljurl [models :as m] [views  :as v] [config :as config])
             [stash.core :as stash]))
 
@@ -13,7 +13,8 @@
      (catch Exception e#
        (if (config/handle-exceptions?)
          (if ~api-action
-           (respond-json-500 (v/internal-error-api))
+           (respond-500 (v/internal-error-api)
+             {:content-type "text/javascript"})
            (respond-500 (v/internal-error)))
          (throw e#)))))
 
@@ -25,7 +26,9 @@
 (defn not-found-api
   "Render a not found error response for api requests."
   [& [request]]
-  (respond-json-404 (v/not-found-api)))
+  (respond-404
+    (v/not-found-api)
+    {:content-type "text/javascript"}))
 
 (defmacro with-shortening
   "Execute the body with the shortening found or render a not found page if
@@ -78,4 +81,6 @@
   [request]
   (with-filters true
     (with-shortening true [shortening (params request :slug)]
-       (respond-json (v/expand-api shortening)))))
+       (respond
+         (v/expand-api shortening)
+         {:content-type "text/javascript"}))))

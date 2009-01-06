@@ -1,6 +1,6 @@
 (ns cljurl.models-test
   (:use clj-unit.core stash.core
-        (cljurl models model-helpers test-helpers)))
+        (cljurl models test-helpers)))
 
 (deftest "generate-slug"
   (let [[shortening success] (generate-slug {})]

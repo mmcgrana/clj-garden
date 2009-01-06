@@ -1,8 +1,10 @@
 (ns cljurl.requests-test
   (require [stash.core :as stash])
   (use clj-unit.core clj-scrape.core
-       (cljurl routing app models model-helpers controllers test-helpers)
+       (cljurl routing app models controllers test-helpers)
        ring.test-helpers))
+
+(def app (build-app :test))
 
 (deftest "with-filters"
   (binding [cljurl.config/+handle-exceptions+ true]
@@ -35,16 +37,16 @@
   (with-fixtures [_]
     (let [[status _ body] (request app (path-info :index))]
       (assert-status 200 status)
-      (assert-selector (:a {:href "/new"} "new shortening") body)
-      (assert-selector (:h3 "Recent Shortenings") body)
-      (assert-selector (:p #" => ") body))))
+      (assert-markup [:a {:href "/new"} "new shortening"] body)
+      (assert-markup [:h3 "Recent Shortenings"] body)
+      (assert-markup [:p #" => "] body))))
 
 (deftest "new"
   (let [[status _ body] (request app (path-info :new))]
     (assert-status 200 status)
-    (assert-selector (:form :p #"Enter url:") body)
-    (assert-selector (:form {:action "/" :method "post"}) body)
-    (assert-selector (:form :input {:type "text" :name "shortening[url]"}) body)))
+    (assert-markup [:form :p #"Enter url:"] body)
+    (assert-markup [:form {:action "/" :method "post"}] body)
+    (assert-markup [:form :input {:type "text" :name "shortening[url]"}] body)))
 
 (def valid-params
   {:shortening {:url "http://amazon.com"}})
@@ -60,15 +62,15 @@
 
 (deftest "create: invalid shortening"
   (let [[_ _ body] (request app (path-info :create) {:params invalid-params})]
-    (assert-selector (:p #"valid-url") body)
-    (assert-selector (:form {:action "/" :method "post"}) body)
-    (assert-selector (:form :input {:value "foo"}) body)))
+    (assert-markup [:p #"valid-url"] body)
+    (assert-markup [:form {:action "/" :method "post"}] body)
+    (assert-markup [:form :input {:name "shortening[url]" :value "foo"}] body)))
 
 (deftest "show: found shortening"
   (with-fixtures [fx]
     (let [sh (fx :shortenings :1)
           [_ _ body] (request app (path-info :show sh))]
-      (assert-selector (:p #"Url shortened") body))))
+      (assert-markup [:p #"Url shortened"] body))))
 
 (deftest "show: missing shortening"
   (let [[status _ _] (request app (path-info :show {:slug "missing"}))]
@@ -80,7 +82,7 @@
           ht (fx :hits :on-1)
           response (request app (path-info :expand sh) {:remote-addr (:ip ht)})]
       (assert-redirect (:url sh) response)
-      (assert= (inc (:hit_count ht)) (:hit_count (reload ht))))))
+      (assert= (inc (:hit_count ht)) (:hit_count (stash/reload ht))))))
 
 (deftest "expand: missing shortening"
   (let [[status _ _] (request app (path-info :expand {:slug "missing"}))]

@@ -1,7 +1,6 @@
 (ns cljurl.models
-  (:use    stash.core
-           stash.timestamps stash.validators
-           (cljurl utils model-helpers))
+  (:use (stash core timestamps validators)
+        cljurl.utils)
   (:require [cljurl.config :as config]))
 
 
@@ -17,10 +16,10 @@
 (defmodel +shortening+
   {:data-source config/+data-source+
    :table-name  :shortenings
-   :pk          :id
+   :pk-init a-uuid
    :columns
-     [[:id         :uuid]
-      [:slug       :string]
+     [[:id         :uuid     {:pk true}]
+      [:slug       :string   {:unique true}]
       [:url        :string]
       [:created_at :datetime]]
    :accessible-attrs
@@ -43,9 +42,9 @@
 (defmodel +hit+
   {:data-source config/+data-source+
    :table-name :hits
-   :pk         :id
+   :pk-init a-uuid
    :columns
-     [[:id            :uuid]
+     [[:id            :uuid     {:pk true}]
       [:shortening_id :uuid]
       [:ip            :string]
       [:created_at    :datetime]

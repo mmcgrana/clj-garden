@@ -1,14 +1,15 @@
 (ns cljre.app
   (:use
-    (ring app controller request)
-    (clj-html core helpers helpers-ext)
-    (cljre app-helpers))
+    (ring controller request)
+    (clj-html core helpers helpers-ext))
   (:require
+    [org.danlarkin.json                    :as json]
     [ring.routing                          :as routing]
     [cwsg.middleware.reloading             :as reloading]
     [cwsg.middleware.show-exceptions       :as show-exceptions]
     [cwsg.middleware.file-content-info     :as file-content-info]
-    [cwsg.middleware.static                :as static]))
+    [cwsg.middleware.static                :as static]
+    [ring.app                              :as app]))
 
 ;; Config
 (def +app-host+ "http://cljre.com")
@@ -66,6 +67,9 @@
     (catch java.util.regex.PatternSyntaxException e
       {:status "syntax-error" :message (.getMessage e)})))
 
+(defn match-view [pattern-str string]
+  (json/encode-to-str (match-data pattern-str string) :indent 2))
+
 (defn not-found-view []
   (with-layout
     [:div#container
@@ -76,20 +80,19 @@
   (respond (index-view)))
 
 (defn match [req]
-  (respond-json (match-data (params req :pattern) (params req :string))))
+  (respond
+    (match-view (params req :pattern) (params req :string))
+    {:content-type "text/javascript"}))
 
 (defn not-found [req]
   (respond-404 (not-found-view)))
 
-; CWSG app
-(defn- wrap-if [test wrapper core]
-  (if test (wrapper core) core))
-
+;; CWSG app
 (defn build-app [env]
-  (wrap-if (= env :dev)
+  (app/wrap-if (= env :dev)
     show-exceptions/wrap
     (file-content-info/wrap
       (static/wrap +public-dir+
-        (wrap-if (= env :dev)
-          (partial reloading/wrap #(list 'cljre.app))
-          (spawn-app router))))))
+        (app/wrap-if (= env :dev)
+          (partial reloading/wrap '(cljre.app))
+          (app/spawn-app router))))))

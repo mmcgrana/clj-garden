@@ -35,3 +35,8 @@
     (assert-status 200 status)
     (assert-content-type "text/javascript" headers)
     (assert-json {:status "match" :result "(\"foo\")"} body)))
+
+(deftest "not-found"
+  (let [[status headers body] (request app [:get "/foo/bar"])]
+    (assert-status 404 status)
+    (assert-match #"404 Page Not Found" body)))

@@ -11,7 +11,7 @@
   <target name="jar"
           description="Create jar file.">
     <jar jarfile="${jarfile}">
-      <fileset dir="./src" includes="stash_timestamps/**/*.clj"/>
+      <fileset dir="./src" includes="stash/**/*.clj"/>
     </jar>
   </target>
 </project>
