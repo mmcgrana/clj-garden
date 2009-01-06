@@ -51,3 +51,16 @@
   "Returns a full url based on the router, action name, and optional params."
   [router name & [params]]
   (second (url-info router name params)))
+
+(defmacro defrouting
+  "Define convenience routing functions based on the root and routes coll, as
+  per compiled-router.
+  Defines vars router, path-info, path, url-info, and url, where the latter
+  4 are such that (path-info :foo) <=> (ring.routing/path-info router :foo)."
+  [root routes]
+  `(do
+     (def ~'router (ring.routing/compiled-router ~root ~routes))
+     (def ~'path-info (partial ring.routing/path-info ~'router))
+     (def ~'path      (partial ring.routing/path      ~'router))
+     (def ~'url-info  (partial ring.routing/url-info  ~'router))
+     (def ~'url       (partial ring.routing/url       ~'router))))

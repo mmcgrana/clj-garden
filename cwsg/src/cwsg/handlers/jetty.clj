@@ -71,7 +71,7 @@
 (defn run
   "Serve the given app according to the given options.
   Options currently consists only of :port, an integer."
-  [app options]
+  [options app]
   (let [port    (or (:port options) (throwf ":port missing from options"))
         server  (doto (Server. port) (.setSendDateHeader true))
         handler (proxy-handler app)]

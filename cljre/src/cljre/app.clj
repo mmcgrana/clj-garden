@@ -2,24 +2,30 @@
   (:use
     (ring app controller request)
     (clj-html core helpers)
-    (cljre helpers))
+    (cljre app-helpers))
   (:require
-    ring.routing
+    [ring.routing                          :as routing]
+    [cwsg.middleware.reloading             :as reloading]
     [cwsg.middleware.show-exceptions       :as show-exceptions]
     [cwsg.middleware.file-content-info     :as file-content-info]
-    [cwsg.middleware.static                :as static]
-    [cljre.reloading                       :as reloading]))
+    [cwsg.middleware.static                :as static]))
 
+
+;; Config
+(def +env+ nil)
 (def +app-host+ "http://cljre.com")
-(def +show-exceptions+ true)
 (def +public-dir+ (java.io.File. "public"))
+(defn dev? [] (= +env+ :dev))
 
-(defrouting
+
+;; Routing
+(routing/defrouting
   +app-host+
   [['cljre.app 'index     :index     :get  "/"]
    ['cljre.app 'match     :match     :post "/match"]
    ['cljre.app 'not-found :not-found :any  "/:path" {:path ".*"}]])
 
+;; Views
 (defmacro with-layout
   "Layout shared by all templates."
   [& body]
@@ -37,11 +43,11 @@
          [:title "cljre: a Clojure Regex Editor"]]
        [:body ~@body]]))
 
-(defn vindex []
+(defn index-view []
   (with-layout
     [:div#container
       [:div#header
-        [:h1 [:a {:href "/" :title "cljre"} "cljre" ] ": a Clojure Regex Editor"]]
+        [:h1 [:a {:href "/" :title "cljre"} "cljre"] ": a Clojure Regex Editor"]]
       [:div#editor
         [:p.label "pattern:"]
         (text-area-tag "pattern" {:id "pattern" :rows 1 :spellcheck "false"})
@@ -54,25 +60,32 @@
             " Clojre app inspired by " [:a {:href "http://lovitt.net/" :title "Michael Lovitt"} "Michael Lovitt"] "'s "
             [:a {:href "http://rubular.com" :title "Rubular"} "Rubular"] "."]]]))
 
-(defn index [req]
-  (respond (vindex)))
-
-(defn match-data [string pattern-str]
+(defn match-data [pattern-str string]
   (try
     (let [pattern   (re-pattern pattern-str)
           matches   (re-seq pattern string)]
       (if matches
-        {:status "match" :result (prn-str matches)}
+        {:status "match" :result (pr-str matches)}
         {:status "no-match"}))
     (catch java.util.regex.PatternSyntaxException e
       {:status "syntax-error" :message (.getMessage e)})))
 
-(defn match [req]
-  (respond-json (match-data (params req :string) (params req :pattern))))
+;; Controllers
+(defn index [req]
+  (respond (index-view)))
 
-(def app
-  (show-exceptions/wrap #(identity +show-exceptions+)
+(defn match [req]
+  (respond-json (match-data (params req :pattern) (params req :string))))
+
+; CWSG app
+(defn- dev-only [wrapper core]
+  (if (dev?) (wrapper core) core))
+
+(defn build-app []
+  (dev-only
+    show-exceptions/wrap
     (file-content-info/wrap
       (static/wrap +public-dir+
-        (reloading/wrap
+        (dev-only
+          (partial reloading/wrap #(list 'cljre.app))
           (spawn-app router))))))

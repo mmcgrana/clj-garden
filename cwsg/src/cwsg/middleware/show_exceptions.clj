@@ -87,15 +87,10 @@ table.trace td.source {
 
 (defn wrap
   "Returns an app corresponding to the given one but for which catches
-  exceptions thrown within the app and displays helpful debugging information.
-  show-test is an arity 0 fn that returns logical truth when such debuggin 
-  information should be rendered and logical false when the exceptions should
-  be re-thrown."
-  [show-test app]
+  exceptions thrown within the app and displays helpful debugging information."
+  [app]
   (fn [env]
     (try
       (app env)
       (catch Exception e
-        (if (show-test)
-          (response env e)
-          (throw e))))))
+        (response env e)))))

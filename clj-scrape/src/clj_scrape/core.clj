@@ -40,8 +40,8 @@
   "Returns a query predicate that matches a node when has a class named
   target-name."
   (let [name-re (re-pattern (str "\\b" target-name "\\b"))]
-   (fn [loc] (if-let [class-str (attr loc :class)]
-               (re-match? name-re class-str)))))
+    (fn [loc] (if-let [class-str (attr loc :class)]
+                (re-match? name-re class-str)))))
 
 (defn id= [target-id]
   "Returns a query predicate that matches a node when it has an id target-id."
@@ -81,7 +81,8 @@
 (defn xml->
   [loc & preds]
   (zf/mapcat-chain loc preds
-                   #(cond (keyword? %) (tag= %)
+                   #(cond (= :desc %)  desc
+                          (keyword? %) (tag= %)
                           (string?  %) (text= %)
                           (pattern? %) (text-match? %)
                           (vector?  %) (zfxml/seq-test %)
