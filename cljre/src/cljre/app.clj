@@ -4,8 +4,7 @@
     (clj-html core helpers)
     (cljre app-helpers))
   (:require
-    ring.routing
-    [cwsg.core                             :as cwsg]
+    [ring.routing                          :as routing]
     [cwsg.middleware.reloading             :as reloading]
     [cwsg.middleware.show-exceptions       :as show-exceptions]
     [cwsg.middleware.file-content-info     :as file-content-info]
@@ -20,7 +19,7 @@
   true)
 
 ;; Routing
-(defrouting
+(routing/defrouting
   +app-host+
   [['cljre.app 'index     :index     :get  "/"]
    ['cljre.app 'match     :match     :post "/match"]
@@ -61,12 +60,12 @@
             " Clojre app inspired by " [:a {:href "http://lovitt.net/" :title "Michael Lovitt"} "Michael Lovitt"] "'s "
             [:a {:href "http://rubular.com" :title "Rubular"} "Rubular"] "."]]]))
 
-(defn match-data [string pattern-str]
+(defn match-data [pattern-str string]
   (try
     (let [pattern   (re-pattern pattern-str)
           matches   (re-seq pattern string)]
       (if matches
-        {:status "match" :result (prn-str matches)}
+        {:status "match" :result (pr-str matches)}
         {:status "no-match"}))
     (catch java.util.regex.PatternSyntaxException e
       {:status "syntax-error" :message (.getMessage e)})))
@@ -76,7 +75,7 @@
   (respond (index-view)))
 
 (defn match [req]
-  (respond-json (match-data (params req :string) (params req :pattern))))
+  (respond-json (match-data (params req :pattern) (params req :string))))
 
 
 ;; CWSG app
@@ -87,4 +86,4 @@
         (spawn-app router)))))
 
 (def app
-  (if (dev?) (show-exceptions core-app) core-app))
+  (if (dev?) (show-exceptions/wrap core-app) core-app))

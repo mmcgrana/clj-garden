@@ -30,14 +30,6 @@
        (format "Expecting redirect status and Location of %s, but got %s and %s."
          expected-path status location))))
 
-; (defmacro assert-selector
-;   "TODOC"
-;   [expected-selector actual-body]
-;   `(let [actual-dom# (dom (java.io.StringReader. ~actual-body))]
-;      (assert-truth (xml1-> actual-dom# ~@(cons 'desc expected-selector))
-;        (format "Expecting body matching %s, but did not."
-;          '~expected-selector))))
-
 (defn assert-markup
   "Assert that a response body matches an expected selector tuple."
   [expected-selector-tuple actual-body]

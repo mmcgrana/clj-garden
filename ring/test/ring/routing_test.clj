@@ -1,5 +1,6 @@
 (ns ring.routing-test
-  (:use clj-unit.core ring.routing))
+  (:use clj-unit.core)
+  (:require [ring.routing :as routing]))
 
 (def show (fn [req] req))
 
@@ -10,25 +11,33 @@
    [c 'show           :show      :get  "/show/:slug"        ]
    [c 'page-not-found :not-found :any  "/:path" {:path ".*"}]])
 
-(def router ("host" compiled-router routes))
+(routing/defrouting "host" routes)
 
 (deftest "recognize"
-  (let [[action-fn params] (recognize router :get "/show/foo")]
-    (assert= :shown (action-fn))
+  (let [[action-fn params] (routing/recognize router :get "/show/foo")]
+    (assert= :shown (action-fn :shown))
     (assert= {:slug "foo"} params)))
 
 (deftest "path-info"
-  (assert= [:get "/show/foo" {:extra "bar"}]
-    (path-info router :show {:slug "foo" :extra "bar"})))
+  (let [info   [:get "/show/foo" {:extra "bar"}]
+        params {:slug "foo" :extra "bar"}]
+    (assert= info (routing/path-info router :show params))
+    (assert= info (path-info :show params))))
 
 (deftest "path"
-  (assert= "/show/foo"
-    (path router :show {:slug "foo" :extra "bar"})))
+  (let [the-path "/show/foo"
+        params   {:slug "foo" :extra "bar"}]
+    (assert= the-path (routing/path router :show params))
+    (assert= the-path (path :show params))))
 
 (deftest "url-info"
-  (assert= [:get "host/show/foo" {:extra "bar"}]
-    (url-info router :show {:slug "foo" :extra "bar"})))
+  (let [info   [:get "host/show/foo" {:extra "bar"}]
+        params {:slug "foo" :extra "bar"}]
+    (assert= info (routing/url-info router :show params))
+    (assert= info (url-info :show params))))
 
 (deftest "url"
-  (assert= "host/show/foo"
-    (url router :show {:slug "foo" :extra "bar"})))
+  (let [the-path "host/show/foo"
+        params   {:slug "foo" :extra "bar"}]
+    (assert= the-path (routing/url router :show params))
+    (assert= the-path (url :show params))))

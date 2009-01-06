@@ -1,18 +1,10 @@
-(ns cljre.helpers
-  (:use clj-html.core ring.controller)
+(ns cljre.app-helpers
+  (:use (clj-html core)
+        (ring controller))
   (:require (org.danlarkin [json :as json])))
 
-(defmacro defrouting
-  [app-host routes]
-  `(do
-     (def ~'router (ring.routing/compiled-router ~app-host ~routes))
-     (def ~'path-info (partial ring.routing/path-info ~'router))
-     (def ~'path      (partial ring.routing/path      ~'router))
-     (def ~'url-info  (partial ring.routing/url-info  ~'router))
-     (def ~'url       (partial ring.routing/url       ~'router))))
-
 (defn respond-js [body]
-  (respond body {"Content-Type" "text/javascript"}))
+  (respond body {:content-type "text/javascript"}))
 
 (defn respond-json [data]
   (respond-js (json/encode-to-str data :indent 2)))

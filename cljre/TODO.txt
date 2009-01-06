@@ -15,5 +15,6 @@ keep record of regex/string combination, see if they can be datamined
 minified google jquery in production, regular local jquery in dev
 asset bundling
 perhaps {:foo "bar" :biz #"bat"} for assert-markup
+[:div {:id "header"} :h1 vs [{:id "header"} :h1 - is questionable
 
 
