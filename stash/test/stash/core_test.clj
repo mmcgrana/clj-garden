@@ -15,4 +15,5 @@
     "core_finders_test"
     "core_transactions_test"
     "core_extensions_test"
+    "core_sugar_test"
     ))

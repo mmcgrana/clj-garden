@@ -12,19 +12,25 @@
          "(" (str-join ", "
                (map #((quoters %) (instance %)) column-names)) ")")))
 
-(defn- pk-where-condition
-  "Reterns the sql where clause that identifies the instance row, based on its
-  pks."
+(defn- pk-where-exp
+  "Returns the where exp data structure that can be used in a query to identify
+  the instance row, based on its pks."
   [instance]
   (let [model    (instance-model instance)
         pk-names (pk-column-names model)]
-    (where-sql model
-      (if (= 1 (count pk-names))
-        [(first pk-names) := (instance (first pk-names))]
-        (reduce
-          #(conj %1 [%2 := (instance %2)])
-          [:and]
-          (pk-column-names model))))))
+    (if (= 1 (count pk-names))
+      (let [single-pk-name (first pk-names)]
+        [single-pk-name := (get instance single-pk-name)])
+      (reduce
+        #(conj %1 [%2 := (get instance %2)])
+        [:and]
+        pk-names))))
+
+(defn- pk-where-sql
+  "Returns the sql where clause that identifies the instance row, based on its
+   pks."
+   [instance]
+   (where-sql (instance-model instance) (pk-where-exp instance)))
 
 (defn update-sql
   "Returns the update sql for the instance."
@@ -35,13 +41,13 @@
     (str "UPDATE " (table-name-str model) " SET "
          (str-join ", "
            (map #(str (name %) " = " ((quoters %) (instance %))) column-names))
-         (pk-where-condition instance))))
+         (pk-where-sql instance))))
 
 (defn delete-sql
   "Returns the delete sql for the instance."
   [instance]
   (let [model (instance-model instance)]
-    (str "DELETE FROM " (table-name-str model) (pk-where-condition instance))))
+    (str "DELETE FROM " (table-name-str model) (pk-where-sql instance))))
 
 (defn persist-insert
   "Persists the new instance to the database, returns an instance
