@@ -22,15 +22,15 @@ a {
 #header h1 a {
   color: black; }
 
-#editor {
-  /*padding: 1.5em;*/ }
-
 #editor .label {
   padding-top: 1em;}
 
 #editor textarea {
   font-family: Monaco;
   width: 99%; }
+
+#editor #pattern {
+  height: 1.3em;}
 
 #footer {
   margin-top: 1.5em;

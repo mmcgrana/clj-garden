@@ -7,8 +7,8 @@ Various Clojure libraries and apps I'm working on.
 * clj-scrape: Bundling of various clojure libraries to facilitate HTML scraping
 * clj-time: Wrapper around Joda Time library
 * clj-unit: Non-magical unit testing framework
-* cljre: Clojure regexp editor, built with Ring
-* cljurl: Url shortening website, built with Ring and Stash
+* cljre: Clojure regexp editor, built with Ring on CWSG
+* cljurl: Url shortening website, built with Ring and Stash on CWSG
 * cwsg: WSGI/Rack for Clojure
 * cwsg-sandbox: Sample cwsg app ready to run
 * gitcred: PageRanking GitHub users
