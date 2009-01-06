@@ -68,12 +68,20 @@
     (catch java.util.regex.PatternSyntaxException e
       {:status "syntax-error" :message (.getMessage e)})))
 
+(defn not-found-view []
+  (with-layout
+    [:div#container
+      "404 Page Not Found"]))
+
 ;; Controllers
 (defn index [req]
   (respond (index-view)))
 
 (defn match [req]
   (respond-json (match-data (params req :pattern) (params req :string))))
+
+(defn not-found [req]
+  (respond-404 (not-found-view)))
 
 ; CWSG app
 (defn- dev-only [wrapper core]
