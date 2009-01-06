@@ -1,20 +1,11 @@
-ensure proper abstractions
-implement tests
-  match Cases to test:
-    pattern or string empty
-      => 'clear results field, perhaps disable' (all client side)
-    pattern and string given
-      pattern does not compile (java.util.regex.PatternSyntaxException)
-        => 'show error message'
-      pattern compiles
-        => 'show result in results field'
+clean up app-helpers situation
+clj bin/serve.clj prod >& prod.log &
       
 better styling
 permalink button eventually (no validation?) /regexs/(uuid/autoinc)
 keep record of regex/string combination, see if they can be datamined
 minified google jquery in production, regular local jquery in dev
 asset bundling
-perhaps {:foo "bar" :biz #"bat"} for assert-markup
 [:div {:id "header"} :h1 vs [{:id "header"} :h1 - is questionable
 
 

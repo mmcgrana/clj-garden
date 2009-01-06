@@ -3,6 +3,8 @@
         (ring test-helpers)
         (cljre app)))
 
+(def app (build-app))
+
 (deftest "with-layout"
   (let [body (with-layout "inner")]
     (assert-markup [:head :title #"cljre"] body)))

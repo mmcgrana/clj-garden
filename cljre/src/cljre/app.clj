@@ -12,11 +12,10 @@
 
 
 ;; Config
+(def +env+ nil)
 (def +app-host+ "http://cljre.com")
 (def +public-dir+ (java.io.File. "public"))
-
-(defn dev? []
-  true)
+(defn dev? [] (= +env+ :dev))
 
 ;; Routing
 (routing/defrouting
@@ -77,13 +76,15 @@
 (defn match [req]
   (respond-json (match-data (params req :pattern) (params req :string))))
 
+; CWSG app
+(defn- dev-only [wrapper core]
+  (if (dev?) (wrapper core) core))
 
-;; CWSG app
-(def core-app
-  (file-content-info/wrap
-    (static/wrap +public-dir+
-      (reloading/wrap #(list 'cljre.app)
-        (spawn-app router)))))
-
-(def app
-  (if (dev?) (show-exceptions/wrap core-app) core-app))
+(defn build-app []
+  (dev-only
+    show-exceptions/wrap
+    (file-content-info/wrap
+      (static/wrap +public-dir+
+        (dev-only
+          (partial reloading/wrap #(list 'cljre.app))
+          (spawn-app router))))))
