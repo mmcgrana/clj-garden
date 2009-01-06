@@ -1,7 +1,7 @@
 (ns cljre.app
   (:use
     (ring app controller request)
-    (clj-html core helpers)
+    (clj-html core helpers helpers-ext)
     (cljre app-helpers))
   (:require
     [ring.routing                          :as routing]
@@ -10,13 +10,11 @@
     [cwsg.middleware.file-content-info     :as file-content-info]
     [cwsg.middleware.static                :as static]))
 
-
 ;; Config
 (def +env+ nil)
 (def +app-host+ "http://cljre.com")
 (def +public-dir+ (java.io.File. "public"))
 (defn dev? [] (= +env+ :dev))
-
 
 ;; Routing
 (routing/defrouting

@@ -1,6 +1,5 @@
 (ns cljre.app-helpers
-  (:use (clj-html core)
-        (ring controller))
+  (:use clj-html.core ring.controller)
   (:require (org.danlarkin [json :as json])))
 
 (defn respond-js [body]
@@ -9,58 +8,3 @@
 (defn respond-json [data]
   (respond-js (json/encode-to-str data :indent 2)))
 
-(defn respond-json [data]
-  (respond-js (json/encode-to-str data :indent 2)))
-
-(defn browser-method?
-  "Given a keyword an http method, returns true iff the method is implemented by
-  browsers."
-  [method]
-  (or (= method :get) (= method :post)))
-
-(defn method-str
-  "Returns the method string corresponding to the given method keyword"
-  [method]
-  (name method))
-
-(defn text-field-tag
-  "Returns an html snippet for a text field"
-  [name & [opts]]
-  (html [:input {:type "text" :name name
-                 :value (get opts :value) :id (get opts :id)}]))
-
-(defn text-area-tag
-  "Returns and html snippet for a text area."
-  [name & [opts]]
-  (html [:textarea {:name name :id (get opts :id)
-                    :rows (get opts :rows) :cols (get opts :cols)
-                    :readonly (get opts :readonly)
-                    :spellcheck (get opts :spellcheck)}
-          (get opts :value)]))
-
-(defn hidden-field-tag
-  "Returns html for a hidden field."
-  [name value]
-  (html [:input {:type "hidden" :name name :value value}]))
-
-(defn submit-tag
-  "Return html for a submit button with value as the text."
-  [value]
-  (html [:input {:type "submit" :name "commit" :value value}]))
-
-(defn form-to
-  "Returns html for a form."
-  [[method url] body]
-  (if (browser-method? method)
-    (html
-      [:form {:method (method-str method) :action url}
-        body])
-    (html
-      [:form {:method "post" :action url}
-        (hidden-field-tag "_method" (method-str method))
-        body])))
-
-(defn link-tag
-  "Returns html for a link with anchor text to the path."
-  [anchor path]
-  (html [:a {:href path} anchor]))
