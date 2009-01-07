@@ -16,7 +16,7 @@
     (str-join ", " (map column-sql column-defs))
     ", " (primary-keys-sql primary-keys) ")"))
 
-(defmacro defddl [ddl-name ddl-doc ddl-sql-args ddl-sql-body]
+(defmacro- defddl [ddl-name ddl-doc ddl-sql-args ddl-sql-body]
   (let [ddl-sql-name (symbol (str ddl-name "-sql"))
         ddl-sql-doc  (str "Returns sql needed for " ddl-name)]
    `(do

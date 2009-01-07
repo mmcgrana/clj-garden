@@ -1,7 +1,8 @@
 h2. clj-garden
 
 Various Clojure libraries and apps I'm working on:
-  
+ 
+ * <code>clj-bin</code>: Helper files that I use when working with Clojure at the console
  * <code>clj-file-utils</code>: Unix-like wrapper for Commons FileUtils
  * <code>clj-html-helpers-ext</code>: Proving ground for <code>clj-html-helpers</code>
  * <code>clj-http-client</code>: HTTP client wrapping Commons HttpClient
@@ -17,7 +18,7 @@ Various Clojure libraries and apps I'm working on:
  * <code>cwsg-sandbox</code>: Sample CWSG app ready to run
  * <code>gitcred</code>: PageRanking GitHub users
  * <code>ring</code>: Functional web framework
- * <code>ring-upload-demo</code>: Demo of file uploading in Ring.
+ * <code>ring-upload-demo</code>: Demo of file uploading in Ring
  * <code>stash</code>: Functional ORM
  * <code>stash-migrations</code>: Migration for Stash models
  * <code>stash-pagination</code>: Paginate Stash find results 

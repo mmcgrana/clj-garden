@@ -1,3 +1,5 @@
+check for reflection in clj-jdbc
+
 Later
 - rethink, test attr protection, foo* situation
 - datetime caster 

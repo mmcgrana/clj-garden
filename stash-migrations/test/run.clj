@@ -1,4 +1,2 @@
 (use 'clj-unit.core)
-(require 'stash.migrations-test)
-
-(run-tests '(stash.migrations-test))
+(require-and-run-tests '(stash.migrations-test))

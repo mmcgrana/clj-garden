@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+SHARED_JARS_DIR = "/Users/mmcgrana/Clojure/jars"
+
+if (ARGV.size == 0) || (ARGV[1] == "help"):
+  puts "cljd <qi install uninstall extract list>"
+
+elsif ARGV[0] == "qi"
+  if ARGV.size != 1
+    puts "qi takes no arguments"
+  else
+    puts `ant`
+    puts `cljd install #{Dir.glob("*.jar").first}`
+    puts `ant clean`
+  end
+
+elsif ARGV[0] == "install":
+  if ARGV.size != 2
+    puts "install <jar-file>"
+  else
+    file = ARGV[1]
+    `cp #{file} #{File.join(SHARED_JARS_DIR, File.basename(file))}`
+    puts "installed #{file} to #{SHARED_JARS_DIR}"
+  end
+
+elsif ARGV[0] == "uninstall"
+  if ARGV.size != 2
+    puts "install <jar>"
+  else
+    jar = ARGV[1]
+    file = File.join(SHARED_JARS_DIR, jar)
+    if File.exist?(file)
+      `rm #{file}`
+      puts "uninstalled #{jar}"
+    else
+      puts "no jar #{jar}"
+    end
+  end
+
+elsif ARGV[0] == "extract":
+  if ARGV.size != 3
+    puts "cljd extract <jar> <dir>"
+  else
+    jar = ARGV[1]
+    dir = ARGV[2]
+    extractee = File.join(SHARED_JARS_DIR, jar)
+    destination = File.join(dir, jar)
+    if File.exist?(extractee)
+      `cp #{extractee} #{destination}`
+      puts "extracted #{jar} to #{dir}"
+    else
+      puts "no jar #{jar}"
+    end
+  end
+
+elsif ARGV[0] == "list":
+  puts `ls #{SHARED_JARS_DIR}`
+
+else
+  puts "unrecognized command #{ARGV[0]}"
+end

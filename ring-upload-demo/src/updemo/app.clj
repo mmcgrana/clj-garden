@@ -39,7 +39,7 @@
    :table-name :uploads
    :pk-init stash/a-uuid
    :columns
-     [[:id            :uuid     {:pk true}]
+     [[:id            :uuid    {:pk true}]
       [:filename      :string]
       [:content_type  :string]
       [:size          :integer]]})

@@ -34,3 +34,11 @@
   (assert= '(7 5 3 1) (migrate conn +migrations+ 0))
   (assert= 0 (get-version conn))
   (drop-version conn))
+
+(deftest "defmigration"
+  (defmigration my-migration [10 conn]
+    [:up conn]
+    [:down conn])
+  (assert= 10 (get my-migration 0))
+  (assert= [:up   :conn] ((get my-migration 1) :conn))
+  (assert= [:down :conn] ((get my-migration 2) :conn)))
