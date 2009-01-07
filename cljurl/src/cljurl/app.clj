@@ -1,10 +1,10 @@
 (ns cljurl.app
   (:require
-    [cwsg.middleware.show-exceptions       :as show-exceptions]
-    [cwsg.middleware.file-content-info     :as file-content-info]
-    [cwsg.middleware.static                :as static]
-    [cwsg.middleware.reloading             :as reloading]
-    [ring.app                              :as app]
+    (cwsg.middleware
+      [show-exceptions       :as show-exceptions]
+      [file-content-info     :as file-content-info]
+      [static                :as static]
+      [reloading             :as reloading])
     (cljurl config routing controllers))
   (:use ring.app))
 
