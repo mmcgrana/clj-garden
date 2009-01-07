@@ -117,6 +117,7 @@
   ([request n-toplevels]
     (take-last n-toplevels (re-split #"." (server-host request)))))
 
+; TODO: no need to add and remove the port here
 (defn domain
   "Returns a String for the full domain without port number name as constitued 
   by the n topmost domains in the host, where n defaults to 1."

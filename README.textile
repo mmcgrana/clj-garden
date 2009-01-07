@@ -12,7 +12,6 @@ Various Clojure libraries and apps I'm working on:
  * <code>clj-scrape</code>: Bundling of various clojure libraries to facilitate HTML scraping
  * <code>clj-time</code>: Wrapper around Joda Time library
  * <code>clj-unit</code>: Non-magical unit testing framework
- * <code>cljre</code>: Clojure regexp editor, built with Ring on CWSG
  * <code>cljurl</code>: Url shortening website, built with Ring and Stash on CWSG
  * <code>cwsg</code>: WSGI/Rack for Clojure
  * <code>cwsg-sandbox</code>: Sample CWSG app ready to run
@@ -23,3 +22,5 @@ Various Clojure libraries and apps I'm working on:
  * <code>stash-migrations</code>: Migration for Stash models
  * <code>stash-pagination</code>: Paginate Stash find results 
  * <code>stash-timestamps</code>: Timestamping callbacks for Stash models
+ 
+See also my various <code>clj-*</code> libraries on my "GitHub page":http://github.com/mmcgrana

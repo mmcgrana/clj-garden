@@ -12,4 +12,4 @@
       (cwsg.middleware.static/wrap (File. "public")
         cwsg.apps.dump/app))))
 
-(cwsg.handlers.jetty/run {:port 8000} app)
+(cwsg.handlers.jetty/run {:port 8080} app)
