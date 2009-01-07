@@ -80,5 +80,3 @@ levels of modularity:
     an fn of env
     routing is a bit troublesome, v.a.v. the app-root param, could perhaps be
       fixed by seperating somewhat the root from params part
-  
-  
