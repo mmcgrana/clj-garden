@@ -14,6 +14,7 @@
 ;; Config
 (def +app-host+ "http://cljre.com")
 (def +public-dir+ (java.io.File. "public"))
+(def +reloadable-namespace-syms+ '(cljre.app))
 
 ;; Routing
 (routing/defrouting
@@ -24,7 +25,6 @@
 
 ;; Views
 (defmacro with-layout
-  "Layout shared by all templates."
   [& body]
   `(html
      (doctype :xhtml-transitional)
@@ -94,5 +94,5 @@
     (file-content-info/wrap
       (static/wrap +public-dir+
         (app/wrap-if (= env :dev)
-          (partial reloading/wrap '(cljre.app))
+          (partial reloading/wrap +reloadable-namespace-syms+)
           (app/spawn-app router))))))

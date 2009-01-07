@@ -7,3 +7,4 @@ minified google jquery in production, regular local jquery in dev
 asset bundling
 [:div {:id "header"} :h1 vs [{:id "header"} :h1 - is questionable
 response ordering
+condense cwsg.middleware.* requires

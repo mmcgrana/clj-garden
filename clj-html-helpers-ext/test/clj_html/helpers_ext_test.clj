@@ -21,6 +21,10 @@
   (assert= "<input type=\"hidden\" name=\"foo[bar]\" value=\"3\" />"
     (hidden-field-tag "foo[bar]" 3)))
 
+(deftest "file-field-tag"
+  (assert= "<input type=\"file\" name=\"foo[bar]\" />"
+    (file-field-tag "foo[bar]")))
+
 (deftest "submit-tag"
   (assert= "<input name=\"commit\" type=\"submit\" value=\"foo\" />"
     (submit-tag "foo")))

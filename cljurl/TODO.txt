@@ -39,6 +39,7 @@ perhaps select-with-logging, modify-with-logging
 [req] 
 [res]
 
+check crunchbase and feather for init/config requirnements
 
 
 levels of modularity:

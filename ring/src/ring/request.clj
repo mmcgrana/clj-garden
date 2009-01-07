@@ -175,13 +175,13 @@
   [request]
   (if-let [ctype (content-type request)]
     (if (re-match? +multipart-re+ ctype)
-      (let [factory (doto (DiskFileItemFactory.) (.setMaxMemorySize 0))
+      (let [factory (doto (DiskFileItemFactory.) (.setSizeThreshold -1))
             upload  (FileUpload. factory)
             context (proxy [RequestContext] []
                       (getContentType       [] (content-type request))
                       (getContentLength     [] (content-length request))
                       (getCharacterEncoding [] (character-encoding request))
-                      (getInputStream       [] ((:stream-fn request))))
+                      (getInputStream       [] (((request :env) :stream-fn))))
             items   (.parseRequest upload context)
             pairs   (map
                       (fn [#^FileItem item]

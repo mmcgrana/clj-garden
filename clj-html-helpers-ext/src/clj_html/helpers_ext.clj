@@ -37,6 +37,11 @@
   [name value]
   (html [:input {:type "hidden" :name name :value value}]))
 
+(defn file-field-tag
+  "Returns html for a file input field."
+  [name]
+  (html [:input {:type "file" :name name}]))
+
 (defn submit-tag
   "Return html for a submit button with value as the text."
   [value]
@@ -44,15 +49,18 @@
 
 (defn form-to
   "Returns html for a form."
-  [[method url] body]
-  (if (browser-method? method)
-    (html
-      [:form {:method (method-str method) :action url}
-        body])
-    (html
-      [:form {:method "post" :action url}
-        (hidden-field-tag "_method" (method-str method))
-        body])))
+  ([target body]
+   (form-to target nil body))
+  ([[method url] opts body]
+   (if (browser-method? method)
+     (html
+       [:form {:method (method-str method) :action url}
+         body])
+     (html
+       [:form {:method "post" :action url
+               :enctype (if (get opts :multipart) "multipart/form-data")}
+         (hidden-field-tag "_method" (method-str method))
+         body]))))
 
 (defn link-tag
   "Returns html for a link with anchor text to the path."
