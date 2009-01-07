@@ -1,8 +1,4 @@
-test uploads in ring
-write some tests to develop mock upload stuff
 implement migrations
-simplify an doc so that people can run themselves
-reflection in parse multipart params
 perhaps get-one, get-all that go by primary keys, as with datamapper
 detect unrecognized column types in compiled-model
 server.clj & console.clj

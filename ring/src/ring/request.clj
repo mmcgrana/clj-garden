@@ -4,8 +4,8 @@
         clojure.contrib.except
         ring.http-utils
         ring.utils)
-  (:import (org.apache.commons.fileupload FileUpload FileItem RequestContext)
-           (org.apache.commons.fileupload.disk DiskFileItemFactory)
+  (:import (org.apache.commons.fileupload FileUpload RequestContext)
+           (org.apache.commons.fileupload.disk DiskFileItemFactory DiskFileItem)
            (org.apache.commons.io IOUtils)
            (java.io InputStream)))
 
@@ -148,7 +148,7 @@
         (if-let [forwarded (get headers "x-forwarded-for")]
           (let [all-ips       (re-split #"," forwarded)
                 remote-ips (remove #(re-match? +local-ip-re+ %) all-ips)]
-            (if (not (empty? remote-ips)) (.trim (first remote-ips)))))
+            (if (not (empty? remote-ips)) (.trim #^String (first remote-ips)))))
         (env :remote-addr))))
 
 (defn referrer
@@ -189,7 +189,7 @@
                       (getInputStream       [] (((request :env) :stream-fn))))
             items   (.parseRequest upload context)
             pairs   (map
-                      (fn [#^FileItem item]
+                      (fn [#^DiskFileItem item]
                         [(.getFieldName item)
                          (if (.isFormField item)
                            (.getString item)
