@@ -108,8 +108,7 @@
 (defn- checked-column-defs
   "Returns a validated seq of column defs specified by model-map."
   [model-map]
-  (get-or model-map :columns
-    (throwf ":columns not provided in model map")))
+  (get-or model-map :columns (throwf ":columns not provided in model map")))
 
 (defn- compiled-column-names
   "Returns a seq of column names based on column-defs that includes all column
@@ -135,7 +134,10 @@
   where which is specified by the mapper-finder fn."
   [mapper-finder column-defs]
   (mash
-    (fn [[name type]] [name (mapper-finder type)])
+    (fn [[name type]]
+      (if-let [mapper (mapper-finder type)]
+        [name mapper]
+        (throwf "Unrecognized column type: %s" type)))
     column-defs))
 
 (defn- compiled-validators

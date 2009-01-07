@@ -12,12 +12,12 @@
   (assert-throws #"Unrecognized keys \(:foobar\)"
     (compiled-model (assoc +post-map+ :callbacks {:foobar [identity]}))))
 
+(deftest "compiled-model: throws on unrecognized column types"
+  (assert-throws #"Unrecognized column type: :bogus_type"
+    (compiled-model (update +post-map+ :columns conj [:a_name :bogus_type]))))
+
 (deftest "defmodel"
   (assert= +macro-post+ (compiled-model +post-map+)))
-
-; TODO: test compilation errors
-
-; TODO: test model accessors
 
 (deftest "column-names"
   (assert= [:id :title :view_count :posted_at :special]
@@ -36,3 +36,6 @@
   (assert=
     [:a_uuid :a_integer :a_boolean :a_long :a_float :a_double :a_string  :a_datetime]
     (non-pk-column-names +schmorg+)))
+
+; TODO: test model accessors
+
