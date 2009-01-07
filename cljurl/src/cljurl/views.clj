@@ -51,7 +51,7 @@
     (form-to (path-info :create)
       (html
         [:p "Enter url:"]
-        (text-field-tag "shortening[url]" {:value (:url shortening)})
+        (text-field-tag "shortening[url]" (:url shortening))
         (submit-tag "Submit")))))
 
 (defn show

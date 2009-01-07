@@ -47,11 +47,11 @@
         [:h1 [:a {:href "/" :title "cljre"} "cljre"] ": a Clojure Regex Editor"]]
       [:div#editor
         [:p.label "pattern:"]
-        (text-area-tag "pattern" {:id "pattern" :rows 1 :spellcheck "false"})
+        (text-area-tag "pattern" nil {:id "pattern" :rows 1 :spellcheck "false"})
         [:p.label "string:"]
-        (text-area-tag "string"  {:id "string" :rows 3 :spellcheck "false"})
+        (text-area-tag "string" nil {:id "string" :rows 3 :spellcheck "false"})
         [:p.label "re-seq result:"]
-        (text-area-tag "result" {:id "result" :rows 3 :spellcheck "false"})]
+        (text-area-tag "result" nil {:id "result" :rows 3 :spellcheck "false"})]
       [:div#footer
         [:p "An " [:a {:href "http://github.com/mmcgrana/cljre/tree/master" :title "cljre code on GitHub"} "open source"]
             " Clojre app inspired by " [:a {:href "http://lovitt.net/" :title "Michael Lovitt"} "Michael Lovitt"] "'s "

@@ -15,7 +15,7 @@
 
 (deftest "text-field-tag"
   (assert= "<input type=\"text\" name=\"foo[bar]\" value=\"3\" />"
-    (text-field-tag "foo[bar]" {:value 3})))
+    (text-field-tag "foo[bar]" 3)))
 
 (deftest "hidden-field-tag"
   (assert= "<input type=\"hidden\" name=\"foo[bar]\" value=\"3\" />"

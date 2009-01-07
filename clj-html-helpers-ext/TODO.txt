@@ -1,4 +1,9 @@
-unify val/opts situation
+Improve link-tag and use it in apps
 add tests for new options
 test untested functions
-consider htmli
+
+Realistically, either need htmli or accommodation
+Benefits of htmli:
+  No need to do nested (html body) calls
+  Can use (for [item items] [:p (h item)])
+  Dynamic maps

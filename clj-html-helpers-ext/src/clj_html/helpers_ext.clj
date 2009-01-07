@@ -18,19 +18,21 @@
   (name method))
 
 (defn text-field-tag
-  "Returns an html snippet for a text field"
-  [name & [opts]]
-  (html [:input {:type "text" :name name
-                 :value (get opts :value) :id (get opts :id)}]))
+  "Returns an html snippet for a text field.
+  Options: :id :class"
+  [name & [value & [opts]]]
+  (html [:input {:type "text" :name name :value value
+                 :id (get opts :id) :class (get opts :class)}]))
 
 (defn text-area-tag
-  "Returns and html snippet for a text area."
-  [name & [opts]]
+  "Returns and html snippet for a text area.
+  Options: :id :class :rows :cols :readonly :spellcheck."
+  [name & [value & [opts]]]
   (html [:textarea {:name name :id (get opts :id)
                     :rows (get opts :rows) :cols (get opts :cols)
                     :readonly (get opts :readonly)
                     :spellcheck (get opts :spellcheck)}
-          (get opts :value)]))
+          value]))
 
 (defn hidden-field-tag
   "Returns html for a hidden field."
