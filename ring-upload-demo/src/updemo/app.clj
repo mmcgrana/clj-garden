@@ -104,8 +104,8 @@
 
 ;; CWSG app
 (def app
-  ;(show-exceptions/wrap
+  (show-exceptions/wrap
     (file-content-info/wrap
       (static/wrap public-dir
         (reloading/wrap reloadable-namespace-syms
-          (app/spawn-app router)))));)
+          (app/spawn-app router))))))

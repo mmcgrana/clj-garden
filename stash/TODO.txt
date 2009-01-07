@@ -1,20 +1,13 @@
-check for reflection in clj-jdbc
-
-Later
-- rethink, test attr protection, foo* situation
-- datetime caster 
-- more validators
-- key-based window pagination
-- select-except
-- multi-order (while still keeping simple case)
-- associations
-- aggregations
-- calculations
-- locking
-- observers
-- serialization
-- identity map
-- double check escaping
-- multi-repository, sharding
-- ordered GUIDs
-  - http://www.informit.com/articles/printerfriendly.aspx?p=25862
+rethink, test attr protection, foo* situation
+datetime caster 
+more validators
+key-based window pagination
+select-except
+multi-order (while still keeping simple case)
+associations
+calculations
+locking, esp. optimistic
+serialization
+double check escaping
+ordered GUIDs
+  http://www.informit.com/articles/printerfriendly.aspx?p=25862

@@ -10,11 +10,11 @@
   given datasource, then closes the connection when done. If this thread
   has an existing connection to the datasource, that one will be provided
   instead of opening a new one."
-  [[binding-sym #^DataSource data-source-form] & body]
+  [[binding-sym data-source-form] & body]
   `(if *connection*
-     (let [~binding-sym *connection*]
+     (let [#^Connection ~binding-sym *connection*]
        ~@body)
-     (with-open [new-conn# (.getConnection ~data-source-form)]
+     (with-open [new-conn# (.getConnection #^DataSource ~data-source-form)]
        (binding [*connection* new-conn#
                  *level*      0]
          (let [~binding-sym new-conn#]
@@ -40,15 +40,16 @@
 
 (defmacro with-statement
   "Evaluates body in the context of a new Statement for the given conn."
-  [[binding-sym #^Connection conn-sym] & body]
-  `(with-open [~binding-sym (.createStatement ~conn-sym)]
-     ~@body))
+  [[binding-sym conn-form] & body]
+  `(let [#^Connection conn# ~conn-form]
+     (with-open [#^Statement ~binding-sym (.createStatement conn#)]
+       ~@body)))
 
 (defmacro with-resultset
   "Evaluates the body in the context of a resultset from the given connection
   based on the given sql."
-  [[binding-sym #^Connection conn-sym sql-form] & body]
-  `(with-statement [statement# ~conn-sym]
+  [[binding-sym conn-sym sql-form] & body]
+  `(with-statement [#^Statement statement# ~conn-sym]
      (let [sql# ~sql-form
            ~binding-sym
              (try
@@ -75,7 +76,7 @@
 
 (defn resultset-tuples
   "Returns a lazy seq of value tuples corresponding to the resultset's rows."
-  [#^java.sql.ResultSet rs]
+  [#^ResultSet rs]
   (let [idxs   (range 1 (inc (.getColumnCount (.getMetaData rs))))
         tuples (fn thisfn []
                  (when (.next rs)
@@ -87,7 +88,7 @@
 (defn resultset-maps
   "Returns a lazy seq of maps corresponding to the column names and values in
   the resultset's rows."
-  [#^java.sql.ResultSet rs]
+  [#^ResultSet rs]
   (let [rsmeta (.getMetaData rs)
         idxs   (range 1 (inc (.getColumnCount rsmeta)))
         keys   (map
