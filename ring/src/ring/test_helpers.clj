@@ -57,6 +57,7 @@
   "Assert that the json encoded in a response body corresponds to a given
   hash/array data strucutre."
   [expected-data actual-body]
-  (assert-truth (= expected-data (json/decode-from-str actual-body))
-    (format "Expecting JSON parsing to %s, but got %s"
-      (prn-str expected-data) (prn-str actual-body))))
+  (let [actual-data (json/decode-from-str actual-body)]
+    (assert-truth (= expected-data actual-data)
+      (format "Expecting JSON parsing to %s, but got %s"
+        (prn-str expected-data) (prn-str actual-data)))))
