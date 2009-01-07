@@ -1,6 +1,6 @@
 (defn find-article
   [request]
-  (stash/find-one +article+ {:where [:id = (params request :id)]}))
+  (stash/get-one +article+ (params request :id)))
 
 (defmacro with-article
   [[article-sym request-form] & body]

@@ -1,4 +1,3 @@
 implement migrations
-perhaps get-one, get-all that go by primary keys, as with datamapper
 detect unrecognized column types in compiled-model
 server.clj & console.clj

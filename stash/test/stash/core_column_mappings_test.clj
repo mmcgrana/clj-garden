@@ -39,7 +39,7 @@
   (let [cname (keyword (str "a_" (name type)))]
     (doseq [val values]
       (deftest-db (str type " quote and parse round trips: " val)
-        (let [schmor (assoc +empty-schmorg+ cname val)]
+        (let [schmor (assoc +simple-schmorg+ cname val)]
           (persist-insert schmor)
           (assert=
             (get schmor cname)

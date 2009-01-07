@@ -20,6 +20,11 @@
         (assoc memo k v)))
     {} coll))
 
+(defn zip
+  "Zip collections into tuples."
+  [& colls]
+  (apply map list colls))
+
 (defn with-assoc-meta
   "Returns an object with the key and value assoced onto its meta data."
   [obj k v]

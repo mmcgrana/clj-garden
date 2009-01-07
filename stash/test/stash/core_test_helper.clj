@@ -25,14 +25,16 @@
   {:data-source +data-source+
    :table-name  :schmorgs
    :columns
-     [[:a_uuid     :uuid    {:pk true}]
-      [:a_integer  :integer {:pk true}]
-      [:a_boolean  :boolean]
-      [:a_long     :long]
-      [:a_float    :float]
-      [:a_double   :double]
-      [:a_string   :string]
-      [:a_datetime :datetime]]
+     [[:pk_uuid    :uuid     {:pk true}]
+      [:pk_integer :integer  {:pk true}]
+      [:a_uuid     :uuid     {:nullable true}]
+      [:a_integer  :integer  {:nullable true}]
+      [:a_boolean  :boolean  {:nullable true}]
+      [:a_long     :long     {:nullable true}]
+      [:a_float    :float    {:nullable true}]
+      [:a_double   :double   {:nullable true}]
+      [:a_string   :string   {:nullable true}]
+      [:a_datetime :datetime {:nullable true}]]
    :accessible-attrs
      [:uuid :boolean :integer :long :float :double :string :datetime]})
 
@@ -40,8 +42,9 @@
   (init +schmorg+ {}))
 
 (def +simple-schmorg-map+
-  {:a_uuid "5260eb5e-3871-42db-ae94-25f1cdff055e"
-   :a_integer 3 :a_boolean true})
+  {:pk_uuid "5260eb5e-3871-42db-ae94-25f1cdff055e"
+   :pk_integer 3
+   :a_boolean true})
 
 (def +simple-schmorg+
   (init* +schmorg+ +simple-schmorg-map+))

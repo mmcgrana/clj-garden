@@ -2,31 +2,22 @@
 
 (deftest "insert-sql: single pk"
   (assert=
-    (str "INSERT INTO posts "
-         "(id, title, view_count, posted_at, special) VALUES "
-         "('" (:id +simple-post+) "', 'f''oo', NULL, NULL, NULL)")
+    (str "INSERT INTO posts (id, title, view_count, posted_at, special) VALUES ('" (:id +simple-post+) "', 'f''oo', NULL, NULL, NULL)")
     (insert-sql +simple-post+)))
 
 (deftest "insert-sql: multiple pks"
   (assert=
-    (str "INSERT INTO schmorgs "
-         "(a_uuid, a_integer, a_boolean, a_long, a_float, a_double, "
-         "a_string, a_datetime) VALUES "
-         "('5260eb5e-3871-42db-ae94-25f1cdff055e', 3, 't', NULL, NULL, "
-         "NULL, NULL, NULL)")
+    "INSERT INTO schmorgs (pk_uuid, pk_integer, a_uuid, a_integer, a_boolean, a_long, a_float, a_double, a_string, a_datetime) VALUES ('5260eb5e-3871-42db-ae94-25f1cdff055e', 3, NULL, NULL, 't', NULL, NULL, NULL, NULL, NULL)"
     (insert-sql +simple-schmorg+)))
 
 (deftest "update-sql: single pk"
   (assert=
-    (str "UPDATE posts SET title = 'f''oo', view_count = NULL, "
-          "posted_at = NULL, special = NULL WHERE (id = '" (:id +simple-post+) "')")
+    (str "UPDATE posts SET title = 'f''oo', view_count = NULL, posted_at = NULL, special = NULL WHERE (id = '" (:id +simple-post+) "')")
     (update-sql +simple-post+)))
 
 (deftest "update-sql: multiple pks"
   (assert=
-    (str "UPDATE schmorgs SET a_boolean = 't', a_long = NULL, a_float = NULL, "
-         "a_double = NULL, a_string = NULL, a_datetime = NULL WHERE "
-         "((a_uuid = '5260eb5e-3871-42db-ae94-25f1cdff055e') AND (a_integer = 3))")
+    "UPDATE schmorgs SET a_uuid = NULL, a_integer = NULL, a_boolean = 't', a_long = NULL, a_float = NULL, a_double = NULL, a_string = NULL, a_datetime = NULL WHERE ((pk_uuid = '5260eb5e-3871-42db-ae94-25f1cdff055e') AND (pk_integer = 3))"
     (update-sql +simple-schmorg+)))
 
 (deftest "delete-sql: single pk"
@@ -34,9 +25,8 @@
     (delete-sql +simple-post+)))
 
 (deftest "delete-sql: multiple pks"
-  (assert= (str "DELETE FROM schmorgs WHERE "
-                "((a_uuid = '5260eb5e-3871-42db-ae94-25f1cdff055e') AND "
-                 "(a_integer = 3))")
+  (assert=
+    "DELETE FROM schmorgs WHERE ((pk_uuid = '5260eb5e-3871-42db-ae94-25f1cdff055e') AND (pk_integer = 3))"
     (delete-sql +simple-schmorg+)))
 
 (deftest-db "persist-insert: inserts a record for the instance, returns as new"

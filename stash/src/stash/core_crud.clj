@@ -15,16 +15,17 @@
 (defn- pk-where-exp
   "Returns the where exp data structure that can be used in a query to identify
   the instance row, based on its pks."
-  [instance]
-  (let [model    (instance-model instance)
-        pk-names (pk-column-names model)]
-    (if (= 1 (count pk-names))
-      (let [single-pk-name (first pk-names)]
-        [single-pk-name := (get instance single-pk-name)])
-      (reduce
-        #(conj %1 [%2 := (get instance %2)])
-        [:and]
-        pk-names))))
+  ([pk-names pk-vals]
+   (if (= 1 (count pk-names))
+     [(first pk-names) := (first pk-vals)]
+     (reduce
+       (fn [and-exp [pk-name pk-val]] (conj and-exp [pk-name := pk-val]))
+       [:and]
+       (zip pk-names pk-vals))))
+  ([instance]
+   (let [pk-names (pk-column-names (instance-model instance))
+         pk-vals  (map instance pk-names)]
+     (pk-where-exp pk-names pk-vals))))
 
 (defn- pk-where-sql
   "Returns the sql where clause that identifies the instance row, based on its
