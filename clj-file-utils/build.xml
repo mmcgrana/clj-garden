@@ -1,0 +1,17 @@
+<project name="clj-routing" default="jar">
+  <description>Pack all sources into a JAR.</description>
+
+  <property name="jarfile" location="clj-file-utils.jar"/>
+
+  <target name="clean"
+          description="Remove generated files and directories.">
+    <delete file="${jarfile}"/>
+  </target>
+
+  <target name="jar"
+          description="Create jar file.">
+    <jar jarfile="${jarfile}">
+      <fileset dir="./src" includes="clj_file_utils/**/*.clj"/>
+    </jar>
+  </target>
+</project>

@@ -1,17 +1,24 @@
 (ns ring.test-helpers
-  (:require [ring.http-utils    :as http-utils]
-            [org.danlarkin.json :as json])
+  (:require [ring.http-utils     :as http-utils]
+            [clj-file-utils.core :as file-utils]
+            [org.danlarkin.json  :as json])
   (:use clj-unit.core clj-scrape.core))
 
 (defn request
   "Returns the response of app to mock request build according to the method,
   path and options."
   [app [method path] & [options]]
-  (app {:uri path
+  (app {:uri            path
         :request-method method
-        :query-string (if-let [params (get options :params)]
-                        (http-utils/query-unparse params))
-        :remote-addr  (get options :remote-addr)}))
+        :mock-params    (get options :params)
+        :remote-addr    (get options :remote-addr)}))
+
+(defn upload
+  "Returns an upload hash that can be used as a value in the :params map for
+  the mock request helper."
+  [[file content-type filename]]
+  {:tempfile file     :size (file-utils/size file)
+   :filename filename :content-type content-type})
 
 (defn assert-status
   "Assert that a response status equals an expected status."

@@ -49,17 +49,22 @@
   [request]
   (request :query-params))
 
-(defn body-params
+(defn form-params
   "Returs a hash of params described by the request's post body if the 
   content-type indicates a form url encoded request, nil otherwise."
   [request]
-  (request :body-params))
+  (request :form-params))
 
 (defn multipart-params
   "Returns a hash of multipart params if the content-type indicates a multipart
   request, nil otherwise."
   [request]
   (request :multipart-params))
+
+(defn mock-params
+  "Returns a hash of mock params given directly in the env, if any."
+  [request]
+  (request :mock-params))
 
 (defn params
   "If only the request is given, returns the merged map of all params from the
@@ -161,7 +166,7 @@
   (with-open [#^InputStream stream (((request :env) :stream-fn))]
     (IOUtils/toString stream)))
 
-(defn- parse-body-params
+(defn- parse-form-params
   "When the request is form-url-encoded, returns the params Map parsed from
   the raw-body, otherwise returns nil."
   [request]
@@ -217,14 +222,17 @@
   (let [request          {:env env}
         request          (assoc request :query-params
                            (query-parse (query-string request)))
-        request          (assoc request :body-params
-                           (parse-body-params request))
+        request          (assoc request :form-params
+                           (parse-form-params request))
         request          (assoc request :multipart-params
                            (parse-multipart-params request))
+        request          (assoc request :mock-params
+                           (:mock-params env))
         request          (assoc request :params
                            (merge (query-params request)
-                                  (body-params request)
-                                  (multipart-params request)))
+                                  (form-params request)
+                                  (multipart-params request)
+                                  (mock-params request)))
         request          (assoc request :request-method
                            (determine-method request))]
   request))

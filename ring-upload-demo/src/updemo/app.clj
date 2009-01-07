@@ -11,7 +11,7 @@
     [cwsg.middleware.static            :as static]
     [ring.app                          :as app]
     [stash.core                        :as stash]
-    [updemo.file-utils                 :as file-utils]))
+    [clj-file-utils.core               :as file-utils]))
 
 ;; Config
 (def app-host "http://localhost:8080")
@@ -104,8 +104,8 @@
 
 ;; CWSG app
 (def app
-  (show-exceptions/wrap
+  ;(show-exceptions/wrap
     (file-content-info/wrap
       (static/wrap public-dir
         (reloading/wrap reloadable-namespace-syms
-          (app/spawn-app router))))))
+          (app/spawn-app router)))));)
