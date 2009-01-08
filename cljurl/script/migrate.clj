@@ -1,9 +1,10 @@
-(require 'cljurl.config 'cljurl.migrations 'clj-jdbc.core 'stash.migrations)
+(require 'cljurl.boot)
 
-(let [env     (keyword (first *command-line-args*))
+(let [env     (keyword (or (first *command-line-args*) "dev"))
       version (Integer. (second *command-line-args*))]
-  (cljurl.config/in-env! env)
-  (clj-jdbc.core/with-connection [conn (cljurl.config/val :data-source)]
+  (binding [cljurl.boot/env env] (require 'cljurl.config))
+  (require 'cljurl.migrations 'clj-jdbc.core 'stash.migrations)
+  (clj-jdbc.core/with-connection [conn cljurl.config/data-source]
     (stash.migrations/create-version conn)
     (stash.migrations/migrate conn updemo.migrations/all version println)))
 

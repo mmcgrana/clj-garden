@@ -1,10 +1,7 @@
 (in-ns 'stash.migrations-test)
 
 (def +data-source+
-  (doto (org.postgresql.ds.PGPoolingDataSource.)
-    (.setDatabaseName "stash-migrations-test")
-    (.setUser         "mmcgrana")
-    (.setPassword     "")))
+  (pg-data-source {:database "stash-migrations-test" :user "mmcgrana" :password ""}))
 
 (defmacro deftest-conn [doc [binding-sym] & body]
   `(deftest ~doc

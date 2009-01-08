@@ -1,10 +1,7 @@
 (in-ns 'stash.core-test)
 
 (def +data-source+
-  (doto (org.postgresql.ds.PGPoolingDataSource.)
-    (.setDatabaseName "stash-test")
-    (.setUser         "mmcgrana")
-    (.setPassword     "")))
+  (pg-data-source {:database "stash-test" :user "mmcgrana" :password ""}))
 
 (defmacro with-clean-db
   [& body]

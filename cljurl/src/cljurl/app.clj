@@ -6,15 +6,17 @@
       [static                :as static]
       [reloading             :as reloading])
     [ring.app :as app]
-    (cljurl config routing controllers)))
+    (cljurl
+      [config :as config]
+      routing controllers)))
 
 (def reloadable-ns-syms '(cljurl.controllers cljurl.models cljurl.views))
 
-(defn build-app [env]
-  (app/wrap-if (= env :dev)
+(def app
+  (app/wrap-if config/dev?
     show-exceptions/wrap
     (file-content-info/wrap
-      (static/wrap cljurl.config/+public-dir+
-        (app/wrap-if (= env :dev)
+      (static/wrap config/public-dir
+        (app/wrap-if config/dev?
           (partial reloading/wrap reloadable-ns-syms)
           (app/spawn-app cljurl.routing/router))))))

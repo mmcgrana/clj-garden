@@ -15,6 +15,4 @@
    [c 'not-found-api  :not-found-api :any  "/:path.js" {:path ".*"}]
    [c 'not-found      :not-found     :any  "/:path"    {:path ".*"}]])
 
-(routing/defrouting
-  config/+app-host+
-  routes)
+(routing/defrouting config/app-host routes)

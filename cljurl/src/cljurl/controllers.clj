@@ -1,8 +1,13 @@
 (ns cljurl.controllers
-  (:use (ring controller request)
-        cljurl.routing)
-  (:require (cljurl [models :as m] [views  :as v] [config :as config])
-            [stash.core :as stash]))
+  (:use
+    (ring controller request)
+    cljurl.routing)
+  (:require
+    (cljurl
+      [models :as m]
+      [views  :as v]
+      [config :as config])
+    [stash.core :as stash]))
 
 (defmacro with-filters
   "Wrap all action code in a try catch that will either show exception details
@@ -11,7 +16,7 @@
   `(try
      ~@body
      (catch Exception e#
-       (if (config/handle-exceptions?)
+       (if config/handle-exceptions
          (if ~api-action
            (respond-500 (v/internal-error-api)
              {:content-type "text/javascript"})

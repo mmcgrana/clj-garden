@@ -2,6 +2,7 @@
   (:use clj-unit.core
         stash.core
         stash.utils
+        stash.data-sources
         clj-time.core
         clojure.contrib.except)
   (:load

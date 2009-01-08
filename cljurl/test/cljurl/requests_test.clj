@@ -1,13 +1,14 @@
 (ns cljurl.requests-test
-  (require [stash.core :as stash])
+  (require [stash.core :as stash]
+           cljurl.app)
   (use clj-unit.core clj-scrape.core
-       (cljurl routing app models controllers test-helpers)
+       (cljurl routing models controllers test-helpers)
        ring.test-helpers))
 
-(def app (build-app :test))
+(def app cljurl.app/app)
 
 (deftest "with-filters"
-  (binding [cljurl.config/+handle-exceptions+ true]
+  (binding [cljurl.config/handle-exceptions true]
     (let [[status _ body] (with-filters false (throw (Exception. "o noews")))]
       (assert-status 500 status)
       (assert-match #"something went wrong" body))))

@@ -1,14 +1,11 @@
 (ns gitcred.data
   (:use gitcred.utils
-        stash.core
+        (stash core data-sources)
         clj-http-client.core clj-time.core clj-scrape.core
         clojure.set))
 
 (def +data-source+
-  (doto (org.postgresql.ds.PGPoolingDataSource.)
-    (.setDatabaseName "gitcred_dev")
-    (.setUser         "mmcgrana")
-    (.setPassword     "")))
+  (pg-data-source {:database "gitcred_dev" :user "mmcgrana" :password ""}))
 
 (defmodel +user+
   {:data-source +data-source+

@@ -2,7 +2,8 @@
   (:use
     (ring controller request)
     (clj-html core helpers helpers-ext)
-    clojure.contrib.str-utils)
+    clojure.contrib.str-utils
+    stash.data-sources)
   (:require
     [ring.routing                      :as routing]
     [cwsg.middleware.reloading         :as reloading]
@@ -19,10 +20,7 @@
 (def uploads-dir (java.io.File. "public/uploads"))
 (def reloadable-namespace-syms '(updemo.app))
 (def data-source
-  (doto (org.postgresql.ds.PGPoolingDataSource.)
-    (.setDatabaseName "updemo_dev")
-    (.setUser         "mmcgrana")
-    (.setPassword     "")))
+  (pg-data-source {:database "updemo_dev" :user "mmcgrana" :password ""}))
 
 ;; Routing
 (routing/defrouting

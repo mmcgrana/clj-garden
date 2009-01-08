@@ -99,3 +99,16 @@ levels of modularity:
     an fn of env
     routing is a bit troublesome, v.a.v. the app-root param, could perhaps be
       fixed by seperating somewhat the root from params part
+      
+(require 'myapp.boot)
+(binding [myapp.boot/env :test]
+  (require 'myapp.config))
+
+; myapp.boot
+(def env nil)
+
+; myapp.config
+(def env boot/env)
+(other defs)
+
+(do-other-stuff)

@@ -1,26 +1,27 @@
-(ns cljurl.config)
+(ns cljurl.config
+  (:use stash.data-sources)
+  (:require cljurl.boot)
+  (:import java.io.File))
 
-(def +app-host+ "localhost:8000")
+(def env cljurl.boot/env)
 
-(def +data-source+
-  (doto (org.postgresql.ds.PGPoolingDataSource.)
-    (.setDatabaseName "cljurl_development")
-    (.setUser         "mmcgrana")
-    (.setPassword     "")))
+(def app-host "localhost:8000")
 
-(def +public-dir+
-  (java.io.File. "public"))
+(def public-dir (File. "public"))
 
-(def +env+ :dev)
+(def dev?  (= env :dev))
+(def test? (= env :test))
+(def prod? (= env :prod))
 
-(defn dev?  [] (= +env+ :dev))
-(defn test? [] (= +env+ :test))
-(defn prod? [] (= +env+ :prod))
+(def handle-exceptions prod?)
 
-(def +handle-exceptions+ nil)
+(def data-source
+  (pg-data-source
+    (cond
+      prod? {:database "cljurl_prod" :user "deploy" :password "somepass"}
+      dev?  {:database "cljurl_development"  :user "mmcgrana" :password ""}
+      test? {:database "cljurl_development" :user "mmcgrana" :password ""})))
 
-(defn handle-exceptions? []
-  (if (nil? +handle-exceptions+)
-    (prod?)
-    +handle-exceptions+))
+
+
 

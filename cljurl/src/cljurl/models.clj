@@ -14,7 +14,7 @@
     [(assoc shortening :slug slug) true]))
 
 (defmodel +shortening+
-  {:data-source config/+data-source+
+  {:data-source config/data-source
    :table-name  :shortenings
    :pk-init a-uuid
    :columns
@@ -40,7 +40,7 @@
   (find-all +shortening+ {:limit n :order [:created_at :desc]}))
 
 (defmodel +hit+
-  {:data-source config/+data-source+
+  {:data-source config/data-source
    :table-name :hits
    :pk-init a-uuid
    :columns
