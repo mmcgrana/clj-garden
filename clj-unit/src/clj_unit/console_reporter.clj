@@ -2,14 +2,6 @@
   (:use clj-unit.utils clojure.contrib.str-utils
         (clj-backtrace core repl)))
 
-(def *test-count*    (atom 0))
-(def *success-count* (atom 0))
-(def *pass-count*    (atom 0))
-(def *failure-count* (atom 0))
-(def *error-count*   (atom 0))
-(def *pending-count* (atom 0))
-(def *start-time*    (atom nil))
-
 (defn print-exception
   "A sort of modified .printStackTrace. Prints to *out* as apposed to *err* and
   only prints those stack elements above the test invocation code."
