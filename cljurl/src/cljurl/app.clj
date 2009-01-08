@@ -5,8 +5,8 @@
       [file-content-info     :as file-content-info]
       [static                :as static]
       [reloading             :as reloading])
-    (cljurl config routing controllers))
-  (:use ring.app))
+    [ring.app :as app]
+    (cljurl config routing controllers)))
 
 (def reloadable-ns-syms '(cljurl.controllers cljurl.models cljurl.views))
 

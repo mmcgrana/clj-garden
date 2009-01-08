@@ -39,7 +39,26 @@ perhaps select-with-logging, modify-with-logging
 [req] 
 [res]
 
-check crunchbase and feather for init/config requirnements
+(defmodel
+  {:data-source #(config/val :data-source)
+   ...})
+
+(defrouting
+  #(config/val :app-root)
+  ...)
+
+; OK
+(if (config/val :handle-exceptions)
+  ...
+  ...)
+
+; Perhaps we really only need dynamic rebinding for testing, which occurs
+; in a single thread
+
+  
+we could try to force load ordering, but is no fun in itself and disallows changing envs dynamically (like for exp handling test)
+but then you pay a performance penalty when you have to do lookups for the model
+specifically nada vs. 1 general call, 1 call to /val, 1 hash lookup, 1 deref
 
 
 levels of modularity:
