@@ -24,3 +24,7 @@ Various Clojure libraries and apps I'm working on:
  * <code>stash-timestamps</code>: Timestamping callbacks for Stash models
  
 See also my various <code>clj-*</code> libraries on my "GitHub page":http://github.com/mmcgrana
+
+---
+
+Copyright 2009 Mark McGranaghan and released under an MIT license.
