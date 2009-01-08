@@ -20,7 +20,7 @@
     (cond
       prod? {:database "cljurl_prod" :user "deploy" :password "somepass"}
       dev?  {:database "cljurl_dev"  :user "mmcgrana" :password ""}
-      test? {:database "cljurl_dev" :user "mmcgrana" :password ""})))
+      test? {:database "cljurl_test" :user "mmcgrana" :password ""})))
 
 
 
