@@ -5,6 +5,9 @@
 
 (def *db* nil)
 
+(defn report-query [reporter sql & [time]]
+  (if reporter (reporter sql time)))
+
 (defmacro with-connection
   "Evaluates body in the context of a new connection to a database from the
   given datasource, then closes the connection when done. If this thread
@@ -15,7 +18,7 @@
      (do ~@body)
      (let [db-spec# ~db-spec-form]
        (with-open [connection# (.getConnection #^DataSource (:data-source db-spec#))]
-         (binding [*db* {:connection connection# :level 0 :logger (:logger db-spec#)}]
+         (binding [*db* {:connection connection# :level 0 :reporter (:reporter db-spec#)}]
            ~@body)))))
 
 (defmacro in-transaction
@@ -26,16 +29,20 @@
   `(do
     (let [db#         *db*
           level#      (:level db#)
-          connection# (:connection db#)]
+          connection# (:connection db#)
+          reporter#   (:reporter   db#)]
       (binding [*db* (assoc db# :level (inc (get db# :level)))]
         (when (zero? level#)
-          (.setAutoCommit connection# false))
+          (with-realtime [n# (.setAutoCommit connection# false)]
+            (report-query reporter# "BEGIN" n#)))
         (try
           (returning (do ~@body)
             (when (zero? level#)
-              (.commit connection#)))
+              (with-realtime [n# (.commit connection#)]
+                (report-query reporter# "COMMIT" n#))))
           (catch Exception e#
-            (.rollback connection#)
+            (let [n# (realtime (.rollback connection#))]
+              (report-query reporter# "ROLLBACK" n#))
             (throwf "Transaction rolled back: %s", (.getMessage e#))))))))
 
 (defmacro with-statement
@@ -48,12 +55,13 @@
   "Evaluates the body in the context of a resultset from the given connection
   based on the given sql."
   [[binding-sym sql-form] & body]
-  `(let [db# *db*]
+  `(let [db#       *db*]
      (with-statement [#^Statement statement# (:connection db#)]
         (let [sql# ~sql-form
               ~binding-sym
                 (try
-                  (.executeQuery statement# sql#)
+                  (with-realtime [n# (.executeQuery statement# sql#)]
+                    (report-query (:reporter db#) sql# n#))
                   (catch Exception e#
                     (throwf "%s: %s" (.getMessage e#) sql#)))]
           ~@body))))
@@ -65,7 +73,8 @@
   (let [db *db*]
     (with-statement [statement (:connection db)]
       (try
-        (.executeUpdate statement sql)
+        (with-realtime [n (.executeUpdate statement sql)]
+          (report-query (:reporter db) sql n))
         (catch Exception e
           (throwf "%s: %s" (.getMessage e) sql))))))
 
