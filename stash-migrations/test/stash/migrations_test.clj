@@ -3,42 +3,47 @@
   (:use clj-unit.core stash.migrations clj-jdbc.data-sources)
   (:load "migrations_ddl_test"))
 
-(deftest-conn "create-version, get-version, set-version, drop_version" [conn]
-  (create-version conn)
-  (assert= 0 (get-version conn))
-  (set-version conn 1)
-  (assert= 1 (get-version conn))
-  (drop-version conn))
+(deftest-conn "create-version, get-version, set-version, drop_version"
+  (create-version)
+  (assert= 0 (get-version))
+  (set-version 1)
+  (assert= 1 (get-version))
+  (drop-version))
+
+(def m1 #(constantly :1))
+(def m3 #(constantly :3))
+(def m5 #(constantly :5))
+(def m7 #(constantly :7))
 
 (def +migrations+
-  [[1 identity] [3 identity] [5 identity] [7 identity]])
+  [[1 m1] [3 m3] [5 m5] [7 m7]])
 
 (deftest "ups"
-  (assert= [[1 identity 1] [3 identity 3] [5 identity 5] [7 identity 7]]
+  (assert= [[1 m1 1] [3 m3 3] [5 m5 5] [7 m7 7]]
     (ups +migrations+ 0 7))
-  (assert= [[3 identity 3] [5 identity 5]]
+  (assert= [[3 m3 3] [5 m5 5]]
     (ups +migrations+ 1 5)))
 
 (deftest "downs"
-  (assert= [[7 identity 5] [5 identity 3] [3 identity 1] [1 identity 0]]
+  (assert= [[7 m7 5] [5 m5 3] [3 m3 1] [1 m1 0]]
     (downs +migrations+ 7 0))
-  (assert= [[5 identity 3] [3 identity 1]]
+  (assert= [[5 m5 3] [3 m3 1]]
     (downs +migrations+ 5 1)))
 
-(deftest-conn "migrate: up, down, no migrations" [conn]
-  (create-version conn)
-  (assert-nil (migrate conn +migrations+ 0))
-  (assert= 0 (get-version conn))
-  (assert= '(1 3 5 7) (migrate conn +migrations+ 7))
-  (assert= 7 (get-version conn))
-  (assert= '(7 5 3 1) (migrate conn +migrations+ 0))
-  (assert= 0 (get-version conn))
-  (drop-version conn))
+(deftest-conn "migrate: up, down, no migrations"
+  (create-version)
+  (assert-nil (migrate +migrations+ 0))
+  (assert= 0 (get-version))
+  (assert= '(1 3 5 7) (migrate +migrations+ 7))
+  (assert= 7 (get-version))
+  (assert= '(7 5 3 1) (migrate +migrations+ 0))
+  (assert= 0 (get-version))
+  (drop-version))
 
 (deftest "defmigration"
-  (defmigration my-migration [conn 10]
-    [:up conn]
-    [:down conn])
+  (defmigration my-migration 10
+    :up
+    :down)
   (assert= 10 (get my-migration 0))
-  (assert= [:up   :conn] ((get my-migration 1) :conn))
-  (assert= [:down :conn] ((get my-migration 2) :conn)))
+  (assert= :up ((get my-migration 1)))
+  (assert= :down ((get my-migration 2))))

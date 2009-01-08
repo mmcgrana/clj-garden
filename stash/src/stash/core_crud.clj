@@ -1,29 +1,18 @@
 (in-ns 'stash.core)
 
-(defn log
-  "If a logger is present, as bound by with-logger, call the logger fn
-  with the log level and log data as the two arguments."
-  [logger level sql time]
+(defn reporter-fn
+  [logger]
   (if logger
-    (logger :info [:query {:sql sql :time time}])))
-
-(defmacro timed
-  "Returns a 2-tuple, the result of evaluating the expression and the time
-  in milliseconds that the evaluation took."
-  [expr]
-  `(let [start# (System/currentTimeMillis)
-         ret#    ~expr
-         time#  (- (System/currentTimeMillis) start#)]
-     [ret# time#]))
+    (fn [sql time]
+      (.info logger (if time sql (str "(" time ") " sql))))))
 
 (defn execute
   "Execute a clj-jdbc query function with a connection to data-source using the
   given sql. Log to the logger if given."
   [execute-fn data-source sql & [logger]]
-  (jdbc/with-connection data-source
-    (let [[ret time] (timed (execute-fn sql))]
-      (log logger :info time sql)
-      ret)))
+  (jdbc/with-reporter (reporter-fn logger)
+    (jdbc/with-connection data-source
+      (execute-fn sql))))
 
 (defn insert-sql
   "Returns the insert sql for the instance."

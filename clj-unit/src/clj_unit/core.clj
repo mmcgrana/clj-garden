@@ -1,12 +1,12 @@
 (ns clj-unit.core
-  (:use (clj-unit utils console-reporter) clojure.contrib.except))
+  (:use (clj-unit utils console-reporter)
+        (clojure.contrib except)))
 
 (defstruct +test-info+ :doc :pending :fn :file :line)
 
 (def *tests-info* (atom {}))
 
-(declare *reporter* *reporter-state* *test-info*)
-
+(declare *test-reporter* *test-reporter-state* *test-info*)
 
 ; reporter interface
 ; hash with keys valued by the functions with sigs as below
@@ -43,14 +43,15 @@
   current reporter state and any additional args, setting the reporter
   state to the updated value returned by the fn."
   [type & args]
-  (set! *reporter-state* (apply (type *reporter*) *reporter-state* args)))
+  (set! *test-reporter-state*
+    (apply (type *test-reporter*) *test-reporter-state* args)))
 
 (defn run-tests
   "Run all tests for the namespace symbols, with either the default console
   reporter or if given a custom reporter."
   [ns-syms & [reporter]]
-  (binding [*reporter* (or reporter +console-reporter+)]
-    (binding [*reporter-state* ((:init *reporter*) ns-syms)]
+  (binding [*test-reporter* (or reporter +console-reporter+)]
+    (binding [*test-reporter-state* ((:init *test-reporter*) ns-syms)]
       (doseq [ns-sym ns-syms]
         (if-let [ns-tests-info (@*tests-info* ns-sym)]
           (do

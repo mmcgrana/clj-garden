@@ -1,14 +1,14 @@
 (ns cljurl.migrations
   (:use stash.migrations))
 
-(defmigration bootstrap [conn 1]
+(defmigration bootstrap 1
   (do
-    (create-table conn :shortenings
+    (create-table :shortenings
       [[:id         :uuid   {:pk true}]
        [:slug       :string {:unique true}]
        [:url        :string]
        [:created_at :datetime]])
-    (create-table conn :hits
+    (create-table :hits
       [[:id             :uuid {:pk true}]
         [:shortening_id :uuid]
         [:ip            :string]
@@ -16,8 +16,8 @@
         [:updated_at    :datetime]
         [:hit_count     :integer]]))
   (do
-    (drop-table conn :shortenings)
-    (drop-table conn :hits)))
+    (drop-table :shortenings)
+    (drop-table :hits)))
 
 (def all
   [bootstrap])

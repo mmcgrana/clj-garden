@@ -41,7 +41,7 @@
 
 ;; Always-used libs
 (use
-  '(clojure.contrib repl-utils repl-ln javadoc duck-streams)
+  '(clojure.contrib repl-utils repl-ln duck-streams)
   'clj-backtrace.repl)
 
 ;; Use a line-numbering repl

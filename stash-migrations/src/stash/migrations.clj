@@ -48,9 +48,6 @@
     (map (fn [[version f to]] [version f (dto-map to)])
          (reverse (ups migrations target-version start-version)))))
 
-(defn- report-if [reporter message]
-  (if reporter (reporter message)))
-
 (defn migrate
   "Migrate a db according to the given migrations sequence up or down
   to the target version.
@@ -68,43 +65,41 @@
   After each individual migration, the schema_info table is updated
   appropriately.
   
-  If a reporter fn is given, is will be invoked with single string arguments
-  indicating the progress of the migrations."
-  [migrations & [target-version reporter]]
+  The clj-jdbc reporter, if bound, is used to report the progress."
+  [migrations & [target-version]]
   (let [start-version  (get-version)
         target-version (or target-version (first (last migrations)))
-        report         (partial report-if reporter)]
+        rep            jdbc/report-db]
     (cond
       ; Migrate up.
       (< start-version target-version)
         (do
-          (report (str "migrating up, " start-version " to " target-version))
+          (rep (str "migrating up, " start-version " to " target-version))
           (let [ran (doall
                       (map (fn [[version up-f to]]
-                             (report (str "running " version " up"))
+                             (rep (str "running " version " up"))
                              (up-f)
                              (set-version to)
                              version)
                            (ups migrations start-version target-version)))]
-            (report (str "done, at " target-version))
+            (rep (str "done, at " target-version))
             ran))
       ; Migrate down.
       (> start-version target-version)
         (do
-          (report (str "migrating down, " start-version " to " target-version))
+          (rep (str "migrating down, " start-version " to " target-version))
           (let [ran (doall
                       (map (fn [[version down-f to]]
-                             (report (str "running " version " down"))
+                             (rep (str "running " version " down"))
                              (down-f)
-                             (set-version conn to)
+                             (set-version to)
                              version)
                            (downs migrations start-version target-version)))]
-            (report (str "done, at " target-version))
+            (rep (str "done, at " target-version))
             ran))
       ; Dont' migrate.
       :else
-        (if report
-          (report (str "migrating not needed, at " target-version))))))
+        (rep (str "migrating not needed, at " target-version)))))
 
 (defmacro defmigration [name version up-form down-form]
   "Helper method to define named migrations.
@@ -113,5 +108,5 @@
   to be given as an argument to stash.migrations/migrate."
   `(def ~name
      [~version
-      (fn ~up-form)
-      (fn ~down-form)]))
+      (fn [] ~up-form)
+      (fn [] ~down-form)]))

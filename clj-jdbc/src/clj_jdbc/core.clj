@@ -3,23 +3,34 @@
   (:import (java.sql Connection Statement ResultSet)
            (javax.sql DataSource)))
 
-(def *db* nil)
+(def *db*       nil)
+(def *db-reporter* nil)
 
-(defn report-query [reporter sql & [time]]
-  (if reporter (reporter sql time)))
+(defn report-db [sql & [time]]
+  "Report the sql query run and optionally the time it took to the bound
+  query reporter."
+  (if-let [reporter *db-reporter*]
+    (reporter sql time)))
+
+(defmacro with-reporter
+  "Execute body in the context of a dynamically bound query reporter.
+  The reporter is an fn of two args - the sql executed and the query time
+  in milliseconds."
+  [reporter-form & body]
+  `(binding [*db-reporter* ~reporter-form]
+     ~@body))
 
 (defmacro with-connection
   "Evaluates body in the context of a new connection to a database from the
   given datasource, then closes the connection when done. If this thread
   has an existing connection to the datasource, that one will be provided
   instead of opening a new one."
-  [db-spec-form & body]
+  [data-source-form & body]
   `(if *db*
      (do ~@body)
-     (let [db-spec# ~db-spec-form]
-       (with-open [connection# (.getConnection #^DataSource (:data-source db-spec#))]
-         (binding [*db* {:connection connection# :level 0 :reporter (:reporter db-spec#)}]
-           ~@body)))))
+     (with-open [connection# (.getConnection #^DataSource ~data-source-form)]
+       (binding [*db* {:connection connection# :level 0}]
+         ~@body))))
 
 (defmacro in-transaction
   "Evaluates body as in transaction on the connection. Updates
@@ -29,20 +40,19 @@
   `(do
     (let [db#         *db*
           level#      (:level db#)
-          connection# (:connection db#)
-          reporter#   (:reporter   db#)]
+          connection# (:connection db#)]
       (binding [*db* (assoc db# :level (inc (get db# :level)))]
         (when (zero? level#)
           (with-realtime [n# (.setAutoCommit connection# false)]
-            (report-query reporter# "BEGIN" n#)))
+            (report-db "BEGIN" n#)))
         (try
           (returning (do ~@body)
             (when (zero? level#)
               (with-realtime [n# (.commit connection#)]
-                (report-query reporter# "COMMIT" n#))))
+                (report-db "COMMIT" n#))))
           (catch Exception e#
             (let [n# (realtime (.rollback connection#))]
-              (report-query reporter# "ROLLBACK" n#))
+              (report-db "ROLLBACK" n#))
             (throwf "Transaction rolled back: %s", (.getMessage e#))))))))
 
 (defmacro with-statement
@@ -55,28 +65,26 @@
   "Evaluates the body in the context of a resultset from the given connection
   based on the given sql."
   [[binding-sym sql-form] & body]
-  `(let [db#       *db*]
-     (with-statement [#^Statement statement# (:connection db#)]
-        (let [sql# ~sql-form
-              ~binding-sym
-                (try
-                  (with-realtime [n# (.executeQuery statement# sql#)]
-                    (report-query (:reporter db#) sql# n#))
-                  (catch Exception e#
-                    (throwf "%s: %s" (.getMessage e#) sql#)))]
-          ~@body))))
+  `(with-statement [#^Statement statement# (:connection *db*)]
+     (let [sql# ~sql-form
+           ~binding-sym
+             (try
+               (with-realtime [n# (.executeQuery statement# sql#)]
+                 (report-db sql# n#))
+               (catch Exception e#
+                 (throwf "%s: %s" (.getMessage e#) sql#)))]
+       ~@body)))
 
 (defn modify
   "Execute against the given connection the given insert, update, delete, or ddl 
   statement, returning the number of items affected."
   [sql]
-  (let [db *db*]
-    (with-statement [statement (:connection db)]
-      (try
-        (with-realtime [n (.executeUpdate statement sql)]
-          (report-query (:reporter db) sql n))
-        (catch Exception e
-          (throwf "%s: %s" (.getMessage e) sql))))))
+  (with-statement [statement (:connection *db*)]
+    (try
+      (with-realtime [n (.executeUpdate statement sql)]
+        (report-db sql n))
+      (catch Exception e
+        (throwf "%s: %s" (.getMessage e) sql)))))
 
 (defn resultset-values
   "Returns a lazy seq of single values corresponding to the resultset's rows."

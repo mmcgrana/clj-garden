@@ -15,6 +15,7 @@
 
 (defmodel +shortening+
   {:data-source config/data-source
+   :logger      config/logger
    :table-name  :shortenings
    :pk-init a-uuid
    :columns
@@ -41,6 +42,7 @@
 
 (defmodel +hit+
   {:data-source config/data-source
+   :logger      config/logger
    :table-name :hits
    :pk-init a-uuid
    :columns

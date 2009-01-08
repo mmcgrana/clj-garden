@@ -9,12 +9,10 @@
     (.setUser         "mmcgrana")
     (.setPassword     "")))
 
-(def test-db-spec
-  {:data-source test-data-source})
 
 (defmacro with-test-connection
   [& body]
-  `(with-connection ~'test-db-spec
+  `(with-connection ~'test-data-source
      (modify "DELETE FROM fruits")
      (modify "INSERT INTO fruits (id, name) VALUES (1, 'apple'), (2, 'pear'), (3, 'grape')")
      ~@body))
@@ -25,11 +23,10 @@
      (with-test-connection
        ~@body)))
 
-(deftest "with-connection: reuses connections in nested calls"
-  (with-connection test-db-spec
-    (let [outer-connection (:connection *db*)]
-      (with-connection test-db-spec
-        (assert= outer-connection (:connection *db*))))))
+(defconntest "with-connection: reuses connections in nested calls"
+  (let [outer-connection (:connection *db*)]
+    (with-connection test-data-source
+      (assert= outer-connection (:connection *db*)))))
 
 (defconntest "modify: preforms a change and returns affected row count"
   (let [change-count (modify "DELETE FROM fruits WHERE id = 2")
@@ -41,6 +38,12 @@
 (defconntest "modify: re-raises exceptions with sql in message"
   (assert-throws #"ERROR.*foobar"
     (modify "foobar")))
+
+(defconntest "modify: reports to reporter if present"
+  (with-reporter #(do
+                     (assert= "DELETE FROM fruits" %1)
+                     (assert-instance Number %2))
+    (modify "DELETE FROM fruits")))
 
 (defconntest "with-resultset: re-raises exceptions with sql in message"
   (assert-throws #"ERROR.*foobar"
