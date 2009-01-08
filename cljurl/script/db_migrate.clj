@@ -5,4 +5,4 @@
 (let [version (Integer. (second *command-line-args*))]
   (stash.core/with-logger cljurl.config/logger
     (clj-jdbc.core/with-connection cljurl.config/data-source
-      (stash.migrations/migrate cljurl.migrations/all version)))
+      (stash.migrations/migrate cljurl.migrations/all version))))

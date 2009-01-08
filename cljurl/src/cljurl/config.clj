@@ -12,8 +12,6 @@
 (def test? (= env :test))
 (def prod? (= env :prod))
 
-(def handle-exceptions prod?)
-
 (def data-source
   (pg-data-source
     (cond
@@ -21,4 +19,8 @@
       dev?  {:database "cljurl_dev"  :user "mmcgrana" :password ""}
       test? {:database "cljurl_test" :user "mmcgrana" :password ""})))
 
-(def logger (logger4j-err))
+(def logger
+  (logger4j-err (cond prod? :info dev? :debug test? :warn)))
+
+(def handle-exceptions? prod?)
+(def log-exceptions?    (not test?))

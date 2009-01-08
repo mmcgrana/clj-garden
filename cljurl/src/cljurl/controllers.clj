@@ -1,12 +1,13 @@
 (ns cljurl.controllers
   (:use
     (ring controller request)
-    cljurl.routing)
+    cljurl.routing
+    clj-backtrace.repl)
   (:require
     (cljurl
-      [models :as m]
-      [views  :as v]
-      [config :as config])
+      [models   :as m]
+      [views    :as v]
+      [config   :as config])
     [stash.core :as stash]))
 
 (defmacro with-filters
@@ -16,7 +17,9 @@
   `(try
      ~@body
      (catch Exception e#
-       (if config/handle-exceptions
+       (if config/log-exceptions?
+         (.error config/logger (pst-str e#)))
+       (if config/handle-exceptions?
          (if ~api-action
            (respond-500 (v/internal-error-api)
              {:content-type "text/javascript"})

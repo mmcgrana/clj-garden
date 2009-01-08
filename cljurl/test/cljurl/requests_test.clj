@@ -8,7 +8,7 @@
 (def app cljurl.app/app)
 
 (deftest "with-filters"
-  (binding [cljurl.config/handle-exceptions true]
+  (binding [cljurl.config/handle-exceptions? true]
     (let [[status _ body] (with-filters false (throw (Exception. "o noews")))]
       (assert-status 500 status)
       (assert-match #"something went wrong" body))))

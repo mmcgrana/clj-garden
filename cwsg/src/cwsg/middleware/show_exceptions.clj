@@ -46,8 +46,7 @@ table.trace td.source {
 
 (defn- js-response [env e]
   [500 {"Content-Type" "text/javascript"}
-    (with-out-str
-      (pst e))])
+    (pst-str e)])
 
 (defn- html-reponse [env e]
   (let [excp (parse-exception e)]
