@@ -1,22 +1,22 @@
 (ns clj-jdbc.core
   (:use clojure.contrib.except clj-jdbc.utils)
-  (:import (java.sql Connection Statement ResultSet)))
+  (:import (java.sql Connection Statement ResultSet)
+           (javax.sql DataSource)))
 
-(def *connection* nil)
-(def *level*      nil)
+(def *db* nil)
 
 (defmacro with-connection
   "Evaluates body in the context of a new connection to a database from the
   given datasource, then closes the connection when done. If this thread
   has an existing connection to the datasource, that one will be provided
   instead of opening a new one."
-  [data-source-form & body]
-  `(if *connection*
+  [db-spec-form & body]
+  `(if *db*
      (do ~@body)
-     (with-open [connection# (.getConnection #^DataSource ~data-source-form)]
-       (binding [*connection* connection#
-                 *level*      0]
-         ~@body))))
+     (let [db-spec# ~db-spec-form]
+       (with-open [connection# (.getConnection #^DataSource (:data-source db-spec#))]
+         (binding [*db* {:connection connection# :level 0 :logger (:logger db-spec#)}]
+           ~@body)))))
 
 (defmacro in-transaction
   "Evaluates body as in transaction on the connection. Updates
@@ -24,9 +24,10 @@
   after an uncaught exception. Supports nested transactions."
   [& body]
   `(do
-    (let [level#      *level*
-          connection# *connection*]
-      (binding [*level* (inc level#)]
+    (let [db#         *db*
+          level#      (:level db#)
+          connection# (:connection db#)]
+      (binding [*db* (assoc db# :level (inc (get db# :level)))]
         (when (zero? level#)
           (.setAutoCommit connection# false))
         (try
@@ -39,32 +40,34 @@
 
 (defmacro with-statement
   "Evaluates body in the context of a new Statement for the given conn."
-  [[binding-sym connection] & body]
-  `(with-open [~binding-sym (.createStatement *connection*)]
+  [[binding-sym connection-sym] & body]
+  `(with-open [~binding-sym (.createStatement ~connection-sym)]
      ~@body))
 
 (defmacro with-resultset
   "Evaluates the body in the context of a resultset from the given connection
   based on the given sql."
   [[binding-sym sql-form] & body]
-  `(with-statement [#^Statement statement# *connection*]
-     (let [sql# ~sql-form
-           ~binding-sym
-             (try
-               (.executeQuery statement# sql#)
-               (catch Exception e#
-                 (throwf "%s: %s" (.getMessage e#) sql#)))]
-       ~@body)))
+  `(let [db# *db*]
+     (with-statement [#^Statement statement# (:connection db#)]
+        (let [sql# ~sql-form
+              ~binding-sym
+                (try
+                  (.executeQuery statement# sql#)
+                  (catch Exception e#
+                    (throwf "%s: %s" (.getMessage e#) sql#)))]
+          ~@body))))
 
 (defn modify
   "Execute against the given connection the given insert, update, delete, or ddl 
   statement, returning the number of items affected."
   [sql]
-  (with-statement [statement *connection*]
-    (try
-      (.executeUpdate statement sql)
-      (catch Exception e
-        (throwf "%s: %s" (.getMessage e) sql)))))
+  (let [db *db*]
+    (with-statement [statement (:connection db)]
+      (try
+        (.executeUpdate statement sql)
+        (catch Exception e
+          (throwf "%s: %s" (.getMessage e) sql))))))
 
 (defn resultset-values
   "Returns a lazy seq of single values corresponding to the resultset's rows."

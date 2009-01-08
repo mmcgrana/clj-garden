@@ -9,9 +9,12 @@
     (.setUser         "mmcgrana")
     (.setPassword     "")))
 
+(def test-db-spec
+  {:data-source test-data-source})
+
 (defmacro with-test-connection
   [& body]
-  `(with-connection ~'test-data-source
+  `(with-connection ~'test-db-spec
      (modify "DELETE FROM fruits")
      (modify "INSERT INTO fruits (id, name) VALUES (1, 'apple'), (2, 'pear'), (3, 'grape')")
      ~@body))
@@ -23,10 +26,10 @@
        ~@body)))
 
 (deftest "with-connection: reuses connections in nested calls"
-  (with-connection test-data-source
-    (let [outer-connection *connection*]
-      (with-connection test-data-source
-        (assert= outer-connection *connection*)))))
+  (with-connection test-db-spec
+    (let [outer-connection (:connection *db*)]
+      (with-connection test-db-spec
+        (assert= outer-connection (:connection *db*))))))
 
 (defconntest "modify: preforms a change and returns affected row count"
   (let [change-count (modify "DELETE FROM fruits WHERE id = 2")
