@@ -1,13 +1,19 @@
-presentable views
-presenable error messages
-logging in general
-  - sql
-  - framework: params, routing, timing.
-  - exceptions
-  - (def *logger* (clj-logger/to-path "log/development.log"))
-  - all clojure prns
+views
+  good home page content
+  layout/css
+  new form
+  error messages for form
+  usefull after page
+  general info around the edges
 
-flash for new url as driver for session store
+logging in general
+ sql
+ framework
+  params
+  routing
+  timing
+ use file and stdout for now
+ use all clojure prns
 
 logging: development
   - see sql queries and their times
@@ -18,7 +24,7 @@ logging: development
     (dedicated, optional request timing and profiling middleware)
   
 logging: testing
-  - probably not useful
+  - probably not useful (level :error)
 
 logging: production
   - see sql queries and their times

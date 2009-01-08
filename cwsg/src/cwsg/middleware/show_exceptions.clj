@@ -2,8 +2,7 @@
   (:use (clj-html core helpers)
         clojure.contrib.str-utils
         (clj-backtrace core repl)
-        cwsg.utils
-        clojure.contrib.repl-utils))
+        cwsg.utils))
 
 (def css "
 /*

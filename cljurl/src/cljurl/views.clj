@@ -18,7 +18,7 @@
       [:head
         (include-css "/stylesheets/main.css")
         [:meta {:http-equiv "Content-Type" :content "text/html;charset=utf-8"}]
-        [:title "cljurl"]
+        [:title "cljurl: the Clojure URL Shortener"]
         [:body content]]]))
 
 (defmacro with-layout
