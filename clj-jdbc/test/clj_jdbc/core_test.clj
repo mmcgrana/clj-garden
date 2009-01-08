@@ -5,7 +5,7 @@
 
 (def test-data-source
   (doto (org.postgresql.ds.PGPoolingDataSource.)
-    (.setDatabaseName "clj-jdbc-test")
+    (.setDatabaseName "clj_jdbc_test")
     (.setUser         "mmcgrana")
     (.setPassword     "")))
 

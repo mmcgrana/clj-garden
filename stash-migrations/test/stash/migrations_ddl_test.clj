@@ -1,7 +1,7 @@
 (in-ns 'stash.migrations-test)
 
 (def +data-source+
-  (pg-data-source {:database "stash-migrations-test" :user "mmcgrana" :password ""}))
+  (pg-data-source {:database "stash_migrations_test" :user "mmcgrana" :password ""}))
 
 (defmacro deftest-conn [doc [binding-sym] & body]
   `(deftest ~doc

@@ -1,7 +1,7 @@
 (in-ns 'stash.core-test)
 
 (def +data-source+
-  (pg-data-source {:database "stash-test" :user "mmcgrana" :password ""}))
+  (pg-data-source {:database "stash_test" :user "mmcgrana" :password ""}))
 
 (defmacro with-clean-db
   [& body]

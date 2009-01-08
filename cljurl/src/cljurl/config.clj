@@ -19,8 +19,8 @@
   (pg-data-source
     (cond
       prod? {:database "cljurl_prod" :user "deploy" :password "somepass"}
-      dev?  {:database "cljurl_development"  :user "mmcgrana" :password ""}
-      test? {:database "cljurl_development" :user "mmcgrana" :password ""})))
+      dev?  {:database "cljurl_dev"  :user "mmcgrana" :password ""}
+      test? {:database "cljurl_dev" :user "mmcgrana" :password ""})))
 
 
 
