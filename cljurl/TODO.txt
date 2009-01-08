@@ -6,59 +6,19 @@ views
   usefull after page
   general info around the edges
 
-logging in general
- sql
- framework
-  params
-  routing
-  timing
- use file and stdout for now
- use all clojure prns
+framework
+  tease apart with-filters
 
-logging: development
-  - see sql queries and their times
-    (dedicated, optional sql logging)
-  - see how actions are routed
-    (test outside of request/response cycle)
-  - see response time breakdowns
-    (dedicated, optional request timing and profiling middleware)
+logging
+  :info [:sql {:query "SELECT * FROM posts" :time 12}]
+  :info [:request {:ns-sym 'cljurl.controllers :fn-sym 'show :params {:id "a"}}
+  :info [:response {:time 131}]
+  :error [:exception {:trace "NullPointerException
+       fooo-bar() biz.bat
+        foo-bxa() foo.bain/fre[fn]"}]
   
-logging: testing
-  - probably not useful (level :error)
-
-logging: production
-  - see sql queries and their times
-    (buffered flat file dedicated to query times and queries)
-    (postgres features)
-  - see what requests are leading to 404s
-    (dedicated file for 404 request info)
-  - grep for long actions, common acitons
-    ()
-  - see exceptions
-    (perhaps good for logging here)
-  
-perhaps select-with-logging, modify-with-logging
-
-threadsaftey of loggers
-configurable log level, set to error for testing
-
-:info [:sql {:query "SELECT * FROM posts" :time 12}]
-:info [:request {:ns-sym 'cljurl.controllers :fn-sym 'show :params {:id "abcd"}}
-:info [:response {:time 131}]
-:error [:exception {:trace "NullPointerException
-     fooo-bar() biz.bat
-      foo-bxa() foo.bain/fre[fn]"}]
-
-INFO - (12 msecs) "SELECT * FROM posts"
-INFO - (54 msecs) 'cljurl.controllers/show {:id "abcd"}
-ERROR - "NUllPointerException
-    bar(568) foo.bar/bat
-    bar(569) foo.bar/bat[fn]"
-
-
-
-
-; boot.clj
-
-(require 'cljurl.conifg)
-(alter-root-binding
+  INFO - (12 msecs) "SELECT * FROM posts"
+  INFO - (54 msecs) 'cljurl.controllers/show {:id "abcd"}
+  ERROR - "NUllPointerException
+      bar(568) foo.bar/bat
+      bar(569) foo.bar/bat[fn]"

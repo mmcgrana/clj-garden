@@ -2,7 +2,8 @@
   (:use
     (ring controller request)
     cljurl.routing
-    clj-backtrace.repl)
+    clj-backtrace.repl
+    cljurl.utils)
   (:require
     (cljurl
       [models   :as m]
@@ -10,21 +11,32 @@
       [config   :as config])
     [stash.core :as stash]))
 
+(defn log-time
+  [time]
+  (.info config/logger (str "(" time " msecs) "
+                            "cljurl.controllers/index {:id \"foo\"}")))
+
+(defmacro with-time-logging
+  "Wraps the body such that the time required to execute the body is logged."
+  [& body]
+  `(with-realtime [time# (do ~@body)]
+     (log-time time#)))
+
 (defmacro with-filters
   "Wrap all action code in a try catch that will either show exception details
   or present an error page to the user, as appropriate."
   [api-action & body]
-  `(try
-     ~@body
-     (catch Exception e#
-       (if config/log-exceptions?
-         (.error config/logger (pst-str e#)))
-       (if config/handle-exceptions?
-         (if ~api-action
-           (respond-500 (v/internal-error-api)
-             {:content-type "text/javascript"})
-           (respond-500 (v/internal-error)))
-         (throw e#)))))
+  `(with-time-logging
+     (try
+       ~@body
+       (catch Exception e#
+         (if config/log-exceptions?
+           (.error config/logger (pst-str e#)))
+         (if config/handle-exceptions?
+           (if ~api-action
+             (respond-500 (v/internal-error-api) {:content-type "text/javascript"})
+             (respond-500 (v/internal-error)))
+           (throw e#))))))
 
 (defn not-found
   "Render a not found error page."
