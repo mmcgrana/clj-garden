@@ -41,9 +41,6 @@ table.trace td.source {
 
 ")
 
-(defn header-str [parsed]
-  (str (re-without #"^class " (str (:class parsed))) ": " (:message parsed)))
-
 (defn- js-response [env e]
   [500 {"Content-Type" "text/javascript"}
     (pst-str e)])
@@ -60,7 +57,7 @@ table.trace td.source {
             [:style {:type "text/css"} css]
             [:body
               [:div#content
-                [:h3.info (h (header-str excp))]
+                [:h3.info (h (str e))]
                 [:table.trace
                   (domap-str [parsed (:trace-elems excp)]
                     (html

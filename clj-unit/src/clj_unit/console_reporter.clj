@@ -2,16 +2,20 @@
   (:use clj-unit.utils clojure.contrib.str-utils
         (clj-backtrace core repl)))
 
+(defn- test-runner-elem?
+  [elem]
+  (and (= (:ns elem) "clj-unit.core")
+       (= (:fn elem) "run-tests")))
+
 (defn print-exception
   "A sort of modified .printStackTrace. Prints to *out* as apposed to *err* and
   only prints those stack elements above the test invocation code."
   [#^Exception e]
-  (let [elems      (.getStackTrace e)
-        ours?      (fn [#^StackTraceElement m]
-                     (re-match? #"clj_unit.core\$run_tests" (.getClassName m)))
-        user-elems (take-while #(not (ours? %)) elems)]
+  (let [parsed (parse-exception e)
+        elems  (:trace-elems parsed)
+        user-elems (take-while (complement test-runner-elem?) elems)]
     (println (str e))
-    (print-trace-elems (parse-trace-elems user-elems))))
+    (print-trace-elems user-elems)))
 
 (def +console-reporter+
   {:init
