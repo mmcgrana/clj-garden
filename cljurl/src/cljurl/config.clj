@@ -1,9 +1,8 @@
 (ns cljurl.config
-  (:use clj-jdbc.data-sources)
-  (:require cljurl.boot)
+  (:use clj-jdbc.data-sources cljurl.utils)
   (:import java.io.File))
 
-(def env cljurl.boot/env)
+(def env (keyword (System/getProperty "cljurl.env")))
 
 (def app-host "localhost:8000")
 
@@ -21,3 +20,5 @@
       prod? {:database "cljurl_prod" :user "deploy" :password "somepass"}
       dev?  {:database "cljurl_dev"  :user "mmcgrana" :password ""}
       test? {:database "cljurl_test" :user "mmcgrana" :password ""})))
+
+(def logger (logger4j-err))

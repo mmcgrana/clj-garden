@@ -1,16 +1,24 @@
 (in-ns 'stash.core)
 
 (defn reporter-fn
+  "Helper fn to bridge the logger and reporter interfaces."
   [logger]
   (if logger
     (fn [sql time]
-      (.info logger (if time sql (str "(" time ") " sql))))))
+      (.info logger (if time (str "(" time " msecs) " sql) sql)))))
+
+(defmacro with-logger
+  "Execute body in a context where the clj-jdbc reporter is bound to invoke
+  the logger."
+  [logger-form & body]
+  `(jdbc/with-reporter (reporter-fn ~logger-form)
+     ~@body))
 
 (defn execute
   "Execute a clj-jdbc query function with a connection to data-source using the
   given sql. Log to the logger if given."
   [execute-fn data-source sql & [logger]]
-  (jdbc/with-reporter (reporter-fn logger)
+  (with-logger logger
     (jdbc/with-connection data-source
       (execute-fn sql))))
 

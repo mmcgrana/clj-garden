@@ -1,4 +1,5 @@
-(ns cljurl.utils)
+(ns cljurl.utils
+  (:import (org.apache.log4j Level Logger ConsoleAppender SimpleLayout)))
 
 (defn str-cat
   "Concat the given strings into a single string. Like (str-join \"\" strs)."
@@ -16,3 +17,14 @@
   "Returns a random element from the given vector."
   [#^clojure.lang.IPersistentVector vec]
   (get vec (rand-int (count vec))))
+
+(defn logger4j-err
+  "Returns a stderr log4j logger with debug log level."
+  []
+  (let [apdr (doto (ConsoleAppender.)
+               (.setTarget (ConsoleAppender/SYSTEM_OUT))
+               (.setLayout (SimpleLayout.))
+               (.activateOptions))]
+    (doto (Logger/getLogger (str (gensym)))
+      (.setLevel (Level/DEBUG))
+      (.addAppender apdr))))

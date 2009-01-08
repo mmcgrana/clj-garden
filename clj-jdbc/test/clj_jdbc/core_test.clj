@@ -49,6 +49,12 @@
   (assert-throws #"ERROR.*foobar"
     (with-resultset [rs "foobar"])))
 
+(defconntest "with-resultset: reports to reporter if present"
+  (with-reporter #(do
+                    (assert= "SELECT NAME FROM fruits" %1)
+                    (assert-instance Number %2))
+    (select-value "SELECT NAME FROM fruits")))
+
 (defconntest "select-value returns a single value when row found"
   (assert= "apple"
     (select-value "SELECT name FROM fruits WHERE id = 1")))

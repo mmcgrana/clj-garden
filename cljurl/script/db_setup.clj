@@ -1,8 +1,8 @@
-(require 'cljurl.boot)
+(System/setProperty "cljurl.env" (or (first *command-line-args*) "dev"))
 
-(let [env (keyword (or (first *command-line-args*) "dev"))]
-  (binding [cljurl.boot/env env] (require 'cljurl.config)))
+(require 'cljurl.config 'clj-jdbc.core 'stash.core 'stash.migrations)
 
-(require 'clj-jdbc.core 'stash.migrations)
+(stash.core/with-logger cljurl.config/logger
+  (clj-jdbc.core/with-connection cljurl.config/data-source
+    (stash.migrations/create-version)))
 
-(stash.migrations/create-version cljurl.config/data-source)

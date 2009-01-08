@@ -1,9 +1,6 @@
-(require 'cljurl.boot)
+(System/setProperty "cljurl.env" (or (first *command-line-args*) "dev"))
 
-(let [env (keyword (or (first *command-line-args*) "dev"))]
-  (binding [cljurl.boot/env env] (require 'cljurl.config)))
-
-(require 'cwsg.handlers.jetty 'cljurl.app)
+(require 'cljurl.config 'cwsg.handlers.jetty 'cljurl.app)
 
 (cwsg.handlers.jetty/run {:port 8080} cljurl.app/app))
 

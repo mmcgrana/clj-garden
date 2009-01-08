@@ -10,19 +10,19 @@
       (throwf "No model found for %s" instance)))
 
 (defn model-map
-  [model]
   "Returns the original model map used to define the compiled model."
-  (:model-map model))
-
-(defn logger
   [model]
-  "Returns the logger associated with the model."
-  (:logger model))
+  (:model-map model))
 
 (defn data-source
   "Returns the data source for to the model."
   [model]
   (:data-source model))
+
+(defn logger
+  "Returns the logger associated with the model."
+  [model]
+  (:logger model))
 
 (defn table-name-str
   "Returns as a string the table name for the model."
@@ -88,6 +88,11 @@
   [model-map]
   (get-or model-map :data-source
     (throwf ":data-source not provided in model map")))
+
+(defn- checked-logger
+  [model-map]
+  "Returns a logger specified by model-map, if present."
+  (get model-map :logger))
 
 (defn- checked-table-name
   "Returns a keyword for the table name specified by model-map, or thorws if
@@ -192,8 +197,8 @@
   (:accessible-attrs model-map))
 
 (def- recognized-model-keys
-  #{:table-name :data-source :pk :pks :pk-init :columns :callbacks :validations
-    :accessible-attrs :extensions})
+  #{:table-name :data-source :logger :pk :pks :pk-init :columns
+    :accessible-attrs :callbacks :validations :extensions})
 
 (defn- checked-model-map
   "Returns the given model map provided that it contains only valid keys,
@@ -215,6 +220,7 @@
           pk-column-names     (compiled-pk-column-names column-defs)]
       {:table-name          (checked-table-name model-map)
        :data-source         (checked-data-source model-map)
+       :logger              (checked-logger model-map)
        :pk-init             (checked-pk-init model-map)
        :column-names        column-names
        :pk-column-names     pk-column-names
