@@ -99,7 +99,7 @@
 
 (deftest-db "destroy, deleted?"
   (let [destroyed (destroy (create +post-with-destroy-cbs+ +complete-post-map+))]
-    (assert-not   (new? destroyed))
+    (assert-not  (new? destroyed))
     (assert-that (deleted? destroyed))
-    (assert-not   (find-one +post+ {:where [:id := (:id destroyed)]}))
+    (assert-not  (find-one +post+ {:where [:id := (:id destroyed)]}))
     (assert= [:before :after] (:track destroyed))))

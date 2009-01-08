@@ -6,5 +6,5 @@
 (require 'cljurl.migrations 'clj-jdbc.core 'stash.migrations)
 
 (let [version (Integer. (second *command-line-args*))]
-  (clj-jdbc.core/with-connection [conn cljurl.config/data-source]
-    (stash.migrations/migrate conn cljurl.migrations/all version println)))
+  (clj-jdbc.core/with-connection cljurl.config/data-source
+    (stash.migrations/migrate cljurl.migrations/all version println)))

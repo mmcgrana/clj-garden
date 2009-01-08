@@ -25,7 +25,7 @@
 (deftest "with-connection: reuses connections in nested calls"
   (with-connection test-data-source
     (let [outer-connection *connection*]
-      (with-connection [conn-inner test-data-source]
+      (with-connection test-data-source
         (assert= outer-connection *connection*)))))
 
 (defconntest "modify: preforms a change and returns affected row count"
@@ -109,7 +109,7 @@
       (modify "INSERT INTO fruits (id, name) VALUES (4,'orange')")
       (throwf "o noes"))
     (catch Exception e))
-  (assert= 3 (select-value conn "SELECT count(id) FROM fruits")))
+  (assert= 3 (select-value "SELECT count(id) FROM fruits")))
 
 (defconntest "in-transaction: allows nesting without autocommit"
   (try

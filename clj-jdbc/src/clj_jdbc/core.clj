@@ -4,7 +4,6 @@
 
 (def *connection* nil)
 (def *level*      nil)
-(def *logger*     nil)
 
 (defmacro with-connection
   "Evaluates body in the context of a new connection to a database from the
@@ -13,17 +12,11 @@
   instead of opening a new one."
   [data-source-form & body]
   `(if *connection*
-     ~@body
-     (binding [*connection* (.getConnection #^DataSource ~data-source-form)
-               *level*      0]
-       ~@body)))
-
-(defmacro with-logger
-  "Evaluates logger in the context of a logger configured for the thread's
-  db actions."
-  [logger & body]
-  `(binding [*logger* logger]
-     ~@body))
+     (do ~@body)
+     (with-open [connection# (.getConnection #^DataSource ~data-source-form)]
+       (binding [*connection* connection#
+                 *level*      0]
+         ~@body))))
 
 (defmacro in-transaction
   "Evaluates body as in transaction on the connection. Updates
@@ -46,15 +39,9 @@
 
 (defmacro with-statement
   "Evaluates body in the context of a new Statement for the given conn."
-  [binding-sym & body]
-  `(let [#^Connection conn# *connection*]
-     (with-open [#^Statement ~binding-sym (.createStatement conn#)]
-       ~@body)))
-
-(defn log [level sql time]
-  "TODOC."
-  (if-let [logger *logger*]
-    (logger :info [:query {:sql sql :time time}])))
+  [[binding-sym connection] & body]
+  `(with-open [~binding-sym (.createStatement *connection*)]
+     ~@body))
 
 (defmacro with-resultset
   "Evaluates the body in the context of a resultset from the given connection
@@ -64,9 +51,7 @@
      (let [sql# ~sql-form
            ~binding-sym
              (try
-               (let [[result time] (timed (.executeQuery statement# sql#))]
-                 (log :info sql time)
-                 result)
+               (.executeQuery statement# sql#)
                (catch Exception e#
                  (throwf "%s: %s" (.getMessage e#) sql#)))]
        ~@body)))
@@ -77,9 +62,7 @@
   [sql]
   (with-statement [statement *connection*]
     (try
-      (let [[result time] (timed (.executeUpdate statement sql))]
-        (log :info sql time)
-        result)
+      (.executeUpdate statement sql)
       (catch Exception e
         (throwf "%s: %s" (.getMessage e) sql)))))
 

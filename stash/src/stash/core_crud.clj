@@ -1,5 +1,30 @@
 (in-ns 'stash.core)
 
+(defn log
+  "If a logger is present, as bound by with-logger, call the logger fn
+  with the log level and log data as the two arguments."
+  [logger level sql time]
+  (if logger
+    (logger :info [:query {:sql sql :time time}])))
+
+(defmacro timed
+  "Returns a 2-tuple, the result of evaluating the expression and the time
+  in milliseconds that the evaluation took."
+  [expr]
+  `(let [start# (System/currentTimeMillis)
+         ret#    ~expr
+         time#  (- (System/currentTimeMillis) start#)]
+     [ret# time#]))
+
+(defn execute
+  "Execute a clj-jdbc query function with a connection to data-source using the
+  given sql. Log to the logger if given."
+  [execute-fn data-source sql & [logger]]
+  (jdbc/with-connection data-source
+    (let [[ret time] (timed (execute-fn sql))]
+      (log logger :info time sql)
+      ret)))
+
 (defn insert-sql
   "Returns the insert sql for the instance."
   [instance]
@@ -50,30 +75,30 @@
   (let [model (instance-model instance)]
     (str "DELETE FROM " (table-name-str model) (pk-where-sql instance))))
 
-(defn modify-with-logging
-  [model sql]
-  (binding [jdbc/*logger* (logger model)]
-    (jdbc/with-connection [conn (data-source model)]
-      (jdbc/modify conn sql))))
-
 (defn persist-insert
   "Persists the new instance to the database, returns an instance
   that is no longer marked as new."
   [instance]
-  (modify-with-logging (instance-model instance) (insert-sql instance))
+  (let [model (instance-model instance)]
+    (execute jdbc/modify (data-source model)
+      (insert-sql instance) (logger model)))
   (with-assoc-meta instance :new false))
 
 (defn persist-update
   "Persists all of the instance to the database, returns the instance."
   [instance]
-  (modify-with-logging (instance-model instance) (update-sql instance))
+  (let [model (instance-model instance)]
+    (execute jdbc/modify (data-source model)
+      (update-sql instance) (logger model)))
   instance)
 
 (defn delete
   "Delete the instance from the database. Returns an instance indicating that
   it has been deleted."
   [instance]
-  (modify-with-logging (instance-model instance) (delete-sql instance))
+  (let [model (instance-model instance)]
+    (execute jdbc/modify (data-source model)
+      (delete-sql instance) (logger model)))
   (with-assoc-meta instance :deleted true))
 
 (defn parsed-attrs

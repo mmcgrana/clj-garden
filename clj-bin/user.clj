@@ -34,11 +34,6 @@
     (compile ns-sym)))
 
 ;; General REPL functions
-(defn pwd
-  "Returns the user's home dir."
-  []
-  (System/getProperty "user.dir"))
-
 (defn quit
   "Quit the clojure process with a 0 status code."
   []
@@ -46,8 +41,7 @@
 
 ;; Always-used libs
 (use
-  '(clojure.contrib repl-utils repl-ln)
-  '[clojure.contrib.duck-streams :only (spit)]
+  '(clojure.contrib repl-utils repl-ln javadoc duck-streams)
   'clj-backtrace.repl)
 
 ;; Use a line-numbering repl

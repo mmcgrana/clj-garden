@@ -5,5 +5,4 @@
 
 (require 'clj-jdbc.core 'stash.migrations)
 
-(clj-jdbc.core/with-connection [conn cljurl.config/data-source]
-  (stash.migrations/create-version conn))
+(stash.migrations/create-version cljurl.config/data-source)

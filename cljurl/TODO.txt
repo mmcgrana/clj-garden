@@ -1,5 +1,3 @@
-=> clj-jdbc.data-sources (core_test.clj)
-
 views
   good home page content
   layout/css

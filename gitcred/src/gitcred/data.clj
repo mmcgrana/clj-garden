@@ -1,6 +1,7 @@
 (ns gitcred.data
   (:use gitcred.utils
-        (stash core data-sources)
+        clj-jdbc.data-sources
+        stash.core
         clj-http-client.core clj-time.core clj-scrape.core
         clojure.set))
 

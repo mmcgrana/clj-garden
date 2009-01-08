@@ -18,7 +18,7 @@
 
 (defmacro- defddl [ddl-name ddl-doc ddl-sql-args ddl-sql-body]
   (let [ddl-sql-name (symbol (str ddl-name "-sql"))
-        ddl-sql-doc  (str "Returns sql needed for " ddl-name)]
+        ddl-sql-doc  (str "Returns sql needed to: " ddl-name)]
    `(do
       (defn ~ddl-sql-name
         ~ddl-sql-doc
@@ -26,8 +26,8 @@
         ~ddl-sql-body)
       (defn ~ddl-name
         ~ddl-doc
-        ~(vec (cons 'conn ddl-sql-args))
-        (jdbc/modify ~'conn ~(cons ddl-sql-name ddl-sql-args))))))
+        ~ddl-sql-args)
+        (jdbc/modify ~(cons ddl-sql-name ddl-sql-args)))))
 
 (defddl create-table
   "Create a table named table-name with column names and types as specified by

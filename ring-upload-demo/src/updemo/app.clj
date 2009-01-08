@@ -3,7 +3,7 @@
     (ring controller request)
     (clj-html core helpers helpers-ext)
     clojure.contrib.str-utils
-    stash.data-sources)
+    clj-jdbc.data-sources)
   (:require
     [ring.routing                      :as routing]
     [cwsg.middleware.reloading         :as reloading]

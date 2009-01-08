@@ -1,6 +1,6 @@
 (ns stash.migrations-test
   (:require [clj-jdbc.core :as jdbc])
-  (:use clj-unit.core stash.migrations stash.data-sources)
+  (:use clj-unit.core stash.migrations clj-jdbc.data-sources)
   (:load "migrations_ddl_test"))
 
 (deftest-conn "create-version, get-version, set-version, drop_version" [conn]

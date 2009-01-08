@@ -5,26 +5,26 @@
   (:load "migrations_ddl"))
 
 (defn create-version
-  "Create a schema_info table conn's db with a single column 'version' and
-  create a single row with 'version' set to 0."
-  [conn]
-  (jdbc/modify conn "CREATE TABLE schema_info (version int8)")
-  (jdbc/modify conn "INSERT INTO schema_info (version) VALUES (0)"))
+  "Create a schema_info table with a single column 'version' and a single row 
+  with 'version' set to 0."
+  []
+  (jdbc/modify "CREATE TABLE schema_info (version int8)")
+  (jdbc/modify "INSERT INTO schema_info (version) VALUES (0)"))
 
 (defn drop-version
-  "Drop the schema_info table from conn's db."
-  [conn]
-  (jdbc/modify conn "DROP TABLE schema_info"))
+  "Drop the schema_info table."
+  []
+  (jdbc/modify "DROP TABLE schema_info"))
 
 (defn get-version
-  "Returns an int for version stored in the schema_info table for conn's db."
-  [conn]
-  (jdbc/select-value conn "SELECT version FROM schema_info"))
+  "Returns an int for version stored in the schema_info table."
+  []
+  (jdbc/select-value "SELECT version FROM schema_info"))
 
 (defn set-version
-  "Update the version int in the schema_info table for conn's db."
-  [conn version]
-  (jdbc/modify conn (str "UPDATE schema_info SET version = " version)))
+  "Update the version int in the schema_info table."
+  [version]
+  (jdbc/modify (str "UPDATE schema_info SET version = " version)))
 
 (defn ups
   "Returns the subsequence of migrations needed to migrate a db up from
@@ -52,7 +52,7 @@
   (if reporter (reporter message)))
 
 (defn migrate
-  "Migrate conn's db according to the given migrations sequence up or down
+  "Migrate a db according to the given migrations sequence up or down
   to the target version.
   The migrations argument is a coll of 3-tuples, where the first element of the
   tuple is the version number, the second a function of a conn argument
@@ -70,8 +70,8 @@
   
   If a reporter fn is given, is will be invoked with single string arguments
   indicating the progress of the migrations."
-  [conn migrations & [target-version reporter]]
-  (let [start-version  (get-version conn)
+  [migrations & [target-version reporter]]
+  (let [start-version  (get-version)
         target-version (or target-version (first (last migrations)))
         report         (partial report-if reporter)]
     (cond
@@ -80,9 +80,10 @@
         (do
           (report (str "migrating up, " start-version " to " target-version))
           (let [ran (doall
-                      (map (fn [[version f to]]
+                      (map (fn [[version up-f to]]
                              (report (str "running " version " up"))
-                             (f conn) (set-version conn to)
+                             (up-f)
+                             (set-version to)
                              version)
                            (ups migrations start-version target-version)))]
             (report (str "done, at " target-version))
@@ -92,9 +93,10 @@
         (do
           (report (str "migrating down, " start-version " to " target-version))
           (let [ran (doall
-                      (map (fn [[version f to]]
+                      (map (fn [[version down-f to]]
                              (report (str "running " version " down"))
-                             (f conn) (set-version conn to)
+                             (down-f)
+                             (set-version conn to)
                              version)
                            (downs migrations start-version target-version)))]
             (report (str "done, at " target-version))
@@ -104,12 +106,12 @@
         (if report
           (report (str "migrating not needed, at " target-version))))))
 
-(defmacro defmigration [name [binding-sym version] up-form down-form]
+(defmacro defmigration [name version up-form down-form]
   "Helper method to define named migrations.
 
   The vars def'd by this macro should then be collected into a sequence
   to be given as an argument to stash.migrations/migrate."
   `(def ~name
      [~version
-      (fn [~binding-sym] ~up-form)
-      (fn [~binding-sym] ~down-form)]))
+      (fn ~up-form)
+      (fn ~down-form)]))

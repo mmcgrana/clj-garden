@@ -1,5 +1,5 @@
 (ns cljurl.config
-  (:use stash.data-sources)
+  (:use clj-jdbc.data-sources)
   (:require cljurl.boot)
   (:import java.io.File))
 

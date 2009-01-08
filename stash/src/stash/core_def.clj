@@ -14,15 +14,15 @@
   "Returns the original model map used to define the compiled model."
   (:model-map model))
 
+(defn logger
+  [model]
+  "Returns the logger associated with the model."
+  (:logger model))
+
 (defn data-source
   "Returns the data source for to the model."
   [model]
   (:data-source model))
-
-(defn instance-data-source
-  "Returns the data source for the model of the instance."
-  [instance]
-  (data-source (instance-model instance)))
 
 (defn table-name-str
   "Returns as a string the table name for the model."
