@@ -2,11 +2,22 @@
   (:use stash.migrations))
 
 (defmigration bootstrap [conn 1]
-  (create-table conn :uploads
-    [[:id            :uuid    {:pk true}]
-     [:filename      :string]
-     [:content_type  :string]
-     [:size          :integer]])
-  (drop-table conn :uploads))
+  (do
+    (create-table conn :shortenings
+      [[:id         :uuid   {:pk true}]
+       [:slug       :string {:unique true}]
+       [:url        :string]
+       [:created_at :datetime]])
+    (create-table conn :hits
+      [[:id             :uuid {:pk true}]
+        [:shortening_id :uuid]
+        [:ip            :string]
+        [:created_at    :datetime]
+        [:updated_at    :datetime]
+        [:hit_count     :integer]]))
+  (do
+    (drop-table conn :shortenings)
+    (drop-table conn :hits)))
 
-(def all [bootstrap])
+(def all
+  [bootstrap])
