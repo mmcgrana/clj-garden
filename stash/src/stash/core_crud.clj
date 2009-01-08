@@ -50,31 +50,31 @@
   (let [model (instance-model instance)]
     (str "DELETE FROM " (table-name-str model) (pk-where-sql instance))))
 
+(defn modify-with-logging
+  [model sql]
+  (binding [jdbc/*logger* (logger model)]
+    (jdbc/with-connection [conn (data-source model)]
+      (jdbc/modify conn sql))))
+
 (defn persist-insert
   "Persists the new instance to the database, returns an instance
   that is no longer marked as new."
   [instance]
-  (let [sql (insert-sql instance)]
-    (jdbc/with-connection [conn (instance-data-source instance)]
-      (jdbc/modify conn sql))
-    (with-assoc-meta instance :new false)))
+  (modify-with-logging (instance-model instance) (insert-sql instance))
+  (with-assoc-meta instance :new false))
 
 (defn persist-update
   "Persists all of the instance to the database, returns the instance."
   [instance]
-  (let [sql (update-sql instance)]
-    (jdbc/with-connection [conn (instance-data-source instance)]
-      (jdbc/modify conn sql))
-    instance))
+  (modify-with-logging (instance-model instance) (update-sql instance))
+  instance)
 
 (defn delete
   "Delete the instance from the database. Returns an instance indicating that
   it has been deleted."
   [instance]
-  (let [sql (delete-sql instance)]
-    (jdbc/with-connection [conn (instance-data-source instance)]
-      (jdbc/modify conn sql)
-      (with-assoc-meta instance :deleted true))))
+  (modify-with-logging (instance-model instance) (delete-sql instance))
+  (with-assoc-meta instance :deleted true))
 
 (defn parsed-attrs
   "Returns a version of the unparsed-attrs that are parsed according to the 

@@ -1,3 +1,5 @@
+=> clj-jdbc.data-sources (core_test.clj)
+
 views
   good home page content
   layout/css
@@ -39,3 +41,16 @@ logging: production
   
 perhaps select-with-logging, modify-with-logging
 
+:info [:sql {:query "SELECT * FROM posts" :time 12}]
+:info [:request {:ns-sym 'cljurl.controllers :fn-sym 'show :params {:id "abcd"}}
+:info [:response {:time 131}]
+
+:error [:exception {:trace "NullPointerException
+     fooo-bar() biz.bat
+      foo-bxa() foo.bain/fre[fn]"}]
+
+
+; boot.clj
+
+(require 'cljurl.conifg)
+(alter-root-binding

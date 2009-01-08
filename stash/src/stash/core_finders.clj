@@ -3,22 +3,25 @@
 (defn find-value-by-sql
   "Returns a single uncast value according to the given sql."
   [model sql]
-  (jdbc/with-connection [conn (data-source model)]
-    (jdbc/select-value conn sql)))
+  (with-logging model
+    (jdbc/with-connection [conn (data-source model)]
+      (jdbc/select-value conn sql))))
 
 (defn find-one-by-sql
   "Returns an instance of model found by the given sql, or nil if no such
   instances are found. "
   [model sql]
-  (if-let [uncast-attrs (jdbc/with-connection [conn (data-source model)]
-                          (jdbc/select-map conn sql))]
+  (if-let [uncast-attrs (with-logging model
+                          (jdbc/with-connection [conn (data-source model)]
+                            (jdbc/select-map conn sql)))]
     (instantiate model uncast-attrs)))
 
 (defn find-all-by-sql
   "Returns all instances of model found by the given sql."
   [model sql]
-  (let [uncast-attrs (jdbc/with-connection [conn (data-source model)]
-                       (jdbc/select-maps conn sql))]
+  (let [uncast-attrs (with-logging model
+                       (jdbc/with-connection [conn (data-source model)]
+                         (jdbc/select-maps conn sql)))]
     (map (partial instantiate model) uncast-attrs)))
 
 (defn find-one
@@ -37,8 +40,7 @@
   "Deletes model's records from the database according to the sql,
   returning the number that were deleted."
   [model sql]
-  (jdbc/with-connection [conn (data-source model)]
-    (jdbc/modify conn sql)))
+  (modify-with-logging model sql))
 
 (defn exist?
   "Returns true iff a record for the model exists that corresponds to the
