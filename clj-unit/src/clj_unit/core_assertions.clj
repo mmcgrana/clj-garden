@@ -17,6 +17,12 @@
   (assert-truth (= expected actual)
     (format "Expected %s, got %s" (pr-str expected) (pr-str actual))))
 
+(defn assert-not=
+  "Assert that two values are not equal according to =."
+  [expected actual]
+  (assert-truth (not (= expected actual))
+    (format "Expected value other than %s", (pr-str actual))))
+
 (defn assert-in-delta
   "Assert that a value is +-delta of another value"
   [expected actual delta]

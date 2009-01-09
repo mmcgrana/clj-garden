@@ -76,9 +76,10 @@ table.trace td.source {
   "Returns a response showing debugging information about the exception.
   Currently supports delegation to either js or html exception views."
   [env e]
-  (if (re-match? #"^text/javascript" (get-in env [:headers "accept"]))
-    (js-response env e)
-    (html-reponse env e)))
+  (let [accept (get-in env [:headers "accept"])]
+    (if (and accept (re-match? #"^text/javascript" accept))
+      (js-response env e)
+      (html-reponse env e))))
 
 (defn wrap
   "Returns an app corresponding to the given one but for which catches
