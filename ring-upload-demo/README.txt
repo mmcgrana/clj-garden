@@ -1,1 +1,1 @@
-Demo of file upload functionality in Ring, the Clojure web framework.
+Demo of file upload functionality in Ring, a Clojure web framework.

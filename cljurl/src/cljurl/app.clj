@@ -10,13 +10,11 @@
       [config :as config]
       routing controllers)))
 
-(def reloadable-ns-syms '(cljurl.controllers cljurl.models cljurl.views))
-
 (def app
-  (app/wrap-if config/dev?
+  (app/wrap-if config/show-exceptions?
     show-exceptions/wrap
     (file-content-info/wrap
       (static/wrap config/public-dir
-        (app/wrap-if config/dev?
-          (partial reloading/wrap reloadable-ns-syms)
+        (app/wrap-if config/reloading?
+          (partial reloading/wrap config/reloadable-ns-syms)
           (app/spawn-app cljurl.routing/router))))))

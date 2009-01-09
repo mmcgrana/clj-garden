@@ -22,5 +22,14 @@
 (def logger
   (logger4j-err (cond prod? :info dev? :debug test? :warn)))
 
+(def show-exceptions?   dev?)
+
 (def handle-exceptions? prod?)
+
 (def log-exceptions?    (not test?))
+
+(def reloading? dev?)
+(def reloadable-ns-syms '(cljurl.controllers cljurl.models cljurl.views))
+
+
+
