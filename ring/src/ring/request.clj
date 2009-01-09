@@ -175,14 +175,21 @@
     (if (re-match? +form-url-encoded-re+ ctype)
       (query-parse (raw-body request)))))
 
+(def #^{:private true
+        :doc "Multipart parsing handler. Saves all multipart param values
+              as tempfiles, regardless of size."}
+  disk-file-item-factory
+  (doto (DiskFileItemFactory.)
+    (.setSizeThreshold -1)
+    (.setFileCleaningTracker nil)))
+
 (defn- parse-multipart-params
   "When the requst is multipart-encoded, returns the params Map parsed from
   the multipart body, otherwise returns nil."
   [request]
   (if-let [ctype (content-type request)]
     (if (re-match? +multipart-re+ ctype)
-      (let [factory (doto (DiskFileItemFactory.) (.setSizeThreshold -1))
-            upload  (FileUpload. factory)
+      (let [upload  (FileUpload. disk-file-item-factory)
             context (proxy [RequestContext] []
                       (getContentType       [] (content-type request))
                       (getContentLength     [] (content-length request))

@@ -1,7 +1,5 @@
-(require 'updemo.app 'updemo.migrations 'clj-jdbc.core 'stash.core 'stash.migrations)
+(require '(ringup app migrations) 'clj-jdbc.core 'stash.migrations)
 
-(stash.core/with-logger updemo.app/logger
-  (clj-jdbc.core/with-connection updemo.app/data-source
-    (stash.migrations/create-version)
-    (stash.migrations/migrate updemo.migrations/all 1)))
-
+(let [version (Integer. (first *command-line-args*))]
+  (clj-jdbc.core/with-connection ringup.app/data-source
+    (stash.migrations/migrate ringup.migrations/all version)))

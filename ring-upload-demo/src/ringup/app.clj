@@ -1,4 +1,4 @@
-(ns updemo.app
+(ns ringup.app
   (:use
     (ring controller request)
     (clj-html core helpers helpers-ext)
@@ -18,18 +18,18 @@
 (def app-host "http://localhost:8080")
 (def public-dir  (java.io.File. "public"))
 (def uploads-dir (java.io.File. "public/uploads"))
-(def reloadable-namespace-syms '(updemo.app))
+(def reloadable-namespace-syms '(ringup.app))
 (def data-source
-  (pg-data-source {:database "updemo_dev" :user "mmcgrana" :password ""}))
+  (pg-data-source {:database "ringup_dev" :user "mmcgrana" :password ""}))
 
 ;; Routing
 (routing/defrouting
   app-host
-  [['updemo.app 'index     :index     :get "/"]
-   ['updemo.app 'new       :new       :get "/new"]
-   ['updemo.app 'create    :create    :put "/"]
-   ['updemo.app 'show      :show      :get "/:id"]
-   ['updemo.app 'not-found :not-found :any "/:path" {:path ".*"}]])
+  [['ringup.app 'index     :index     :get "/"]
+   ['ringup.app 'new       :new       :get "/new"]
+   ['ringup.app 'create    :create    :put "/"]
+   ['ringup.app 'show      :show      :get "/:id"]
+   ['ringup.app 'not-found :not-found :any "/:path" {:path ".*"}]])
 
 ;; Models
 (stash/defmodel +upload+

@@ -1,3 +1,3 @@
 (use 'clj-unit.core)
 
-(require-and-run-tests '(updemo.app-test))
+(require-and-run-tests '(ringup.app-test))

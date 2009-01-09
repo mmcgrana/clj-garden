@@ -1,6 +1,6 @@
 (System/setProperty "cljurl.env" (or (first *command-line-args*) "dev"))
 
-(require 'cljurl.config 'cljurl.migrations 'clj-jdbc.core 'stash.migrations)
+(require '(cljurl config migrations) 'clj-jdbc.core 'stash.migrations)
 
 (let [version (Integer. (second *command-line-args*))]
   (stash.core/with-logger cljurl.config/logger

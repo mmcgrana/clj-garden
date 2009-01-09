@@ -8,6 +8,8 @@ views
 
 framework
   tease apart with-filters
+  seperate app-specific from general code in scripts/
+  better cli for scripts
 
 logging
   :info [:sql {:query "SELECT * FROM posts" :time 12}]

@@ -1,8 +1,4 @@
-(require 'cljurl.boot)
+(require 'ringup.app 'clj-jdbc.core '(stash core migrations))
 
-(let [env (keyword (or (first *command-line-args*) "dev"))]
-  (binding [cljurl.boot/env env] (require 'cljurl.config)))
-
-(require 'clj-jdbc.core 'stash.migrations)
-
-(stash.migrations/create-version cljurl.config/data-source)
+(clj-jdbc.core/with-connection ringup.app/data-source
+  (stash.migrations/create-version))

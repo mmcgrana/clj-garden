@@ -1,9 +1,9 @@
-(ns updemo.app-test
-  (:use clj-unit.core updemo.app ring.test-helpers)
+(ns ringup.app-test
+  (:use clj-unit.core ringup.app ring.test-helpers)
   (:require [clj-file-utils.core :as file-utils]))
 
 (def upload-info
-  [(file-utils/file "test" "updemo" "assets" "test.png")
+  [(file-utils/file "test" "ringup" "assets" "test.png")
    "image/png"
    "test_filename.png"])
 

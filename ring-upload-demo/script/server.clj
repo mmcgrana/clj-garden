@@ -1,4 +1,3 @@
-(require 'cwsg.handlers.jetty 'updemo.app)
+(require 'cwsg.handlers.jetty 'ringup.app)
 
-(cwsg.handlers.jetty/run {:port 8080}
-  updemo.app/app))
+(cwsg.handlers.jetty/run {:port 8080} ringup.app/app))
