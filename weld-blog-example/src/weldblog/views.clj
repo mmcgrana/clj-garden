@@ -10,7 +10,7 @@
 
 (defmacro with-layout-throwing
   [thrown-form & body]
-  `(let [inner# (do ~body)]
+  `(let [inner# (html ~@body)]
      (html
        (doctype :xhtml-transitional)
        [:html {:xmlns "http://www.w3.org/1999/xhtml"}

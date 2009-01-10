@@ -13,10 +13,10 @@
         [:title "cwsg env dump"]]
       [:body
         [:pre
-          (domap-str [[key value] (sort-by key env)]
+          (domap-str [[key value] (sort-by key (dissoc env :body))]
             (h (str key "\n  " (prn-str value) "\n")))]
-        [:h3 "Body contents:"]
-          (prn-str (IOUtils/toString (:body env)))]]))
+        [:h3 ":body contents:"]
+          (prn-str (if-let [body (:body env)] (IOUtils/toString body) nil))]]))
 
 (defn app
   "Returns a response tuple corresponding to an HTML dump of the request

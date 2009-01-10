@@ -42,35 +42,38 @@ table.trace td.source {
 ")
 
 (defn- js-response [env e]
-  [500 {"Content-Type" "text/javascript"}
-    (pst-str e)])
+  {:status  500
+   :headers {"Content-Type" "text/javascript"}
+   :body    (pst-str e)})
 
 (defn- html-reponse [env e]
   (let [excp (parse-exception e)]
-    [500 {"Content-Type" "text/html"}
-      (html
-        (doctype :xhtml-transitional)
-        [:html {:xmlns "http://www.w3.org/1999/xhtml"}
-          [:head
-            [:meta {:http-equiv "Content-Type" :content "text/html;charset=utf-8"}]
-            [:title "Show Exceptions"]
-            [:style {:type "text/css"} css]
-            [:body
-              [:div#content
-                [:h3.info (h (str e))]
-                [:table.trace
-                  (domap-str [parsed (:trace-elems excp)]
-                    (html
-                      [:tbody
-                        (if (:clojure parsed)
-                          (html
-                            [:tr
-                              [:td.source (h (source-str         parsed))]
-                              [:td.method (h (clojure-method-str parsed))]])
-                          (html
-                            [:tr
-                              [:td.source (h (source-str    parsed))]
-                              [:td.method (h (java-method-str parsed))]]))]))]]]]])]))
+    {:status 500
+     :headers {"Content-Type" "text/html"}
+     :body
+       (html
+         (doctype :xhtml-transitional)
+         [:html {:xmlns "http://www.w3.org/1999/xhtml"}
+           [:head
+             [:meta {:http-equiv "Content-Type" :content "text/html;charset=utf-8"}]
+             [:title "Show Exceptions"]
+             [:style {:type "text/css"} css]
+             [:body
+               [:div#content
+                 [:h3.info (h (str e))]
+                 [:table.trace
+                   (domap-str [parsed (:trace-elems excp)]
+                     (html
+                       [:tbody
+                         (if (:clojure parsed)
+                           (html
+                             [:tr
+                               [:td.source (h (source-str         parsed))]
+                               [:td.method (h (clojure-method-str parsed))]])
+                           (html
+                             [:tr
+                               [:td.source (h (source-str    parsed))]
+                               [:td.method (h (java-method-str parsed))]]))]))]]]]])}))
 
 (defn- response
   "Returns a response showing debugging information about the exception.

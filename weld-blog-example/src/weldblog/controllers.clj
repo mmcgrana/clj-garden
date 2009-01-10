@@ -30,8 +30,7 @@
     (respond (v/show post))))
 
 (defn new [req]
-  (with-post [post (params req :id)]
-    (respond (v/new post))))
+  (respond (v/new (stash/init m/+post+))))
 
 (defn edit [req]
   (with-post [post (params req :id)]

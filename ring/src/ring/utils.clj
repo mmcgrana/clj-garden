@@ -16,11 +16,6 @@
   [#^java.util.regex.Pattern pattern string]
   (.find (.matcher pattern string)))
 
-(defn re-without
-  "Returns a String with the given pattern re-gsub'd out the given string."
-  [pattern string]
-  (re-gsub pattern "" string))
-
 (defn re-get
   "Returns the nth captured group resulting from matching the given pattern
   against the given string, or nil if no match is found."

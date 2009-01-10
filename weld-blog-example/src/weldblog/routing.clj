@@ -7,7 +7,8 @@
 
 (routing/defrouting config/app-host
   [[c 'index      :posts       :get "/"                  ]
-    [c 'new       :new-post    :get "/new"               ]
-    [c 'create    :create-post :put "/"                  ]
-    [c 'show      :post        :get "/:id"               ]
-    [c 'not-found :not-found   :any "/:path" {:path ".*"}]])
+   [c 'index-atom :posts-atom  :get "/posts.atom"        ]
+   [c 'new        :new-post    :get "/new"               ]
+   [c 'create     :create-post :put "/"                  ]
+   [c 'show       :post        :get "/:id"               ]
+   [c 'not-found  :not-found   :any "/:path" {:path ".*"}]])

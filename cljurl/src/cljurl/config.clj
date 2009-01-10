@@ -27,7 +27,7 @@
 (def log-exceptions?    (not test?))
 
 (def reloading? dev?)
-(def reloadable-ns-syms '(cljurl.controllers cljurl.models cljurl.views))
+(def reloadables '(cljurl.controllers cljurl.models cljurl.views))
 
 
 

@@ -5,14 +5,14 @@
     clojure.contrib.str-utils
     clj-jdbc.data-sources)
   (:require
-    [ring.routing                      :as routing]
-    [cwsg.middleware.reloading         :as reloading]
-    [cwsg.middleware.show-exceptions   :as show-exceptions]
-    [cwsg.middleware.file-content-info :as file-content-info]
-    [cwsg.middleware.static            :as static]
-    [ring.app                          :as app]
-    [stash.core                        :as stash]
-    [clj-file-utils.core               :as file-utils]))
+    [ring.routing                    :as routing]
+    [cwsg.middleware.reloading       :as reloading]
+    [cwsg.middleware.show-exceptions :as show-exceptions]
+    [cwsg.middleware.file-info       :as file-info]
+    [cwsg.middleware.static          :as static]
+    [ring.app                        :as app]
+    [stash.core                      :as stash]
+    [clj-file-utils.core             :as file-utils]))
 
 ;; Config
 (def app-host "http://localhost:8080")
@@ -103,7 +103,7 @@
 ;; CWSG app
 (def app
   (show-exceptions/wrap
-    (file-content-info/wrap
+    (file-info/wrap
       (static/wrap public-dir
         (reloading/wrap reloadable-namespace-syms
           (app/spawn-app router))))))

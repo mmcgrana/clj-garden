@@ -1,10 +1,10 @@
 (ns cljurl.app
   (:require
     (cwsg.middleware
-      [show-exceptions       :as show-exceptions]
-      [file-content-info     :as file-content-info]
-      [static                :as static]
-      [reloading             :as reloading])
+      [shoe-exception :as show-exceptions]
+      [file-info      :as file-info]
+      [static         :as static]
+      [reloading      :as reloading])
     [ring.app :as app]
     (cljurl
       [config :as config]
@@ -13,8 +13,8 @@
 (def app
   (app/wrap-if config/show-exceptions?
     show-exceptions/wrap
-    (file-content-info/wrap
+    (file-info/wrap
       (static/wrap config/public-dir
         (app/wrap-if config/reloading?
-          (partial reloading/wrap config/reloadable-ns-syms)
+          (partial reloading/wrap config/reloadables)
           (app/spawn-app cljurl.routing/router))))))

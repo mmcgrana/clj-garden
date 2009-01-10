@@ -1,4 +1,4 @@
-(ns ring.middleware.file-content-info
+(ns ring.middleware.file-info
   (:use clojure.contrib.def)
   (:import (org.apache.commons.io FilenameUtils)
            (java.io File)))
