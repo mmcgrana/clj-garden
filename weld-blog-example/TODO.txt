@@ -10,6 +10,9 @@ app tests
 update readme with list of projects
 ring-hello-world (simplest possible app, to demonstrate not confined to layout)
 ring-base-app (full fledge app setup for first non-toy app)
+consider reloadability of routing and apps - currently not possible
+perhaps handlers could transparently handle vars
+  what are the semantics of relading in Clojure in general
 
 
 

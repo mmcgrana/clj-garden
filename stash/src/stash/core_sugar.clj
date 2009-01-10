@@ -6,8 +6,9 @@
 
 (defn get-one
   "Returns an instance corresponding to the record for the given pk val(s)."
-  [model pk-vals]
-  (find-one model {:where (pk-where-exp (pk-column-names model) pk-vals)}))
+  [model pk-val-or-vals]
+  (let [pk-vals (if (coll? pk-val-or-vals) pk-val-or-vals [pk-val-or-vals])]
+    (find-one model {:where (pk-where-exp (pk-column-names model) pk-vals)})))
 
 (defn reload
   "Returns an instance corresponding to the given one but reloaded fresh from

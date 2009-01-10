@@ -74,31 +74,37 @@
 
 (defn error-messages-post
   [post]
-  [:div.error-messages
-    [:h3 "There were problems with your submission:"]
-    (domap-str [error (errors post)]
-      (html [:p (name (:on error))]))])
+  (if-let [errs (errors post)]
+    (html
+      [:div.error-messages
+        [:h3 "There were problems with your submission:"]
+        (domap-str [err errs]
+          (html [:p (name (:on err))]))])))
 
 (defn partial-post-form
   [post]
   (html
+    [:p "title:"]
     [:p (text-field-tag "post[title]" (:title post))]
+    [:p "body:"]
     [:p (text-area-tag  "post[body]"  (:body  post) {:rows 20 :cols 80})]
     [:p (submit-tag "Submit Post")]))
 
 (defn new
   [post]
-  [:h1 "New Post"]
-  (error-messages-post post)
-  (form-to (path :create-post)
-    (partial-post-form post)))
+  (html
+    [:h1 "New Post"]
+    (error-messages-post post)
+    (form-to (path-info :create-post)
+      (partial-post-form post))))
 
 (defn edit
   [post]
-  [:h1 "Editing Post"]
-  (error-messages-post post)
-  (form-to (path :update-post post)
-    (partial-post-form post)))
+  (html
+    [:h1 "Editing Post"]
+    (error-messages-post post)
+    (form-to (path-info :update-post post)
+      (partial-post-form post))))
 
 (defn not-found []
   (with-layout

@@ -27,8 +27,7 @@
 (def exception-logging?  (not test?))
 
 (def reloading? dev?)
-(def reloadables '(weldblog.models      weldblog.views
-                   weldblog.controllers weldblog.routing))
+(def reloadables '(weldblog.models weldblog.views weldblog.controllers))
 
 
 

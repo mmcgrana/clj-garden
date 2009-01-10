@@ -1,5 +1,5 @@
-#!/bin/bash 
-#see also clji
+#!/bin/bash
+#see also clj
 
 USER_CLJ_DIR=/Users/mmcgrana/Clojure
 SHARED_JARS_DIR=$USER_CLJ_DIR/jars
@@ -19,8 +19,9 @@ for file in $SHARED_JARS_DIR/*.jar; do
     CP=$CP:$file
 done
 
+CP=$CP:$USER_CLJ_DIR
 if [ -z "$1" ]; then
-    echo "no script given"
+    java -cp $CP jline.ConsoleRunner clojure.main -r
 else
-    java -cp $CP clojure.main $1
+    java -cp $CP jline.ConsoleRunner clojure.main -i $1 -r
 fi

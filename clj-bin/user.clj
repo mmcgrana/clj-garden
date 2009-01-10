@@ -1,5 +1,5 @@
 ;; Announce
-(println "Loading repl extensions")
+(println "REPL Extensions")
 
 ;; Macroexpansion utils
 (defn- mapr
@@ -43,6 +43,3 @@
 (use
   '(clojure.contrib repl-utils repl-ln duck-streams)
   'clj-backtrace.repl)
-
-;; Use a line-numbering repl
-(repl)

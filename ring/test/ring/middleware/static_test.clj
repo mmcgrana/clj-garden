@@ -10,7 +10,6 @@
 (def index-html (File. public-dir "index.html"))
 (def foo-html   (File. public-dir "foo.html"))
 
-
 (def app (wrap public-dir (constantly :response)))
 
 (deftest "wrap: unsafe method"
