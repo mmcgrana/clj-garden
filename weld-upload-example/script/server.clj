@@ -1,3 +1,6 @@
-(require 'cwsg.handlers.jetty 'ringup.app)
+(System/setProperty "weldblog.env" (or (first *command-line-args*) "dev"))
 
-(cwsg.handlers.jetty/run {:port 8080} ringup.app/app))
+(require 'ring.handlers.jetty 'weldup.app)
+
+(ring.handlers.jetty/run {:port 8080} weldup.app/app)
+

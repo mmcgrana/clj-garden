@@ -1,4 +1,4 @@
-(ns ringup.migrations
+(ns weldup.migrations
   (:use stash.migrations))
 
 (defmigration bootstrap 1

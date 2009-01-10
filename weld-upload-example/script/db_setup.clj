@@ -1,4 +1,14 @@
-(require 'ringup.app 'clj-jdbc.core '(stash core migrations))
+(use 'clojure.contrib.shell-out)
 
-(clj-jdbc.core/with-connection ringup.app/data-source
-  (stash.migrations/create-version))
+(let [env (or (first *command-line-args*) "dev")]
+  (System/setProperty "weldup.env" env)
+  (sh "createdb" (str "weldup_" env) "--owner" "mmcgrana"))
+
+(require 'weldup.app 'clj-jdbc.core '(stash core migrations))
+
+(let [logger      weldblog.app/logger
+      data-source weldblog.app/data-source]
+  (stash.core/with-logger logger
+    (clj-jdbc.core/with-connection data-source
+      (stash.migrations/create-version))))
+

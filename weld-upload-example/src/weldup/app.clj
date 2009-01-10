@@ -1,23 +1,25 @@
-(ns ringup.app
+(ns weldup.app
   (:use
-    (ring controller request)
+    (weld controller request)
     (clj-html core helpers helpers-ext)
     clojure.contrib.str-utils
     clj-jdbc.data-sources)
   (:require
-    [ring.routing                    :as routing]
-    [cwsg.middleware.reloading       :as reloading]
-    [cwsg.middleware.show-exceptions :as show-exceptions]
-    [cwsg.middleware.file-info       :as file-info]
-    [cwsg.middleware.static          :as static]
-    [ring.app                        :as app]
-    [stash.core                      :as stash]
-    [clj-file-utils.core             :as file-utils]))
+    (weld
+      [routing :as routing]
+      [app     :as app])
+    (ring.middleware
+      [reloading       :as reloading]
+      [show-exceptions :as show-exceptions]
+      [file-info       :as file-info]
+      [static          :as static])
+    [stash.core :as stash]
+    [clj-file-utils.core :as file-utils]))
 
 ;; Config
 (def app-host "http://localhost:8080")
-(def public-dir  (java.io.File. "public"))
-(def uploads-dir (java.io.File. "public/uploads"))
+(def public-dir  (file-utils/file "public"))
+(def uploads-dir (file-utils/file "public/uploads"))
 (def reloadable-namespace-syms '(ringup.app))
 (def data-source
   (pg-data-source {:database "ringup_dev" :user "mmcgrana" :password ""}))
@@ -40,7 +42,9 @@
      [[:id            :uuid    {:pk true}]
       [:filename      :string]
       [:content_type  :string]
-      [:size          :integer]]})
+      [:size          :integer]]
+   :accessible-attrs
+     [:filename :content_type :size]})
 
 (defn upload-file [upload]
   (file-utils/file uploads-dir (:id upload)))
@@ -49,12 +53,11 @@
   (re-gsub #"(?i)[^a-z0-9_.]" "_" filename))
 
 (defn create-upload [upload-map]
-  (let [upload (stash/create* +upload+
+  (let [upload (stash/create +upload+
                  {:filename     (normalize-filename (:filename upload-map))
                   :content_type (:content-type upload-map)
                   :size         (:size upload-map)})]
     (file-utils/cp (:tempfile upload-map) (upload-file upload))))
-
 
 ;; Views
 (defmacro with-layout
@@ -100,7 +103,7 @@
     (send-file (upload-file upload) {:filename (:filename upload)})
     (not-found [req])))
 
-;; CWSG app
+;; Ring app
 (def app
   (show-exceptions/wrap
     (file-info/wrap

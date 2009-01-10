@@ -2,4 +2,4 @@
 
 (require 'ring.handlers.jetty 'weldblog.app)
 
-(ring.handlers.jetty/run {:port 8080} weldblog.app/app))
+(ring.handlers.jetty/run {:port 8080} weldblog.app/app)
