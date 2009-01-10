@@ -27,8 +27,13 @@
 
 (defn str-cat
   "Concat the given strings into a single string. Like (str-join \"\" strs)."
-  [strs]
-  (apply str strs))
+  [strings]
+  (apply str strings))
+
+(defn trim
+  "Trims a string, removing leading and trailing whitespace."
+  [#^String string]
+  (.trim string))
 
 (defmacro get-or
   "Short for (or (get map key) or-form)."

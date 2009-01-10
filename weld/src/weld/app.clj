@@ -6,7 +6,6 @@
   weld.routing/compiled-router."
   [router]
   (fn [env]
-    (let [req                 (from-env env)
-         [action-fn r-params] (recognize router (request-method req) (uri req))
-         request              (assoc-route-params req r-params)]
-      (action-fn request))))
+    (let [[act-fn r-params] (recognize router (request-method* env) (uri env))
+          env+           (assoc-route-params env r-params)]
+      (act-fn env+))))

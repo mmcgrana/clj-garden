@@ -1,5 +1,5 @@
 check out james' comment on round-trip testing
-
+Check out templating, especially for tests
 simplest dependency manager that could possibly work:
   no runtime component
   no searching for config files

@@ -10,8 +10,8 @@
   [app [method path] & [options]]
   (app {:uri            path
         :request-method method
-        :mock-params    (get options :params)
-        :remote-addr    (get options :remote-addr)}))
+        :remote-addr    (get options :remote-addr)
+        :weld.request/mock-params (get options :params)}))
 
 (defn upload
   "Returns an upload hash that can be used as a value in the :params map for
