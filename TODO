@@ -1,0 +1,10 @@
+check out james' comment on round-trip testing
+
+simplest dependency manager that could possibly work:
+  no runtime component
+  no searching for config files
+  central data source
+  each jar lists the jars on which it directly depends
+  then apply search to get all needed jars
+  could even write the file as a clojure data structure
+  some libs will only conditionally depend on jars - just make a call 1 way

@@ -4,8 +4,8 @@ designed to encourage modular and reusable web application design and allow for
 server portability.
 
 == Status
-Ring is currently being actively developed; see the working version of the spec
-at SPEC and check out the example Ring apps in src/ring/examples.
+Ring is currently being actively developed; see the working version of the SPEC 
+document and check out the example Ring apps in src/ring/examples.
 
 ---
 Copyright (c) 2009 Mark McGranaghan and released under an MIT license.

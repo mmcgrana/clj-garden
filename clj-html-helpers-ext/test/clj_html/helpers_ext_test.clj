@@ -36,8 +36,10 @@
     (form-to [:put "/foo"] "inner")))
 
 (deftest "link-to"
-  (assert= "<a href=\"http://google.com\">foo</a>"
-    (link-to "foo" "http://google.com")))
+  (assert= "<a href=\"/bar\" title=\"foo\">foo</a>"
+    (link-to "foo" "/bar"))
+  (assert= "<a href=\"/bar\" title=\"bat\">foo</a>"
+    (link-to "foo" "/bar" {:title "bat"})))
 
 (deftest "delete-button"
   (assert= "<form method=\"post\" action=\"/foo\"><input type=\"hidden\" name=\"_method\" value=\"delete\" /><input name=\"commit\" type=\"submit\" value=\"Delete\" /></form>"

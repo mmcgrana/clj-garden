@@ -66,8 +66,9 @@
 
 (defn link-to
   "Returns html for a link with anchor text to the url."
-  [text url]
-  (html [:a {:href url} text]))
+  [text url & [opts]]
+  (let [title (get opts :title text)]
+    (html [:a {:href url :title title} text])))
 
 (defn delete-button
   "Returns html for a form consisting only of a button that, when clicked,
