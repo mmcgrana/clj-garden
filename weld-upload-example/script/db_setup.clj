@@ -6,8 +6,8 @@
 
 (require 'weldup.app 'clj-jdbc.core '(stash core migrations))
 
-(let [logger      weldblog.app/logger
-      data-source weldblog.app/data-source]
+(let [logger      weldup.app/logger
+      data-source weldup.app/data-source]
   (stash.core/with-logger logger
     (clj-jdbc.core/with-connection data-source
       (stash.migrations/create-version))))

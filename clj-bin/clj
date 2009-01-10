@@ -22,5 +22,5 @@ done
 if [ -z "$1" ]; then
     echo "no script given"
 else
-    java -cp $CP clojure.main $1
+    java -cp $CP clojure.main $@
 fi

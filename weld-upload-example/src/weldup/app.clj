@@ -3,7 +3,8 @@
     (weld controller request)
     (clj-html core helpers helpers-ext)
     clojure.contrib.str-utils
-    clj-jdbc.data-sources)
+    clj-jdbc.data-sources
+    clj-log4j.core)
   (:require
     (weld
       [routing :as routing]
@@ -22,7 +23,8 @@
 (def uploads-dir (file-utils/file "public/uploads"))
 (def reloadable-namespace-syms '(ringup.app))
 (def data-source
-  (pg-data-source {:database "ringup_dev" :user "mmcgrana" :password ""}))
+  (pg-data-source {:database "weldup_dev" :user "mmcgrana" :password ""}))
+(def logger (logger4j :err :info))
 
 ;; Routing
 (routing/defrouting
