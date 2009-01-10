@@ -24,7 +24,7 @@
 
 (defn env-with
   [attrs]
-  (merge base-env attrs))
+  (init (merge base-env attrs)))
 
 (deftest "headers"
   (assert= {"foo" "bar"} (headers (env-with {:headers {"foo" "bar"}}))))
@@ -54,12 +54,41 @@
   (assert= {:foo {:bar "bat"}}
     (query-params (env-with {:query-string "foo[bar]=bat"}))))
 
-; TODO: body-str
-; TODO: form-params
-; TODO: multipart-params
-; TODO: mock-params
-; TODO: params*
-; TODO: params
+(deftest "body-str"
+  (assert= "foobar"
+    (body-str (env-with {:body (str-input-stream "foobar")}))))
+
+(deftest "form-params"
+  (assert= nil (form-params (env-with {:body "foo=bar"})))
+  (assert= {:foo {:bar "bat"}}
+    (form-params (env-with {:body (str-input-stream "foo[bar]=bat")
+                            :content-type "application/x-www-form-urlencoded"}))))
+
+; TODO: multipart-params - needs pretty elaborate helper infrastructure
+
+(deftest "mock-params"
+  (assert= {:foo "bar"}
+    (mock-params (env-with {:weld.request/mock-params {:foo "bar"}}))))
+
+(deftest "params*"
+  (binding [weld.request/multipart-params (constantly {:multipart "multipart"})]
+    (assert= {:query "query" :multipart "multipart" :mock "mock"}
+      (params* (env-with {:query-string "query=query"
+                          :weld.request/mock-params {:mock "mock"}}))))
+  (binding [weld.request/multipart-params (constantly nil)]
+    (assert= {:query "query" :form "form" :mock "mock"}
+      (params* (env-with {:query-string "query=query"
+                          :body (str-input-stream "form=form")
+                          :content-type "application/x-www-form-urlencoded"
+                          :weld.request/mock-params {:mock "mock"}})))))
+
+(deftest "params"
+  (assert= {:query "query" :route "route"}
+    (params (env-with {:query-string "query=query"
+                       :weld.request/route-params {:route "route"}})))
+  (assert= "bat"
+    (let [the-env (env-with {:query-string "foo[bar]=bat"})]
+      (params the-env :foo :bar))))
 
 (deftest "request-method*"
   (assert= :get (request-method* (env-with {:request-method :get}))))
@@ -67,10 +96,14 @@
 (deftest "request-method"
   (assert= :get  (request-method (env-with {:request-method :get})))
   (assert= :post (request-method (env-with {:request-method :post})))
-  ; TODO: when :post, test for piggyback in params
-  ; TODO: when :post, test for invalid piggyback
-  ; TODO: unrecognize method :foobar
-  )
+  (assert= :delete
+    (request-method (env-with {:request-method :post
+                               :weld.request/mock-params {:_method "delete"}})))
+  (assert-throws #"Unrecognized piggyback method :post"
+    (request-method (env-with {:request-method :post
+                               :weld.request/mock-params {:_method "bar"}})))
+  (assert-throws #"Unrecognized :request-method :bar"
+    (request-method (env-with {:request-method :bar}))))
 
 (deftest "scheme"
   (assert= "https"
@@ -83,7 +116,7 @@
 (deftest "server-port"
   (assert= 80 (server-port (env-with {:server-port 80}))))
 
-; Todo: need to review the whole server host / name / port thing
+; TODO: need to review the whole server host / name / port thing
 (def xfhost-header {"x-forwarded-host" "google.com"})
 (def h-header      {"host"             "yahoo.com"})
 (def server-attrs  {:server-name "ask.com" :server-port 80})

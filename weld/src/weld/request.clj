@@ -56,11 +56,15 @@
   [env]
   (query-parse (query-string env)))
 
-(defn- body-str
+(defn body-str
   "Returns a single String of the raw request body. Should  be called only 
   within an exclusive guard that rules out all other such guards, i.e. it must
   be called no more than once. Should not be called if the reader input is to 
   be used."
+  [env]
+  (force (:weld.request/body-str-delay env)))
+
+(defn- body-str-io
   [env]
   (with-open [#^InputStream stream (:body env)]
     (IOUtils/toString stream)))
@@ -85,6 +89,10 @@
 (defn multipart-params
   "Returns a hash of multipart params if the content-type indicates a multipart
   request, nil otherwise."
+  [env]
+  (force (:weld.request/multipart-params-delay env)))
+
+(defn- multipart-params-io
   [env]
   (if-let [ctype (content-type env)]
     (if (re-match? multipart-re ctype)
@@ -115,13 +123,14 @@
   [env]
   (:weld.request/mock-params env))
 
-(defn params*
-  "Returns all params except for those determined from the route."
-  [env]
-  (merge (query-params     env)
-         (form-params      env)
-         (multipart-params env)
-         (mock-params      env)))
+(def #^{:doc "Returns all params except for those determined from the route."}
+  params*
+  (memoize-by :weld.request/memoization-key
+    (fn [env]
+      (merge (query-params     env)
+             (form-params      env)
+             (multipart-params env)
+             (mock-params      env)))))
 
 (defn params
   "Returns params, including those determined from the route.
@@ -149,7 +158,8 @@
         r-method
       (= :post r-method)
         (if-let [p-method (:_method (params* env))]
-          (or (recognized-nonpiggyback-methods (keyword p-method)) :post)
+          (or (recognized-nonpiggyback-methods (keyword p-method))
+              (throwf "Unrecognized piggyback method %s" r-method))
           :post)
       :else
         (throwf "Unrecognized :request-method %s" r-method))))
@@ -210,6 +220,15 @@
   "Returns a String for the http refer(r)er"
   [env]
   (get-in env [:headers "http-referer"]))
+
+(defn init
+  "Returns a prepared env based on the given raw env, where the preparations
+  enable the env to correctly handle memoization."
+  [env]
+  (assoc env
+    :weld.request/memoization-key        (clojure.lang.RT/nextID)
+    :weld.request/multipart-params-delay (delay (multipart-params-io env))
+    :weld.request/body-str-delay         (delay (body-str-io env))))
 
 (defn assoc-route-params
   "Returns a new request object like the corresponding to the given one but 

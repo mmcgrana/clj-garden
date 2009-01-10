@@ -14,8 +14,9 @@
   (let [parsed (parse-exception e)
         elems  (:trace-elems parsed)
         user-elems (take-while (complement test-runner-elem?) elems)]
-    (println (str e))
-    (print-trace-elems user-elems)))
+    (binding [*use-color* true]
+      (println (with-color :red (str e)))
+      (print-trace-elems user-elems))))
 
 (def +console-reporter+
   {:init

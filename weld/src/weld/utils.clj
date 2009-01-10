@@ -39,3 +39,15 @@
   "Short for (or (get map key) or-form)."
   [map key or-form]
   `(or (get ~map ~key) ~or-form))
+
+(defn memoize-by
+  "TODOC"
+  [key-f f]
+  (let [mem (atom {})]
+    (fn [arg]
+      (let [key (key-f arg)]
+        (if-let [e (find @mem key)]
+          (val e)
+          (let [ret (f arg)]
+            (swap! mem assoc key ret)
+            ret))))))
