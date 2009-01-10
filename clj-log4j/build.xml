@@ -1,0 +1,19 @@
+<project name="clj-log4j" default="jar">
+  <description>
+    Pack all sources into a JAR.
+  </description>
+
+  <property name="jarfile" location="clj-log4j.jar"/>
+
+  <target name="clean"
+          description="Remove generated files and directories.">
+    <delete file="${jarfile}"/>
+  </target>
+
+  <target name="jar"
+          description="Create jar file.">
+    <jar jarfile="${jarfile}">
+      <fileset dir="./src" includes="clj-log4j/**/*.clj"/>
+    </jar>
+  </target>
+</project>

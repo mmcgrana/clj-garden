@@ -1,6 +1,5 @@
 (ns cljurl.utils
-  (:use clojure.contrib.except)
-  (:import (org.apache.log4j Level Logger ConsoleAppender SimpleLayout)))
+  (:use clojure.contrib.except))
 
 (defmacro returning
   [val-form & body]
@@ -43,27 +42,3 @@
   "Returns a random element from the given vector."
   [#^clojure.lang.IPersistentVector vec]
   (get vec (rand-int (count vec))))
-
-(def log-levels
-  {:debug Level/DEBUG
-   :info  Level/INFO
-   :warn  Level/WARN
-   :error Level/ERROR
-   :fatal Level/FATAL})
-
-(defn log-level
-  "Returns a static field of Level corresponding to the lower case keyword
-  level."
-  [level]
-  (or (log-levels level) (throwf "unrecognized log level: %s" level)))
-
-(defn logger4j-err
-  "Returns a stderr log4j logger with debug log level."
-  [level]
-  (let [apdr (doto (ConsoleAppender.)
-               (.setTarget (ConsoleAppender/SYSTEM_OUT))
-               (.setLayout (SimpleLayout.))
-               (.activateOptions))]
-    (doto (Logger/getLogger (str (gensym)))
-      (.setLevel (log-level level))
-      (.addAppender apdr))))

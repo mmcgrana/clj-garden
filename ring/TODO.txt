@@ -1,1 +1,15 @@
-More thorough testing
+Make it as easy as possible to get started
+  no downloading, just java -cp big.jar our.class
+Finish spec
+Less sucky dump.clj
+Linter
+Middleware as needed, especially infrastructural
+Documentation
+Final sophisticated tree example
+Consider utils carefully
+Tests
+wrap-if in ring.builder, other builder tools
+basic_stack.clj
+account for all dependencies
+server boot fits in a tweet
+tests

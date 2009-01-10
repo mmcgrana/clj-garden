@@ -1,5 +1,5 @@
 (ns cljurl.config
-  (:use clj-jdbc.data-sources cljurl.utils)
+  (:use clj-jdbc.data-sources cljurl.utils clj-log4j)
   (:import java.io.File))
 
 (def env (keyword (System/getProperty "cljurl.env")))
@@ -20,7 +20,7 @@
       test? {:database "cljurl_test" :user "mmcgrana" :password ""})))
 
 (def logger
-  (logger4j-err (cond prod? :info dev? :debug test? :warn)))
+  (logger4j :err (cond prod? :info dev? :debug test? :warn)))
 
 (def show-exceptions?   dev?)
 (def handle-exceptions? prod?)
