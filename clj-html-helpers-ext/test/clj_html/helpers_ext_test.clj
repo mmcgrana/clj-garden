@@ -38,3 +38,7 @@
 (deftest "link-to"
   (assert= "<a href=\"http://google.com\">foo</a>"
     (link-to "foo" "http://google.com")))
+
+(deftest "delete-button"
+  (assert= "<form method=\"post\" action=\"/foo\"><input type=\"hidden\" name=\"_method\" value=\"delete\" /><input name=\"commit\" type=\"submit\" value=\"Delete\" /></form>"
+    (delete-button "Delete" "/foo")))

@@ -16,7 +16,7 @@
 (defn upload
   "Returns an upload hash that can be used as a value in the :params map for
   the mock request helper."
-  [[file content-type filename]]
+  [file content-type filename]
   {:tempfile file     :size (file-utils/size file)
    :filename filename :content-type content-type})
 

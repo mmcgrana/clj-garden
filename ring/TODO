@@ -13,3 +13,4 @@ basic_stack.clj
 account for all dependencies
 server boot fits in a tweet
 tests
+colorize show exception traces

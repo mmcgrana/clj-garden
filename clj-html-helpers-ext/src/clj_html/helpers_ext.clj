@@ -45,9 +45,9 @@
   (html [:input {:type "file" :name name}]))
 
 (defn submit-tag
-  "Return html for a submit button with value as the text."
-  [value]
-  (html [:input {:type "submit" :name "commit" :value value}]))
+  "Return html for a submit button with the given text."
+  [text]
+  (html [:input {:type "submit" :name "commit" :value text}]))
 
 (defn form-to
   "Returns html for a form."
@@ -65,9 +65,16 @@
          body]))))
 
 (defn link-to
-  "Returns html for a link with anchor text to the path."
-  [anchor path]
-  (html [:a {:href path} anchor]))
+  "Returns html for a link with anchor text to the url."
+  [text url]
+  (html [:a {:href url} text]))
+
+(defn delete-button
+  "Returns html for a form consisting only of a button that, when clicked,
+  will send a delete request to the given path."
+  [text url]
+  (form-to [:delete url]
+    (submit-tag text)))
 
 (def #^{:private true} mime-type-strs
   {:rss  "application/rss+xml"

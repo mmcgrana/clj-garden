@@ -21,7 +21,7 @@
 (def app-host "http://localhost:8080")
 (def public-dir  (file-utils/file "public"))
 (def uploads-dir (file-utils/file "public/uploads"))
-(def reloadable-namespace-syms '(ringup.app))
+(def reloadable-namespace-syms '(weldup.app))
 (def data-source
   (pg-data-source {:database "weldup_dev" :user "mmcgrana" :password ""}))
 (def logger (logger4j :err :info))
@@ -29,11 +29,12 @@
 ;; Routing
 (routing/defrouting
   app-host
-  [['ringup.app 'index     :index     :get "/"]
-   ['ringup.app 'new       :new       :get "/new"]
-   ['ringup.app 'create    :create    :put "/"]
-   ['ringup.app 'show      :show      :get "/:id"]
-   ['ringup.app 'not-found :not-found :any "/:path" {:path ".*"}]])
+  [['weldup.app 'index     :index     :get    "/"]
+   ['weldup.app 'new       :new       :get    "/new"]
+   ['weldup.app 'create    :create    :put    "/"]
+   ['weldup.app 'show      :show      :get    "/:id"]
+   ['weldup.app 'destroy   :destroy   :delete "/:id"]
+   ['weldup.app 'not-found :not-found :any    "/:path" {:path ".*"}]])
 
 ;; Models
 (stash/defmodel +upload+
@@ -55,11 +56,16 @@
   (re-gsub #"(?i)[^a-z0-9_.]" "_" filename))
 
 (defn create-upload [upload-map]
-  (let [upload (stash/create +upload+
-                 {:filename     (normalize-filename (:filename upload-map))
-                  :content_type (:content-type upload-map)
-                  :size         (:size upload-map)})]
-    (file-utils/cp (:tempfile upload-map) (upload-file upload))))
+  (stash/transaction +upload+
+    (let [upload (stash/create +upload+
+                   {:filename     (normalize-filename (:filename upload-map))
+                    :content_type (:content-type upload-map)
+                    :size         (:size upload-map)})]
+      (file-utils/cp (:tempfile upload-map) (upload-file upload)))))
+
+(defn destroy-upload [upload]
+  (stash/destroy upload)
+  (file-utils/rm-f (upload-file upload)))
 
 ;; Views
 (defmacro with-layout
@@ -74,9 +80,11 @@
 (defn index-view [uploads]
   (with-layout
     [:p [:a {:href (path :new)} "new upload"]]
-    [:h3 "Uploaded"]
+    [:h3 (if (> (count uploads) 0) "Uploaded" "None Uploaded Yet")]
     (domap-str [upload uploads]
-      (html [:p [:a {:href (path :show upload)} (h (:filename upload))]]))))
+      (html
+        [:p [:a {:href (path :show upload)} (h (:filename upload))]]
+        (delete-button "Delete" (path :destroy upload))))))
 
 (defn new-view []
   (with-layout
@@ -87,7 +95,7 @@
         (submit-tag "Upload")))))
 
 ;; Controllers
-(defn not-found [req]
+(defn not-found [& [req]]
   (redirect (path :index)))
 
 (defn index [req]
@@ -100,10 +108,20 @@
   (create-upload (params req :upload))
   (redirect (path :index)))
 
+(defmacro with-upload
+  [[binding-sym id-form] & body]
+  `(if-let [~binding-sym (stash/find-one +upload+ {:where [:id := ~id-form]})]
+     (do ~@body)
+     (not-found)))
+
 (defn show [req]
-  (if-let [upload (stash/find-one +upload+ {:where [:id := (params req :id)]})]
-    (send-file (upload-file upload) {:filename (:filename upload)})
-    (not-found [req])))
+  (with-upload [upload (params req :id)]
+    (send-file (upload-file upload) {:filename (:filename upload)})))
+
+(defn destroy [req]
+  (with-upload [upload (params req :id)]
+    (destroy-upload upload)
+    (redirect (path :index))))
 
 ;; Ring app
 (def app

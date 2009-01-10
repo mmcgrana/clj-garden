@@ -1,1 +1,18 @@
-Filesystem manipulation utilities for Clojure, wrapping Apache Commons IO.
+h1. clj-file-utils
+
+Unix-like filesystem manipulation utilities for Clojure, wrapping Apache Commons IO.
+
+h2. Implemented Functions
+
+    file
+    size
+    mv
+    cp
+    cp-r
+    rm
+    rm-f
+    rm-r
+    rm-rf
+    touch
+    mkdirp
+    chmod

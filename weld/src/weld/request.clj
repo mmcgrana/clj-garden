@@ -194,6 +194,7 @@
   disk-file-item-factory
   (doto (DiskFileItemFactory.)
     (.setSizeThreshold -1)
+    (.setRepository (java.io.File. "/Users/mmcgrana/Desktop/git/clj-garden/weld-upload-example/public/uploads"))
     (.setFileCleaningTracker nil)))
 
 (defn- parse-multipart-params
@@ -207,17 +208,19 @@
                       (getContentType       [] (content-type request))
                       (getContentLength     [] (content-length request))
                       (getCharacterEncoding [] (character-encoding request))
-                      (getInputStream       [] ((request :env) :stream)))
+                      (getInputStream       [] ((request :env) :body)))
             items   (.parseRequest upload context)
             pairs   (map
                       (fn [#^DiskFileItem item]
                         [(.getFieldName item)
                          (if (.isFormField item)
                            (.getString item)
-                           {:filename     (.getName item)
-                            :size         (.getSize item)
-                            :content-type (.getContentType item)
-                            :tempfile     (.getStoreLocation item)})])
+                           ; need first pair to prevent premature tempfile GC
+                           {:disk-file-item item
+                            :filename       (.getName item)
+                            :size           (.getSize item)
+                            :content-type   (.getContentType item)
+                            :tempfile       (.getStoreLocation item)})])
                       items)]
       (pairs-parse pairs)))))
 

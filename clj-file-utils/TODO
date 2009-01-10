@@ -1,12 +1,2 @@
-touch
-mkdir
-mkdir-p
-rm
-rm-r
-cp-r
-mv
-size
-chmod
-
 tests
 documentation

@@ -4,7 +4,7 @@
 
 (def mock-upload
   (upload
-    (file-utils/file "test" "ringup" "assets" "test.png")
+    (file-utils/file "test" "weldup" "assets" "test.png")
     "image/png"
     "test_filename.png"))
 
