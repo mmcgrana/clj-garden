@@ -1,5 +1,4 @@
-move logging into stash?
-
+review dm docs
 rethink, test attr protection, foo* situation
 datetime caster 
 more validators

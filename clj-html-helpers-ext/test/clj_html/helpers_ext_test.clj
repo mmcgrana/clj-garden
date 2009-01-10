@@ -35,6 +35,6 @@
   (assert= "<form method=\"post\" action=\"/foo\"><input type=\"hidden\" name=\"_method\" value=\"put\" />inner</form>"
     (form-to [:put "/foo"] "inner")))
 
-(deftest "link-tag"
+(deftest "link-to"
   (assert= "<a href=\"http://google.com\">foo</a>"
-    (link-tag "foo" "http://google.com")))
+    (link-to "foo" "http://google.com")))

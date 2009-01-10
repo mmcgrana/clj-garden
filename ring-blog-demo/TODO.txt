@@ -1,0 +1,35 @@
+(flashing :message response)
+
+basic authentication
+error handling
+controller logging
+generally, find the weak points
+pretty-printing xml and json api, with nice responses
+test auto-discovery-link-tag
+app tests
+update readme with list of projects
+ring-hello-world (simplest possible app, to demonstrate not confined to layout)
+ring-base-app (full fledge app setup for first non-toy app)
+
+
+
+
+perhaps defaction
+updated hacks in atom feed
+
+what is the fastest to implement escape-html
+to gist of htmlc htmli comparison
+
+;(def session-store cookies/store)
+;(def session-secret-key "longstring")
+;(def session-id-key     "ringblog-session-id")
+;(def ignore-tampered-cookies (not prod?))
+
+; (router/defrouting config/app-host
+;   (resource :posts
+;     resource :comments))
+
+; (htmlfor [post posts]
+;   [:name {:key "val"}])
+
+; cling -> wiki backed by jgit and ring

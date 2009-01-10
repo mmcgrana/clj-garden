@@ -30,7 +30,7 @@
   "Home page - List recent shortenings."
   [shortenings]
   (with-layout
-    (link-tag "new shortening" (path :new))
+    (link-to "new shortening" (path :new))
     [:h3 "Recent Shortenings"]
     (domap-str [shortening shortenings]
       (html

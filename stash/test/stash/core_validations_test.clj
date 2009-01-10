@@ -15,6 +15,10 @@
 (def invalid-instance
   (init +post-with-validations+ {}))
 
+(deftest "error"
+  (assert= (struct +error+ 'on 'cause) (error 'on 'cause))
+  (assert= (struct +error+ 'on 'cause 'expected) (error 'on 'cause 'expected)))
+
 (deftest "errors: not on an valid instance before and after validation"
   (assert-not (errors valid-instance))
   (assert-not (errors (validated    valid-instance))))

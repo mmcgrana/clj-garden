@@ -71,7 +71,7 @@
       {}
       non-empty)))
 
-(defn- querylike-parse
+(defn querylike-parse
   "Helper for public facing functions parsing querystring-like values."
   [separator string]
   (if string
@@ -85,13 +85,6 @@
   query string."
   [query-string]
   (querylike-parse #"&\s*" query-string))
-
-(defn cookie-parse
-  "Returns a non-nested map of cookie values corresponding to the given Cookie
-  header string, or nil if the given value is nil."
-  [cookie-string]
-  (querylike-parse #";\s*" cookie-string))
-
 
 (defn query-unparse-line
   [line]

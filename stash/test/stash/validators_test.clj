@@ -1,12 +1,14 @@
 (ns stash.validators-test
   (:use clj-unit.core stash.core stash.validators))
 
-(def url-validator (valid-url :url))
+(deftest "valid-url"
+  (let [url-validator (valid-url :url)]
+    (doseq [url ["http://google.com" "http://google.com/foo?bar=bat"]]
+      (assert-not (url-validator {:url url})))
+      (doseq [url ["fobar" "http://google"]]
+        (assert= (error :url :valid-url) (url-validator {:url url})))))
 
-(deftest "valid-url: returns nil for valid urls"
-  (doseq [url ["http://google.com" "http://google.com/foo?bar=bat"]]
-    (assert-not (url-validator {:url url}))))
-
-(deftest "valid-url: returns error for invalid url"
-  (doseq [url ["fobar" "http://google"]]
-    (assert= (struct +error+ :url :valid-url) (url-validator {:url url}))))
+(deftest "presence: nil attribute"
+  (let [presence-validator (presence :url)]
+    (assert-not (presence-validator {:url "not blank"}))
+    (assert= (error :url :presence) (presence-validator {:url nil}))))

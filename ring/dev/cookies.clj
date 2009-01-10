@@ -1,11 +1,4 @@
-; Note need to adjust wag
-;
-; "Cookie: __utma=100242306.65013152.1228534554.1228534554.1228539624.2; __utmc=100242306; __utmz=100242306.1228539624.2.2.utmccn=(referral)|utmcsr=merb.rubyforge.org|utmcct=/|utmcmd=referral; DokuWiki=bd799c27341199a2135535a8b59668bf"
-; 
-; {"Set-Cookie"
-;   ["name=newvalue; expires=date; path=/; domain=.example.org"
-;    "othername=othervlaue; expires=date; path=/; domain=.example.org"]}
-
+;; Interface examples
 (defn create
   "Create a cookie"
   (let [some-val (params request :some-val)]
@@ -23,16 +16,76 @@
 (defn destroy
   "Remove a cookie"
   [request]
-  (less-cookie :my_cookie
+  (les-cookie :my_cookie
     (success (v/something {}))))
 
-(defn reading-session
-  [request]
-  (let [user-id (session request :user-id)]
-    (if (and user-id (m/find-user-by-id user-id))
-      (success (v/main))
-      (redirect (path c/login)))))
 
+;; Alternate interface
+(defn show "Read-only a cookie" [req]
+  (respond (str "your cookie val: " (cookies req :a-cookie-key))))
+
+(defn create "Create a cookie, then read it before returning" [req]
+  (with-cookies [cookies req]
+    (let [new-cookies (assoc cookies :user_id 23)]
+      (println new-cookies)
+      [new-cookies (respond "you're logged in")])))
+
+(defn create "Simple cookie stash" [req]
+  (sending-cookie :user_id 23 (respond "you're logged in")))
+
+
+; lets not get to ambitious with the middleware stuff, but make it future-proof with the env response
+
+
+; "Cookie: __utma=100242306.65013152.1228534554.1228534554.1228539624.2; __utmc=100242306; __utmz=100242306.1228539624.2.2.utmccn=(referral)|utmcsr=merb.rubyforge.org|utmcct=/|utmcmd=referral; DokuWiki=bd799c27341199a2135535a8b59668bf"
+; 
+; {"Set-Cookie"
+;   ["name=newvalue; expires=date; path=/; domain=.example.org"
+;    "othername=othervlaue; expires=date; path=/; domain=.example.org"]}
+
+
+(defn time/days-from-nom
+  [n])
+
+(defn time/strftime
+  [format time])
+
+  cookies
+    session
+      flash
+
+  def some_action
+    cookies[:key]                                          # reading
+    cookies[:key] = :val                                   # writing
+    cookies[:key] = {:value :val :expires 2.days.from_now} # writing with opts
+    cookies.delete[:key]                                   # deleting
+
+    also domain stuff
+  end
+
+  cookie lifecycle
+    if using cookies, set cookie in response
+    borswer sends on next request
+    if sent by browser and using, may parse from request
+    if cookies asked for, read them
+    at end of request, send any new, changed, or deleted cookies
+
+
+  (defn cookies
+    [req]
+    (if-let [cookie-string (headers req "set-cookie")]
+      (let [cookie-hash (http-utils/cookie-parse cookie-string)]
+        ())))
+
+
+
+; (defn reading-session
+;   [request]
+;   (let [user-id (session request :user-id)]
+;     (if (and user-id (m/find-user-by-id user-id))
+;       (success (v/main))
+;       (redirect (path c/login)))))
+; 
 ; setup cookie session based on request
 ; reques comes in with cookie
 ; get cookie valued by session-id-key
@@ -48,56 +101,6 @@
   (let [session (session request)
         new-sesson (assoc-session session :user-id "someid")]
     (success (v/main) {:session new-session})))
-
-(defn generate-cookie)
-
-(defvar- +cookie-expiry-format+ "%a, %d-%b-%Y %H:%M:%S GMT"
-  "strftime formatter for Set-Cookie expiry header")
-
-(defn- cookie-string
-  [name value options]
-  (let [^#StringBilder builder (StringBuilder.)
-        secure        (:secure options)
-        expires       (:expires options)
-        other-options (dissoc options :secure :expires)]
-    (.append builder (str (the-str name) "=" (url-escape value) ";"))
-    (doseq [[op-name op-val] other-options]
-      (.append (str (the-str op-name) "=" op-val ";"))
-    (if expires
-      (.append builder
-        "expires=" (time/strftime +cookie-expiry-format+ expires) ";"))
-    (if secure
-      (.append builder "secure"))
-    (str builder)))
-
-(defn send-cookie
-  ([name value response]
-   (with-cookie name value {} response))
-  ([name value options response]
-   (let [headers         (nth response 1)
-         cookied-headers (assoc headers "set-cookie"
-                           (conj
-                             (or (get headers "set-cookie") [])
-                             (cookie-string name value options)))]
-     (assoc response 1 cookied-headers))))
-
-(defn delete-cookie
-  [name response]
-  (with-cookie name "" {:expires (time/days-from-now -1)}))
-
-(defn cookies
-  "If only the request is given, returns the map of all cookies for the request.
-  If additional args are given, they are treated as keys with which to get-in 
-  from the cookies map".
-  ([request]
-   (cookie-parse ((request :headers) "cookie")))
-  ([request & keys] (get-in (cookies request) keys)))
-
-(defn time/days-from-nom
-  [n])
-
-(defn time/strftime
-  [format time])
 
 
 

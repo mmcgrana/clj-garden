@@ -4,10 +4,13 @@
         clojure.contrib.except
         ring.http-utils
         ring.utils)
+  (:require [clj-time.core :as time])
   (:import (org.apache.commons.fileupload FileUpload RequestContext)
            (org.apache.commons.fileupload.disk DiskFileItemFactory DiskFileItem)
            (org.apache.commons.io IOUtils)
-           (java.io InputStream)))
+           (java.io InputStream)
+           (org.joda.time.format DateTimeFormat))
+  (:load "request_cookies"))
 
 (defvar- +multipart-re+         #"multipart/form-data")
 (defvar- +form-url-encoded-re+  #"^application/x-www-form-urlencoded")
@@ -17,6 +20,16 @@
 (defvar- +recognized-nonpiggyback-methods+
   #{:get :head :put :delete :options}
   "A set of Keywords corresponding to recognized nonpiggyback http methods.")
+
+(defn env
+  "Returns the raw CWSG env for the request."
+  [request]
+  (request :env))
+
+(defn headers
+  "Returns the raw headers for the request."
+  [request]
+  ((request :env) :headers))
 
 (defn content-type
   "Returns a String for the request's content type."

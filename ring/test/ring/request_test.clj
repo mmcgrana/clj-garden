@@ -1,16 +1,14 @@
 (ns ring.request-test
   (:use clj-unit.core ring.request)
-  (:import (java.io ByteArrayInputStream)))
-
-;      req                     (from-env env)
-;     [action-fn route-params] (recognizer (request-method req) (uri req))
-;     request                  (assoc-route-params req route-params)]
+  (:require [clj-time.core :as time])
+  (:import (java.io ByteArrayInputStream))
+  (:load "request_cookies_test"))
 
 (defn str-input-stream
   [string]
   (ByteArrayInputStream. (.getBytes string)))
 
-(def env
+(def base-env
   {:uri                "/foo/bar"
    :query-string       ""
    :scheme             "http"
@@ -26,7 +24,7 @@
 
 (defn req-with
   [attrs]
-  (from-env (merge env attrs)))
+  (from-env (merge base-env attrs)))
 
 (deftest "request-method: before route params"
   (assert= :get  (request-method (req-with {:request-method :get})))

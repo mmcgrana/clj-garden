@@ -64,7 +64,21 @@
          (hidden-field-tag "_method" (method-str method))
          body]))))
 
-(defn link-tag
+(defn link-to
   "Returns html for a link with anchor text to the path."
   [anchor path]
   (html [:a {:href path} anchor]))
+
+(def #^{:private true} mime-type-strs
+  {:rss  "application/rss+xml"
+   :atom "application/rss+xml"})
+
+(defn auto-discovery-link-tag
+  "Returns an asset auto discovery tag to make browsers aware of e.g. rss feeds.
+  feed-type should be one of :rss or :atom.
+  Options: :title, :rel, :href."
+  [feed-type & [opts]]
+  (html [:link {:rel   (get-or opts :rel   "alternate")
+                :type  (get-or opts :type  (mime-type-strs feed-type))
+                :title (get-or opts :title (upcase (name feed-type)))
+                :href  (get    opts :href)}]))

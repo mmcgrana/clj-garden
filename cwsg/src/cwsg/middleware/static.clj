@@ -30,18 +30,20 @@
   "Returns an app that serves a file out the given directory if one exists that
   corresponse to the request, or delegates to the given app if such a file does 
   not exist."
-  [dir app]
-  (ensure-dir dir)
-  (fn [env]
-    (if (#{:get :head} (:request-method env))
-      (let [uri (url-decode (:uri env))]
-        (if (str-includes? ".." uri)
-          (forbidden)
-          (let [path (cond
-                       (.endsWith "/" uri) (str uri "index.html")
-                       (re-match? #"\.[a-z]+$" uri) uri
-                       :else (str uri ".html"))]
-            (if-let [file (maybe-file dir path)]
-              (success file)
-              (app env)))))
-      (app env))))
+  ([dir app]
+   (ensure-dir dir)
+   (fn [env]
+     (if (#{:get :head} (:request-method env))
+       (let [uri (url-decode (:uri env))]
+         (if (str-includes? ".." uri)
+           (forbidden)
+           (let [path (cond
+                        (.endsWith "/" uri) (str uri "index.html")
+                        (re-match? #"\.[a-z]+$" uri) uri
+                        :else (str uri ".html"))]
+             (if-let [file (maybe-file dir path)]
+               (success file)
+               (app env)))))
+       (app env))))
+  ([dir]
+   (partial wrap dir)))

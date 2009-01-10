@@ -10,26 +10,25 @@
   "Returns a map representing the given request, to be passed as the env
   to an app."
   [#^HttpServletRequest request]
-  (let [content-length   (.getContentLength request)]
-    {:uri                (.getRequestURI request)
-     :query-string       (.getQueryString request)
-     :scheme             (.getScheme request)
-     :request-method     (keyword (.toLowerCase (.getMethod request)))
-     :content-type       (.getContentType request)
-     :content-length     (let [len (.getContentLength request)]
-                           (if (>= len 0) len))
-     :character-encoding (.getCharacterEncoding request)
-     :server-port        (.getServerPort request)
-     :server-name        (.getServerName request)
-     :remote-addr        (.getRemoteAddr request)
-     :headers            (reduce
-                           (fn [header-map #^String header-name]
-                             (assoc header-map
-                               (.toLowerCase header-name)
-                               (.getHeader request header-name)))
-                           {}
-                           (enumeration-seq (.getHeaderNames request)))
-     :stream-fn          #(.getInputStream request)}))
+  {:cwsg/uri                (.getRequestURI request)
+   :cwsg/query-string       (.getQueryString request)
+   :cwsg/scheme             (.getScheme request)
+   :cwsg/request-method     (keyword (.toLowerCase (.getMethod request)))
+   :cwsg/content-type       (.getContentType request)
+   :cwsg/content-length     (let [len (.getContentLength request)]
+                         (if (>= len 0) len))
+   :cwsg/character-encoding (.getCharacterEncoding request)
+   :cwsg/server-port        (.getServerPort request)
+   :cwsg/server-name        (.getServerName request)
+   :cwsg/remote-addr        (.getRemoteAddr request)
+   :cwsg/headers            (reduce
+                         (fn [header-map #^String header-name]
+                           (assoc header-map
+                             (.toLowerCase header-name)
+                             (.getHeader request header-name)))
+                         {}
+                         (enumeration-seq (.getHeaderNames request)))
+   :cwsg/input              (.getInputStream request)}))
 
 (defn- apply-response-tuple
   "Apply the given [status headers body] response tuple to the given response."
@@ -37,8 +36,11 @@
   ; Apply the status.
   (.setStatus response status)
   ; Apply the headers.
-  (doseq [[header-name header-value] headers]
-    (.setHeader response header-name header-value))
+  (doseq [[key val-or-vals] headers]
+    (if (string? val-or-vals)
+      (.setHeader response key val-or-vals)
+      (doseq [val val-or-vals]
+        (.addHeader response key val))))
   ; Apply the body - the method depends on the given body type.
   (instance-case body
     String

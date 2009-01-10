@@ -31,7 +31,3 @@
   (deftest (format "query-unparse: works on %s" query-params)
     (assert= query-params (query-parse (query-unparse query-params)))))
 
-(deftest "cookie-parse"
-  (assert=
-    {:foo "bar" :baz "bat" :whiz "bang"}
-    (cookie-parse "foo=bar;baz=bat; whiz=bang")))

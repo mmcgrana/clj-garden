@@ -164,27 +164,25 @@
   "Save the instance to the database. Returns the instance, marked as not new 
   and perhaps trasformed by callbacks."
   [instance]
-  (let [new        (new? instance)
-        bv-name    (if new :before-validation-on-create
-                           :before-validation-on-update)
-        av-name    (if new :after-validation-on-create
-                           :after-validation-on-update)
-        bs-name    (if new :before-create :before-update)
-        as-name    (if new :after-create  :after-update)
-        persist-fn (if new persist-insert persist-update)]
-    (let [[bv-instance bv?] (run-named-callbacks instance bv-name)]
-      (if-not bv?
-        bv-instance
-        (let [v-instance (validated bv-instance)]
-          (if (errors? v-instance)
-            v-instance
-            (let [[av-instance av?] (run-named-callbacks v-instance av-name)
-                  [bs-instance bs?] (run-named-callbacks av-instance bs-name)]
-              (if-not bs?
-                bs-instance
-                (let [s-instance (persist-fn bs-instance)
-                      [as-instance as?] (run-named-callbacks s-instance as-name)]
-                  as-instance)))))))))
+  (let [[bv-name av-name bs-name as-name persist-fn]
+          (if (new? instance)
+            [:before-validation-on-create :after-validation-on-create
+             :before-create :after-create persist-insert]
+            [:before-validation-on-update :after-validation-on-update
+             :before-update :after-update persist-update])
+        [bv-instance bv?] (run-named-callbacks instance bv-name)]
+    (if-not bv?
+      bv-instance
+      (let [v-instance (validated bv-instance)]
+        (if (errors? v-instance)
+          v-instance
+          (let [[av-instance av?] (run-named-callbacks v-instance av-name)
+                [bs-instance bs?] (run-named-callbacks av-instance bs-name)]
+            (if-not bs?
+              bs-instance
+              (let [s-instance (persist-fn bs-instance)
+                    [as-instance as?] (run-named-callbacks s-instance as-name)]
+                as-instance))))))))
 
 (defn create*
   "Like create, but bypasses mass-assignment protection."

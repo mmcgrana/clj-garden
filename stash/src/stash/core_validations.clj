@@ -2,6 +2,11 @@
 
 (defstruct +error+ :on :cause :expected)
 
+(defn error
+  "Constructor for +error+ structs."
+  [on cause & [expected]]
+  (struct +error+ on cause expected))
+
 (defn errors
   "Returns a coll of errors for the given instance, or nil if there are none."
   [instance]

@@ -1,9 +1,8 @@
 (ns cljurl.controllers
   (:use
     (ring controller request)
-    cljurl.routing
-    clj-backtrace.repl
-    cljurl.utils)
+    (cljurl routing utils)
+    clj-backtrace.repl)
   (:require
     (cljurl
       [models   :as m]
