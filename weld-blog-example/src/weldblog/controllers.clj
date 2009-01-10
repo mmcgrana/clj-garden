@@ -9,7 +9,7 @@
       [config   :as config])
     [stash.core :as stash]))
 
-(defn not-found []
+(defn not-found [& [req]]
   (respond-404 (v/not-found)))
 
 (defmacro with-post
