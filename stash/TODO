@@ -1,11 +1,8 @@
 stash.core/update ???
 
-review dm docs
 rethink, test attr protection, foo* situation
 datetime caster 
 more validators
-key-based window pagination
-select-except
 multi-order (while still keeping simple case)
 associations
 calculations

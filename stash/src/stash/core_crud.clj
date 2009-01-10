@@ -190,8 +190,7 @@
   (save (init* model attrs)))
 
 (defn create
-  "Creates an instance of the model with the attrs. Validations and validations
-  and create callbacks."
+  "Creates an instance of the model with the attrs."
   [model & [attrs]]
   (limit-keys attrs (accessible-attrs model))
   (create* model attrs))
