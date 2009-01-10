@@ -1,12 +1,11 @@
 (ns weld.request-test
   (:use clj-unit.core weld.request)
-  (:require [clj-time.core :as time])
-  (:import (java.io ByteArrayInputStream)))
+  (:require [clj-time.core :as time]))
 
 (defn str-input-stream
   "Returns a ByteArrayInputStream for the given String."
   [string]
-  (ByteArrayInputStream. (.getBytes string)))
+  (java.io.ByteArrayInputStream. (.getBytes string)))
 
 (def base-env
   {:server-port        80
