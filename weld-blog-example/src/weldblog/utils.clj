@@ -1,4 +1,5 @@
-(ns weldblog.utils)
+(ns weldblog.utils
+  (:use clojure.contrib.prxml))
 
 (defn xml
   [& markup]

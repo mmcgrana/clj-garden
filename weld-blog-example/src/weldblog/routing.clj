@@ -5,9 +5,9 @@
 
 (def c 'weldblog.controllers)
 
-(router/defrouting config/app-host
-  [[c 'index      :index     :get "/"                  ]
-    [c 'new       :new       :get "/new"               ]
-    [c 'create    :create    :put "/"                  ]
-    [c 'show      :show      :get "/:id"               ]
-    [c 'not-found :not-found :any "/:path" {:path ".*"}]])
+(routing/defrouting config/app-host
+  [[c 'index      :posts       :get "/"                  ]
+    [c 'new       :new-post    :get "/new"               ]
+    [c 'create    :create-post :put "/"                  ]
+    [c 'show      :post        :get "/:id"               ]
+    [c 'not-found :not-found   :any "/:path" {:path ".*"}]])

@@ -17,5 +17,4 @@
    :accessible-attrs
      [:title :body]
    :validations
-     [[:url presence]]
-   :callbacks}))
+     [[:url presence]]}))

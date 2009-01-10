@@ -1,5 +1,5 @@
 (ns weldblog.config
-  (:use clj-jdbc.data-sources clj-log4j)
+  (:use clj-jdbc.data-sources clj-log4j.core)
   (:import java.io.File))
 
 (def env (keyword (System/getProperty "weldblog.env")))

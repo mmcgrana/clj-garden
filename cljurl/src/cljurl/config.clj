@@ -1,5 +1,5 @@
 (ns cljurl.config
-  (:use clj-jdbc.data-sources cljurl.utils clj-log4j)
+  (:use clj-jdbc.data-sources cljurl.utils clj-log4j.core)
   (:import java.io.File))
 
 (def env (keyword (System/getProperty "cljurl.env")))

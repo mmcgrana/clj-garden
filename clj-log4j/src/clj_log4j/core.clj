@@ -1,5 +1,5 @@
-(ns 'clj-log4j.core
-  (:use (clojure.contrib except case))
+(ns clj-log4j.core
+  (:use (clojure.contrib except fcase))
   (:import (org.apache.log4j Level Logger ConsoleAppender SimpleLayout)))
 
 (def log-levels

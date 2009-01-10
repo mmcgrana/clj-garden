@@ -96,11 +96,13 @@
   "Experimental. Invokes the given handler with the status, headers, and 
   response body input stream for a request to the given url with the given 
   headers."
-  [url headers handler]
-  (http-execute-method (GetMethod. url) headers nil
-    (fn [s h #^HttpMethod get-method]
-      (with-open [b-stream (.getResponseBodyAsStream get-method)]
-        (handler s h b-stream)))))
+  ([url headers handler]
+   (http-execute-method (GetMethod. url) headers nil
+     (fn [s h #^HttpMethod get-method]
+       (with-open [b-stream (.getResponseBodyAsStream get-method)]
+         (handler s h b-stream)))))
+  ([url handler]
+   (http-get-stream url {} handler)))
 
 (defn- headers-and-body-args
   "Returns a tuple of [headers body-args] corresponding to the given

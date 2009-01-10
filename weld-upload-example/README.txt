@@ -1,1 +1,1 @@
-Demo of file upload functionality in Ring, a Clojure web framework.
+Example of file upload functionality in Weld, a Clojure web framework.

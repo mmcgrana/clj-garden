@@ -1,0 +1,8 @@
+Finish documentation
+Include jars for convenience.
+Spin off into proper project
+Figure out logging situation
+Consider HttpComponents 4
+Test against a Ring echo server
+
+so for the readme, what i needed to get it working were the commons io, logging, codec and httpclient jars (I put them in the java ext dir) and clj-http-client.jar (explicitly, not the directory containing it) on the classpath

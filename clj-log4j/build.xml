@@ -13,7 +13,7 @@
   <target name="jar"
           description="Create jar file.">
     <jar jarfile="${jarfile}">
-      <fileset dir="./src" includes="clj-log4j/**/*.clj"/>
+      <fileset dir="./src" includes="clj_log4j/**/*.clj"/>
     </jar>
   </target>
 </project>

@@ -1,0 +1,1 @@
+An example blog application in Weld, a Clojure web framework.

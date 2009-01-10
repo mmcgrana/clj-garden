@@ -8,12 +8,13 @@
       [reloading         :as reloading])
     (weldblog
       [config :as config]
-      routing controllers)))
+      [routing :as routing]
+      controllers)))
 
-(def app
-  (wrap-if config/exception-details? show-exceptions/wrap
-    (file-content-info/wrap
-      (static/wrap config/public-dir
-        (wrap-if config/reloading? (reloading/wrap config/reloadables)
-          (spawn-app routing/router))))))
+(def app (spawn-app routing/router))
+  ;(wrap-if config/exception-details? show-exceptions/wrap
+  ;  (file-content-info/wrap
+  ;    (static/wrap config/public-dir
+  ;      (wrap-if config/reloading? (reloading/wrap config/reloadables)
+  ;        (spawn-app routing/router))))))
 

@@ -78,7 +78,7 @@
   feed-type should be one of :rss or :atom.
   Options: :title, :rel, :href."
   [feed-type & [opts]]
-  (html [:link {:rel   (get-or opts :rel   "alternate")
-                :type  (get-or opts :type  (mime-type-strs feed-type))
-                :title (get-or opts :title (upcase (name feed-type)))
+  (html [:link {:rel   (or (get opts :rel)   "alternate")
+                :type  (or (get opts :type)  (mime-type-strs feed-type))
+                :title (or (get opts :title) (.toUpperCase (name feed-type)))
                 :href  (get    opts :href)}]))

@@ -1,21 +1,22 @@
 (ns weldblog.views
-  (:use weldblog.routing
+  (:use (weldblog routing utils)
         (clj-html core helpers helpers-ext)
-        [stash.core :only (errors)]))
+        [stash.core :only (errors)])
+  (:require [clj-time.core :as time]))
 
 (defmacro with-layout
   [& body]
   `(with-layout-throwing {} ~@body))
 
 (defmacro with-layout-throwing
-  [thrown & body]
-  `(let [inner# (do ~@content)]
+  [thrown-form & body]
+  `(let [inner# (do ~body)]
      (html
        (doctype :xhtml-transitional)
        [:html {:xmlns "http://www.w3.org/1999/xhtml"}
          [:head
            (include-css "/stylesheets/main.css")
-           (thrown :for_head)
+           (~thrown-form :for_head)
            [:meta {:http-equiv "Content-Type" :content "text/html;charset=utf-8"}]
            [:title "Ring Blog Example"]
            [:body inner#]]])))
@@ -32,11 +33,12 @@
   [posts]
   (with-layout-throwing
     {:for_head
-      (atom-autodiscovery-tag "Feed for Ring Blog Example" (path :posts-atom))}
+      (auto-discovery-link-tag :atom
+        {:title "Feed for Ring Blog Example" :href (path :posts-atom)})}
     [:h1 "Posts"]
-    [:p (link-to "New Post" (path :new-posts))]
+    [:p (link-to "New Post" (path :new-post))]
     [:div#posts
-      (map-str post-partial posts)]))
+      (map-str partial-post posts)]))
 
 (defn index-atom
   [posts]
@@ -66,7 +68,7 @@
 (defn show
   [post]
   (with-layout
-    (post-partial post)
+    (partial-post post)
     [:p (link-to "All Posts" (path :posts)) " | "
         (link-to "Edit Post" (path :edit-post post))]))
 

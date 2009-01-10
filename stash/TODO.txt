@@ -1,3 +1,5 @@
+stash.core/update ???
+
 review dm docs
 rethink, test attr protection, foo* situation
 datetime caster 

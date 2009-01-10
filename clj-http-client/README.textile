@@ -1,0 +1,58 @@
+h1. clj-http-client
+
+@clj-http-client@ is a Clojure library providing basic HTTP client functionality. The library can execute @GET@, @HEAD@, @PUT@, @POST@, and @DELETE@ methods and send arbitrary headers and request bodies, as well as receive response bodies either as fully buffered values or as efficient streams.
+
+h2. Installation
+
+First, clone the @clj-garden@ project from GitHub and build the @clj-http-client@ subproject with @ant@:
+
+    $ git clone git://github.com/mmcgrana/clj-garden.git
+    $ cd clj-http-client
+    $ ant
+
+This last step will produce a @clj-http-client.jar@ file, which you should include in your path. You will additionally need to include the following 4 dependencies in your path, which can be downloaded from the listed sites:
+ 
+ * "commons-httpclient-3.1.jar":http://hc.apache.org/downloads.cgi (be sure to select version 3.1)
+ * "commons-codec-1.3.jar":http://commons.apache.org/downloads/download_codec.cgi
+ * "commons-io-1.4.jar":http://commons.apache.org/downloads/download_io.cgi
+ * "commons-logging-1.1.1.jar":http://commons.apache.org/downloads/download_logging.cgi
+
+h2. Usage
+
+Once you have installed the 5 needed jars, you can experiment with the library at the REPL:
+
+    user=> (use 'clj-http-client.core)
+
+To @GET@ the Clojure home page:
+
+    user=> (http-get "http://clojure.org")
+
+The @http-get@ function fetches the specified URL and returns a 3-tuple of the response status code, headers, and body as a String. You can use Clojure destructuring to conveniently access the individual elements:
+
+   user=> (let [[status headers body] (http-get "http://clojure.org")] status)
+
+@http-get@ is useful when you want the response body as a @String@, i.e. when you are interested in the text of the page. You may however be fetching non-textual data, in which case you should use a different function. If the response body will be reasonably small, you can use:
+
+    user=> (http-get-bytes "http://clojure.corg/space/showimage/favicon.png")
+
+This will return a buffered byte array for the response body tuple element.
+If you are fetching large files, you may want to stream them instead of buffering them into memory. Here I use Apache Commons IO Utils to pipe a binary response to a file as it is being downloaded:
+
+    user=> 
+
+Note the the syntax for @http-get-stream@ is slightly different that for the other function. This is necessary because all operations on the streaming HTTP response need to occur within the scope of the @http-get-stream@ function so that it can assure IO resources are appropriately freed upon completion.
+
+    user=> (import 'org.apache.commons.io.IOUtils 'java.io.FileInputStream)
+    user=> (http-get-stream "http://clojure.org/space/showimage/clojure-icon.gif"
+             (fn [status headers stream]
+               (IOUtils/copy stream (FileOutputStream. "clojure.gif"))))
+
+@TODO: document other HTTP methods, request body handling@.
+
+h2. Feedback
+
+@clj-http-client@ is being actively develop; if you run into any problems or have any comments please contact @mmcgrana@ on GitHub.
+
+---
+
+Copyright (c) 2009 Mark McGranaghan and released under an MIT license.
