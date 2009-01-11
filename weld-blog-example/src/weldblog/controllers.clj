@@ -9,53 +9,50 @@
       [config   :as config])
     [stash.core :as stash]))
 
-(defn not-found [& [req]]
-  (respond-404 (v/not-found)))
-
 (defmacro with-post
-  [[binding-sym id-form] & body]
-  `(if-let [~binding-sym (stash/get-one m/+post+ ~id-form)]
+  [[post-bind id-form] & body]
+  `(if-let [~post-bind (stash/get-one m/+post+ ~id-form)]
      (do ~@body)
      (not-found)))
 
-(defn index [req]
-  (respond (v/index (stash/find-all m/+post+))))
+(defn index [env]
+  (with-fading-session [sess env]
+    (respond (v/index (stash/find-all m/+post+) sess))))
 
-(defn index-atom [req]
+(defn index-atom [env]
   (respond (v/index-atom (stash/find-all m/+post+))
     {:content-type "application/rss+xml"}))
 
-(defn show [req]
-  (with-post [post (params req :id)]
-    (respond (v/show post))))
+(defn show [env]
+  (with-post [post (params env :id)]
+    (with-fading-session [sess env]
+      (respond (v/show post sess)))))
 
-(defn new [req]
+(defn new [env]
   (respond (v/new (stash/init m/+post+))))
 
-(defn edit [req]
-  (with-post [post (params req :id)]
+(defn edit [env]
+  (with-post [post (params env :id)]
     (respond (v/edit post))))
 
-(defn create [req]
-  (let [post (stash/create m/+post+ (params req :post))]
+(defn create [env]
+  (let [post (stash/create m/+post+ (params env :post))]
     (if (stash/valid? post)
-      (redirect (path :post post))
+      (flash-env env {:success :post-create}
+        (redirect (path :post post)))
       (respond (v/new post)))))
-      ;(flashing :post-create-success (redirect (path :post post)))
-      ;(flashing :post-create-error   (response (v/new post))))))
 
-(defn update [req]
-  (with-post [post (params req :id)]
-    (let [post (stash/save (stash/update-attrs post (params req :post)))]
+(defn update [env]
+  (with-post [post (params env :id)]
+    (let [post (stash/save (stash/update-attrs post (params env :post)))]
       (if (stash/valid? post)
-        (redirect (path :post post))
+        (flash-env env {:success :post-update}
+          (redirect (path :post post)))
         (respond (v/edit post))))))
-        ;(flashing :post-update-success (redirect (path :post post)))
-        ;(flashing :post-update-failure (response (v/edit post)))))))
 
-(defn destroy [req]
-  (with-post [post (params req :id)]
+(defn destroy [env]
+  (with-post [post (params env :id)]
     (stash/destroy post)
-    (redirect (path :posts))))
-    ;(flashing :post-destroy-success (redirect (path :posts)))))
+    (flash-env env {:success :post-destroy}
+      (redirect (path :posts)))))
 

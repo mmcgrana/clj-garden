@@ -56,6 +56,12 @@
           (assert= :session-value (session unflashed-env :session-key))
           (assert-nil (flash (session unflashed-env))))))))
 
+(deftest "flash-env"
+  (assert=
+    (with-session [sess cookied-env]
+      (flash-session sess :flash-message blank-response))
+    (flash-env cookied-env :flash-message blank-response)))
+
 ; get flash - ok
 ; come back to corret page - ok
 ; get redirected or come back later to other flashing page - nothing we can do

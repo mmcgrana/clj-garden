@@ -69,6 +69,14 @@
   (write-session (assoc sess :flash message)
     resp))
 
+(defn flash-env
+  "Like (with-session [sess env] (flash-session sess message @body)).
+  Use only if the session is not otherwise being written to in this request
+  (use flash-session in that case)."
+  [env message resp]
+  (with-session [sess env]
+    (flash-session sess message resp)))
+
 (defmacro with-fading-session
   "In cases in which a session may be flashed an therefore needs to be resent
   to the client to prevent the flash from persisting into subsequent requests,
