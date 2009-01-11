@@ -14,3 +14,13 @@
 (deftest "take-last"
   (assert= (list 3 4 5) (take-last 3 (list 1 2 3 4 5)))
   (assert= (list 1 2 3) (take-last 5 (list 1 2 3))))
+
+(deftest "memoize-by"
+  (let [memoized (memoize-by :mem-key :val-key)]
+    (let [h1 {:mem-key 1 :val-key :a}
+          h2 {:mem-key 1 :val-key :b}
+          h3 {:mem-key 2 :val-key :c}]
+      (assert= (memoized h1) :a)
+      (assert= (memoized h1) :a)
+      (assert= (memoized h2) :a)
+      (assert= (memoized h3) :c))))

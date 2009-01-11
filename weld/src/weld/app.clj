@@ -7,6 +7,6 @@
   [router]
   (fn [env]
     (let [env+ (init env)]
-      (let [[a-fn r-params] (recognize router (request-method* env+) (uri env+))
+      (let [[a-fn r-params] (recognize router (request-method env+) (uri env+))
             env++           (assoc-route-params env+ r-params)]
         (a-fn env++)))))
