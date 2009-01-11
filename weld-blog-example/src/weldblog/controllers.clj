@@ -9,6 +9,9 @@
       [config   :as config])
     [stash.core :as stash]))
 
+(defn not-found [& env]
+  (respond-404 (v/not-found)))
+
 (defmacro with-post
   [[post-bind id-form] & body]
   `(if-let [~post-bind (stash/get-one m/+post+ ~id-form)]

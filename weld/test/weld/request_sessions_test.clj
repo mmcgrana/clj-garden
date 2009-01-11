@@ -46,10 +46,11 @@
         auth-env  (env-from-response auth-resp)]
     (assert= :session-value (session auth-env :session-key))
     (with-session [auth-sess auth-env]
-      (let [flash-resp (flash-session auth-sess :flash-message blank-response)
+      (let [flash-resp (flash-session auth-sess {:success "!"} blank-response)
             flash-env  (env-from-response flash-resp)]
         (assert= :session-value (session flash-env :session-key))
-        (assert= :flash-message (flash (session flash-env)))
+        (assert= {:success "!"} (flash (session flash-env)))
+        (assert= "!" (flash (session flash-env) :success))
         (let [unflashed-resp (with-fading-session [fading-sess flash-env]
                                 blank-response)
               unflashed-env  (env-from-response unflashed-resp)]

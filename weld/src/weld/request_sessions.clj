@@ -88,6 +88,10 @@
      (write-session ~sess-bind (do ~@body))))
 
 (defn flash
-  "Reads the flash value from a session"
-  [sess]
-  (:flash sess))
+  "Reads flash data from a session. If only the env argument is given, returns
+   all the flash data; if an additional arg is given, uses it to key into the
+   session data, which must in that case be an associative data structure."
+  ([sess]
+   (:flash sess))
+  ([sess arg]
+   (get (flash sess) arg)))

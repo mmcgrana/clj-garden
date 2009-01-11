@@ -29,12 +29,23 @@
       [:div.post_body
         (h (:body post))]]))
 
+(def success-messages
+  {:post-create "Post created"
+   :post-update "Post updated"
+   :post-destroy "Post destroyed"})
+
+(defn success-flash
+  [sess]
+  (if-let [message (success-messages (:success (:flash sess)))]
+    (html [:p.success message])))
+
 (defn index
-  [posts]
+  [posts sess]
   (with-layout-throwing
     {:for_head
       (auto-discovery-link-tag :atom
         {:title "Feed for Ring Blog Example" :href (path :posts-atom)})}
+    (success-flash sess)
     [:h1 "Posts"]
     [:p (link-to "New Post" (path :new-post))]
     [:div#posts
@@ -66,8 +77,9 @@
               (h (:body post))]]])]]))
 
 (defn show
-  [post]
+  [post sess]
   (with-layout
+    (success-flash sess)
     (partial-post post)
     [:p (link-to "All Posts" (path :posts)) " | "
         (link-to "Edit Post" (path :edit-post post))]))
