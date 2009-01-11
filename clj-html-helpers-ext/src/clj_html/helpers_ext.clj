@@ -1,5 +1,5 @@
 (ns clj-html.helpers-ext
-  (:use (clj-html core helpers)))
+  (:use (clj-html core utils helpers)))
 
 (defn hstr
   "Returns an html-escaped string representation of val. Like (h (str val))."

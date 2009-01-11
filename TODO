@@ -9,3 +9,4 @@ simplest dependency manager that could possibly work:
   could even write the file as a clojure data structure
   some libs will only conditionally depend on jars - just make a call 1 way
 purple for dots and messages in clj-unit
+rething run-tests, require-and-run-tests

@@ -1,6 +1,6 @@
 (ns weldblog.views
-  (:use (weldblog routing utils)
-        (clj-html core helpers helpers-ext)
+  (:use (weldblog routing utils auth)
+        (clj-html core utils helpers helpers-ext)
         [stash.core :only (errors)])
   (:require [clj-time.core :as time]))
 
@@ -21,23 +21,36 @@
            [:title "Ring Blog Example"]
            [:body inner#]]])))
 
-(defn partial-post
-  [post]
-  (html
-    [:div {:class (str "post_" (:id post))}
-      [:h2 (link-to (:title post) (path :post post))]
-      [:div.post_body
-        (h (:body post))]]))
+(def message-info
+  {:session-needed    [:notice  "Please log in"]
+   :session-created   [:success "You are now logged in"]
+   :session-destroyed [:notice  "You are now logged out"]
+   :post-created      [:success "Post created"]
+   :post-updated      [:success "Post updated"]
+   :post-destroyed    [:success "Post destroyed"]})
 
-(def success-messages
-  {:post-create "Post created"
-   :post-update "Post updated"
-   :post-destroy "Post destroyed"})
-
-(defn success-flash
+(defn message
   [sess]
-  (if-let [message (success-messages (:success (:flash sess)))]
-    (html [:p.success message])))
+  (when-let-html [[type text] (message-info (:flash sess))]
+    [:p {:class (name type)} text]))
+
+; nil :params :message
+(defhtml new-session [& [info]]
+  [:p.info (h (pr-str info))]
+  (let [params (get info :params)]
+    (form-to (path-info :create-session)
+      (html [:p (text-field-tag "password" (get params :password))]))))
+
+(defhtml partial-post
+  [post]
+  [:div {:class (str "post_" (:id post))}
+    [:h2 (link-to (:title post) (path :post post))]
+    [:div.post_body
+      (h (:body post))]])
+
+(defhtml session-info
+  [sess]
+  [:p.login-info (pr-str sess)])
 
 (defn index
   [posts sess]
@@ -45,26 +58,27 @@
     {:for_head
       (auto-discovery-link-tag :atom
         {:title "Feed for Ring Blog Example" :href (path :posts-atom)})}
-    (success-flash sess)
+    (message sess)
+    (session-info sess)
     [:h1 "Posts"]
-    [:p (link-to "New Post" (path :new-post))]
+    (when-html (authenticated? sess)
+      [:p (link-to "New Post" (path :new-post))])
     [:div#posts
       (map-str partial-post posts)]))
 
-(defn index-atom
+(defxml index-atom
   [posts]
-  (xml
-    [:decl! {:version "1.1"}]
-    [:feed {:xmlns "http://www.w3.org/2005/Atom" "xml:lang" "en-US"}
-      [:id (url :posts-atom)]
-      [:title "Ring Blog Example"]
-      [:updated (time/xmlschema (time/now))]
-      [:link {:href (url :posts-atom) :rel "self" :type "application/rss+xml"}]
-      [:author
-        [:name "Mark McGranaghan"]
-        [:email "mmcgrana@gmail.com"]
-        [:uri "http://github.com/mmcgrana"]]
-      (for [post posts]
+  [:decl! {:version "1.1"}]
+  [:feed {:xmlns "http://www.w3.org/2005/Atom" "xml:lang" "en-US"}
+    [:id (url :posts-atom)]
+    [:title "Ring Blog Example"]
+    [:updated (time/xmlschema (time/now))]
+    [:link {:href (url :posts-atom) :rel "self" :type "application/rss+xml"}]
+    [:author
+      [:name "Mark McGranaghan"]
+      [:email "mmcgrana@gmail.com"]
+      [:uri "http://github.com/mmcgrana"]]
+    (for [post posts]
       [:entry
         [:id (url :post post)]
         [:title (h (:title post))]
@@ -74,56 +88,60 @@
           (time/xmlschema (time/now))]
         [:summary {:type "xhtml"}
           [:div {:xmlns "http://www.w3.org/1999/xhtml"}
-            (h (:body post))]]])]))
+            (h (:body post))]]])])
 
 (defn show
   [post sess]
   (with-layout
-    (success-flash sess)
+    (message sess)
+    (session-info sess)
     (partial-post post)
-    [:p (link-to "All Posts" (path :posts)) " | "
-        (link-to "Edit Post" (path :edit-post post))]))
+    [:p (link-to "All Posts" (path :posts))
+      (when-html (authenticated? sess)
+        " | " (link-to "Edit Post" (path :edit-post post)))]))
 
 (defn error-messages-post
   [post]
-  (if-let [errs (errors post)]
-    (html
-      [:div.error-messages
-        [:h3 "There were problems with your submission:"]
-        (domap-str [err errs]
-          (html [:p (name (:on err))]))])))
+  (when-let-html [errs (errors post)]
+    [:div.error-messages
+      [:h3 "There were problems with your submission:"]
+      (for-html [err errs]
+        [:p (name (:on err))])]))
 
-(defn partial-post-form
+(defhtml partial-post-form
   [post]
-  (html
-    [:p "title:"]
-    [:p (text-field-tag "post[title]" (:title post))]
-    [:p "body:"]
-    [:p (text-area-tag  "post[body]"  (:body  post) {:rows 20 :cols 80})]
-    [:p (submit-tag "Submit Post")]))
+  [:p "title:"]
+  [:p (text-field-tag "post[title]" (:title post))]
+  [:p "body:"]
+  [:p (text-area-tag  "post[body]"  (:body  post) {:rows 20 :cols 80})]
+  [:p (submit-tag "Submit Post")])
 
 (defn new
-  [post]
-  (html
+  [post sess]
+  (with-layout
+    (session-info sess)
     [:h1 "New Post"]
     (error-messages-post post)
     (form-to (path-info :create-post)
       (partial-post-form post))))
 
 (defn edit
-  [post]
-  (html
+  [post sess]
+  (with-layout
+    (session-info sess)
     [:h1 "Editing Post"]
     (error-messages-post post)
     (form-to (path-info :update-post post)
       (partial-post-form post))))
 
-(defn not-found []
+(defn not-found [sess]
   (with-layout
+    (session-info sess)
     [:h3 "We're sorry - we couln't find that."]
     [:p  "Please return to the " (link-to "Home Page" (path :posts))]))
 
-(defn internal-error []
+(defn internal-error [sess]
   (with-layout
+    (session-info sess)
     [:h3 "We're sorry - something went wrong."]
     [:p  "We've been notified of the problem and are looking into it."]))

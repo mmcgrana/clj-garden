@@ -1,6 +1,6 @@
 (ns clj-log4j.core
   (:use (clojure.contrib except fcase))
-  (:import (org.apache.log4j Level Logger ConsoleAppender SimpleLayout)))
+  (:import (org.apache.log4j Level Logger ConsoleAppender PatternLayout)))
 
 (def log-levels
   {:debug Level/DEBUG
@@ -24,7 +24,7 @@
                  (case output
                    :out (ConsoleAppender/SYSTEM_OUT)
                    :err (ConsoleAppender/SYSTEM_ERR)))
-               (.setLayout (SimpleLayout.))
+               (.setLayout (PatternLayout. "%m%n"))
                (.activateOptions))]
     (doto (Logger/getLogger (str (gensym)))
       (.setLevel (log-level level))

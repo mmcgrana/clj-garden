@@ -1,5 +1,5 @@
 (ns ring.middleware.show-exceptions
-  (:use (clj-html core helpers)
+  (:use (clj-html core utils helpers)
         clojure.contrib.str-utils
         (clj-backtrace core repl)
         ring.utils))

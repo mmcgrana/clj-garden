@@ -16,5 +16,5 @@
     (file-info/wrap
       (static/wrap config/public-dir
         (wrap-if config/reloading? (reloading/wrap config/reloadables)
-          (spawn-app routing/router))))))
+          (spawn-app routing/router config/logger))))))
 

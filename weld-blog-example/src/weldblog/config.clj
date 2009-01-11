@@ -29,5 +29,7 @@
 (def reloading? dev?)
 (def reloadables '(weldblog.models weldblog.views weldblog.controllers))
 
+(def admin-password "secret")
+
 
 

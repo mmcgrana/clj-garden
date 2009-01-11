@@ -1,5 +1,4 @@
 Set up upload test helper so that it emulates the GC situation
-request, routing, cookie-set, and response routing
 
 framework
   tease apart with-filters
@@ -7,6 +6,8 @@ framework
   better cli for scripts
 
 logging
+  request, routing, cookie-set, and response routing
+  
   :info [:sql {:query "SELECT * FROM posts" :time 12}]
   :info [:request {:ns-sym 'cljurl.controllers :fn-sym 'show :params {:id "a"}}
   :info [:response {:time 131}]
@@ -19,3 +20,19 @@ logging
   ERROR - "NUllPointerException
       bar(568) foo.bar/bat
       bar(569) foo.bar/bat[fn]"
+
+
+
+GET /foo/bar
+routing: 'weldblog.controller 'index
+params: {:params-key :param}
+query: (1 msecs) "SELECT * FROM posts"
+response: (123 msecs) 300 "/foo/bar"
+
+GET /biz/bat
+routing: 'weldblog.controller 'show
+params: {:id "foo"}
+query: (1 msecs) "SELCT * FROM posts where"
+response: (123 msecs) 300 "/show/:id"
+
+

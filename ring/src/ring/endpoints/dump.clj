@@ -1,5 +1,5 @@
 (ns ring.endpoints.dump
-  (:use (clj-html core helpers)
+  (:use (clj-html core utils helpers)
         clojure.contrib.def)
   (:import (org.apache.commons.io IOUtils)))
 
