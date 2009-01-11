@@ -9,3 +9,4 @@ account for all dependencies
 server boot fits in a tweet
 handler tests
 colorize show exception traces
+move as much stuff from both ends of the ring into middleware

@@ -24,14 +24,41 @@
 (defn show "Read-only a cookie" [req]
   (respond (str "your cookie val: " (cookies req :a-cookie-key))))
 
+; no
 (defn create "Create a cookie, then read it before returning" [req]
   (with-cookies [cookies req]
     (let [new-cookies (assoc cookies :user_id 23)]
       (println new-cookies)
       [new-cookies (respond "you're logged in")])))
 
+(let [cookies     (cookies env)
+      new-val     (dosomething-with cookies)]
+  (setting-cookie :user_id new-val (respond (v/index))))
+
+
 (defn create "Simple cookie stash" [req]
-  (sending-cookie :user_id 23 (respond "you're logged in")))
+  (setting-cookie :user_id 23 (respond "you're logged in")))
+  (setting-cookies {:user_id 23 :foobar :bat})
+
+(defn cookies
+  ([env]
+   (DO COOKIE READING))
+  ([env & args]
+   (get-in (cookies env) args)))
+
+(def setting-cookies
+  [toset response]
+  (DO COOKIE WRITING))
+
+(defn setting-cookie
+  [key val response]
+  (setting-cookies {key val} response))
+
+(defmacro with-cookies
+  [[binding-sym env] & body]
+  `(let [~binding-sym (cookies env)
+         [new-cookies# response#] (do ~@body)]
+     (write-cookies new-cookies# response#)))
 
 
 ; lets not get to ambitious with the middleware stuff, but make it future-proof with the env response

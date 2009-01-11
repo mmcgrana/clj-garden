@@ -1,29 +1,7 @@
 (ns weld.request-test
-  (:use clj-unit.core weld.request)
-  (:require [clj-time.core :as time]))
-
-(defn str-input-stream
-  "Returns a ByteArrayInputStream for the given String."
-  [string]
-  (java.io.ByteArrayInputStream. (.getBytes string)))
-
-(def base-env
-  {:server-port        80
-   :server-name        "localhost"
-   :remote-addr        nil
-   :uri                "/foo/bar"
-   :query-string       ""
-   :scheme             "http"
-   :request-method     :get
-   :headers            {}
-   :content-type       nil
-   :content-length     nil
-   :character-encoding nil
-   :body               (str-input-stream "")})
-
-(defn env-with
-  [attrs]
-  (init (merge base-env attrs)))
+  (:use clj-unit.core weld.request clojure.contrib.str-utils)
+  (:require [clj-time.core :as time])
+  (:load "request_shared_test" "request_cookies_test" "request_sessions_test"))
 
 (deftest "headers"
   (assert= {"foo" "bar"} (headers (env-with {:headers {"foo" "bar"}}))))

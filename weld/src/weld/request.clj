@@ -9,7 +9,8 @@
            (org.apache.commons.fileupload.disk DiskFileItemFactory DiskFileItem)
            (org.apache.commons.io IOUtils)
            (java.io InputStream)
-           (org.joda.time.format DateTimeFormat)))
+           (org.joda.time.format DateTimeFormat))
+  (:load "request_cookies" "request_sessions"))
 
 (defvar- multipart-re         #"multipart/form-data")
 (defvar- form-url-encoded-re  #"^application/x-www-form-urlencoded")
@@ -83,7 +84,6 @@
   disk-file-item-factory
   (doto (DiskFileItemFactory.)
     (.setSizeThreshold -1)
-    (.setRepository (java.io.File. "/Users/mmcgrana/Desktop/git/clj-garden/weld-upload-example/public/uploads"))
     (.setFileCleaningTracker nil)))
 
 (defn multipart-params

@@ -24,3 +24,9 @@
       (assert= (memoized h1) :a)
       (assert= (memoized h2) :a)
       (assert= (memoized h3) :c))))
+
+(deftest "base64-encode, base64-decode"
+  (let [data    {:foo "bar" }
+        encoded (base64-encode (pr-str data))]
+    (assert-match #"[a-zA-Z0-9\+\/]" encoded)
+    (assert= data (read-string (base64-decode encoded)))))

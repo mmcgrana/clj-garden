@@ -1,5 +1,6 @@
 (ns weld.utils
-  (:use clojure.contrib.str-utils))
+  (:use clojure.contrib.str-utils)
+  (:import org.apache.commons.codec.binary.Base64))
 
 (defn re-without
   "Returns a String with the given pattern re-gsub'd out the given string."
@@ -41,7 +42,7 @@
   `(or (get ~map ~key) ~or-form))
 
 (defn memoize-by
-  "TODOC"
+  "Memoize a function of one argument by some function on that argument."
   [key-f f]
   (let [mem (atom {})]
     (fn [arg]
@@ -51,3 +52,13 @@
           (let [ret (f arg)]
             (swap! mem assoc key ret)
             ret))))))
+
+(defn base64-encode
+  [unencoded]
+  "Returns a string of base64 encoded data for the given unencoded string."
+  (String. (Base64/encodeBase64 (.getBytes unencoded))))
+
+(defn base64-decode
+  "Returns a string of base64 decoded data for the given encoded string."
+  [encoded]
+  (String. (Base64/decodeBase64 (.getBytes encoded))))

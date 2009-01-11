@@ -13,9 +13,10 @@
   "If only the request is given, returns the map of all cookies for the request.
   If additional args are given, they are treated as keys with which to get-in 
   from the cookies map".
-  ([request]
-   (cookie-parse ((request :headers) "cookie")))
-  ([request & keys] (get-in (cookies request) keys)))
+  ([env]
+   (cookie-parse (get-in env [:headers "cookie"])))
+  ([env & args]
+   (get-in (cookies env) args)))
 
 (defn cookie-str
   "Returns a string to be used as Set-Cookie value such that a cookie is set
@@ -32,10 +33,10 @@
   "Returns response, augmented with a Set-Cookie header for the given
   cookie-string."
   [response cookie-string]
-  (let [headers     (response 1)
+  (let [headers     (:headers response)
         new-headers (assoc headers "Set-Cookie"
                        (conj (get-or headers "Set-Cookie" []) cookie-string))]
-    (assoc response 1 new-headers)))
+    (assoc response :headers new-headers)))
 
 (defn with-cookie
   "Returns response, augmented with a Set-Cookie header according to the
