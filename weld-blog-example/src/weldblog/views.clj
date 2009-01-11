@@ -54,27 +54,27 @@
 (defn index-atom
   [posts]
   (xml
-    [:decl! {:version "1.1"}
-      [:feed {:xmlns "http://www.w3.org/2005/Atom" "xml:lang" "en-US"}
-        [:id (url :posts-atom)]
-        [:title "Ring Blog Example"]
-        [:updated (time/xmlschema (time/now))]
-        [:link {:href (url :posts-atom) :rel "self" :type "application/rss+xml"}]
-        [:author
-          [:name "Mark McGranaghan"]
-          [:email "mmcgrana@gmail.com"]
-          [:uri "http://github.com/mmcgrana"]]
-        (for [post posts]
-        [:entry
-          [:id (url :post post)]
-          [:title (h (:title post))]
-          [:link {:rel "alternate" :type "text/html"
-                  :href (url :post post)}]
-          [:updated
-            (time/xmlschema (time/now))]
-          [:summary {:type "xhtml"}
-            [:div {:xmlns "http://www.w3.org/1999/xhtml"}
-              (h (:body post))]]])]]))
+    [:decl! {:version "1.1"}]
+    [:feed {:xmlns "http://www.w3.org/2005/Atom" "xml:lang" "en-US"}
+      [:id (url :posts-atom)]
+      [:title "Ring Blog Example"]
+      [:updated (time/xmlschema (time/now))]
+      [:link {:href (url :posts-atom) :rel "self" :type "application/rss+xml"}]
+      [:author
+        [:name "Mark McGranaghan"]
+        [:email "mmcgrana@gmail.com"]
+        [:uri "http://github.com/mmcgrana"]]
+      (for [post posts]
+      [:entry
+        [:id (url :post post)]
+        [:title (h (:title post))]
+        [:link {:rel "alternate" :type "text/html"
+                :href (url :post post)}]
+        [:updated
+          (time/xmlschema (time/now))]
+        [:summary {:type "xhtml"}
+          [:div {:xmlns "http://www.w3.org/1999/xhtml"}
+            (h (:body post))]]])]))
 
 (defn show
   [post sess]

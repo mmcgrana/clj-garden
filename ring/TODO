@@ -3,10 +3,8 @@ Make it as easy as possible to get started
 Less sucky dump.clj
 Linter
 Documentation
-Final sophisticated tree example
 Consider utils carefully
 account for all dependencies
-server boot fits in a tweet
 handler tests
 colorize show exception traces
 move as much stuff from both ends of the ring into middleware

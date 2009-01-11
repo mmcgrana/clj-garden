@@ -9,15 +9,3 @@ simplest dependency manager that could possibly work:
   could even write the file as a clojure data structure
   some libs will only conditionally depend on jars - just make a call 1 way
 purple for dots and messages in clj-unit
-
-request_cookies.clj:19 weld.request/-DOT-
-
-; last line is 19
-(defn cookies
-  "If only the request is given, returns the map of all cookies for the request.
-  If additional args are given, they are treated as keys with which to get-in 
-  from the cookies map".
-  ([env]
-   (cookie-parse (get-in env [:headers "cookie"])))
-  ([env & args]
-   (get-in (cookies env) keys)))

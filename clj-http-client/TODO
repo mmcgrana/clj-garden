@@ -1,6 +1,4 @@
 Finish documentation
-Include jars for convenience.
-Spin off into proper project
 Figure out logging situation
 Consider HttpComponents 4
 Test against a Ring echo server
