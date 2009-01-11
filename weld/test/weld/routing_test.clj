@@ -14,7 +14,9 @@
 (routing/defrouting "host" routes)
 
 (deftest "recognize"
-  (let [[action-fn params] (routing/recognize router :get "/show/foo")]
+  (let [[ns-sym fn-sym action-fn params] (routing/recognize router :get "/show/foo")]
+    (assert= 'weld.routing-test ns-sym)
+    (assert= 'show fn-sym)
     (assert= :shown (action-fn :shown))
     (assert= {:slug "foo"} params)))
 

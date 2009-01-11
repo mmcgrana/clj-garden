@@ -1,0 +1,6 @@
+Idea for a more general Clojure logging library:
+
+- Logger is a fn of two args, the level and a closure to produce the message
+- Helper method provided by lib that takes a map of 
+- Then for a logging implementation to be used it either needs to implement the
+  interface directly or use the helper.

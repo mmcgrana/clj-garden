@@ -5,7 +5,7 @@
   [logger]
   (if logger
     (fn [sql time]
-      (.info logger (if time (str "(" time " msecs) " sql) sql)))))
+      (.info logger (if time (str "query: (" time " msecs) " sql) sql)))))
 
 (defmacro with-logger
   "Execute body in a context where the clj-jdbc reporter is bound to invoke

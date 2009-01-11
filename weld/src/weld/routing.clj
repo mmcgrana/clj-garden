@@ -21,7 +21,7 @@
   path, taking advantage of dynamic resolution."
   [method path]
   (let [[[ns-sym fn-sym] params] ((:symbolic-recognizer router) method path)]
-    [(ns-resolve ns-sym fn-sym) params]))
+    [ns-sym fn-sym (ns-resolve ns-sym fn-sym) params]))
 
 (defn path-info
   "Returns a [method path unused-params] tuple based on the router, action name,

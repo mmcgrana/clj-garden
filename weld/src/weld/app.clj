@@ -10,6 +10,9 @@
   (str "request: " (.toUpperCase (name (request-method env))) " "
        (full-uri env)))
 
+(defn routing-log [ns-sym fn-sym]
+  (str "routing: " (pr-str ns-sym) "/" (pr-str fn-sym)))
+
 (defn params-log [env]
   (str "params: " (pr-str (params env))))
 
@@ -25,8 +28,10 @@
     (log logger (request-log env))
     (let [start (System/currentTimeMillis)
           env+ (init env)]
-      (let [[a-fn r-params] (recognize router (request-method env+) (uri env+))
+      (let [[ns-sym fn-sym a-fn r-params]
+              (recognize router (request-method env+) (uri env+))
             env++           (assoc-route-params env+ r-params)]
+        (log logger (routing-log ns-sym fn-sym))
         (log logger (params-log env++))
         (let [resp (a-fn env++)]
           (log logger (response-log resp start))
