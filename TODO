@@ -1,14 +1,12 @@
 == Release
+Remoe clj-unit clj-routing
 Own projects:
-  clj-unit
   ring
   weld
 Check Weld dependencies
 Brief Weld readme
 How to run Ring unit tests
-Readme and presentability of clj-unit
 Feasability of Compojure shim
-Trim 3 projects from github
 Colorize show-exceptions trace
 Put 3 examples in README
 
