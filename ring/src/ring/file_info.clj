@@ -1,7 +1,7 @@
-(ns ring.middleware.file-info
+(ns ring.file-info
   (:use clojure.contrib.def)
-  (:import (org.apache.commons.io FilenameUtils)
-           (java.io File)))
+  (:import org.apache.commons.io.FilenameUtils
+           java.io.File))
 
 (defvar- mime-type-map
   {"ai"    "application/postscript"
@@ -67,10 +67,11 @@
 
 (defn wrap
   "Wrap an app such that responses with a file a body will have 
-  corresponding Content-Type and Content-Length headers added."
+  corresponding Content-Type and Content-Length headers added if they are not
+  allready present and can be determined from the file."
   [app]
-  (fn [env]
-    (let [{:keys [headers body] :as response} (app env)]
+  (fn [req]
+    (let [{:keys [headers body] :as response} (app req)]
       (if (instance? File body)
         (assoc response :headers
           (assoc headers "Content-Length" (str (.length body))

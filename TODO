@@ -10,11 +10,12 @@ simplest dependency manager that could possibly work:
 purple for dots and messages in clj-unit
 cling -> wiki w/ ring, weld, jgit "a Clojure Wiki Thing"
 
-== ring
-Linter
-Try compiling carefully
+== Ring
+Try compiling carefully, making build file
 
-== weld
+== Weld
+update in weld?
+
 Set up upload test helper so that it emulates the GC situation
 
 framework
@@ -23,3 +24,4 @@ framework
   better cli for scripts
 
 see if the weld-level routing logic can be simplified
+better logging implementation

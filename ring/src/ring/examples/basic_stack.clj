@@ -1,13 +1,14 @@
+; A failry typical middleware configuration wrapping the dump endpoint.
+
 (ns ring.examples.basic-stack
-  (:require (ring.middleware show-exceptions file-info file)
-            ring.endpoints.dump
-            ring.handlers.jetty)
+  (:require (ring show-exceptions file-info file reloading dump jetty))
   (:import (java.io File)))
 
 (def app
-  (ring.middleware.show-exceptions/wrap
-    (ring.middleware.file-info/wrap
-      (ring.middleware.file/wrap (File. "src/ring/examples/public")
-        ring.endpoints.dump/app))))
+  (ring.show-exceptions/wrap
+    (ring.file-info/wrap
+      (ring.file/wrap (File. "src/ring/examples/public")
+        (ring.reloading/wrap '(ring.dump)
+          ring.dump/app)))))
 
-(ring.handlers.jetty/run {:port 8080} app)
+(ring.jetty/run {:port 8080} app)

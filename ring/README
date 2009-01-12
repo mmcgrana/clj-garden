@@ -1,45 +1,47 @@
 === Ring
 
-     ^--->HTTP Reqeust--->[Handler]--->Env1--->[Middleware]--->Env2----v
-     |                                                                 |
-  [Cient]                                                          [Endpoint]
-     |                                                                 |
-     ^----HTTP Response<--[Handler]<---Res2<---[Middleware]<---Res1<---v
+    ^--->HTTP Request--->[Handler]--->Req1---->[Middleware]--->Req2----v
+    |                                                                  |
+ [Cient]                                                           [Endpoint]
+    |                                                                  |
+    ^----HTTP Response<--[Handler]<---Resp2<---[Middleware]<---Resp1<--v
 
 == Overview
-Ring is a web application library inspired by Python's WSGI and Ruby's Rack, 
-designed to encourage modular and concise web applications.
+Ring is a library inspired by Python's WSGI and Ruby's Rack that 
+enables modular and concise Clojure web applications. Ring abstracts the details 
+of HTTP and defines a simple API by which web application components can 
+cleanly interact with each other.
 
 == Quick Setup
-The various ring.* libs in this distribution depend on different jars, but if 
-you have all of the jars included in the deps/ directory then you will be able
-to use any of the libs in this distribution.
+All jars needed to load any of the ring.* libs in this distribution are 
+included in the jars/ directory, 
 
-Note that Jetty is currently required as it is the only server for which we 
-have implemented a Ring handler. The Jetty jars are also in the jars/
-directory.
-
-Your exect boot process will depend on your environement, but a simple Clojure script to get a hello world Ring app might look like:
-
-  (require 'ring.handlers.jetty)
+To see Ring in action, run:
   
-  (defn app
-    [env]
-    {:status  200
-     :headers {"Content-Type" "text/html"}
-     :body    "Hello World from Ring"})
+  java -Djava.ext.dirs=jars clojure.main src/ring/examples/hello_world.clj
 
-  (ring.handlers.jetty/run {:port 8080} app)
+You can learn more about Ring's dependencies at the following sites:
 
+clojure.jar, clojure-contrib.jar:
+  http://clojure.org
+jetty-6.1.14.jar, jetty-util-6.1.14.jar, servlet-api-2.5-6.1.14.jar:
+  http://www.mortbay.org/jetty/
+commons-io-1.4.jar:
+  http://commons.apache.org/io/
+clj-html.jar, clj-html-helpers.jar, clj-backtrace.jar:
+  http://github.com/mmcgrana
 
-== Examples
-You can find 2 example Ring apps in the src/examples directory of this
-directory; a "hello world" example consisting of a single function and 
-"basic stack" example showing a typical Ring setup with common middleware.
+You can find additional example Ring apps in the src/examples directory of this
+distribution, including a "basic stack" example that shows a typical Ring 
+setup with wrapping middleware.
 
 == Spec
 Please consult the SPEC file at the root of this distribution for a complete 
 description of the Ring interface.
+
+== Development
+Ring is being actively developed; you can track its progress and contribute at:
+  http://github.com/mmcgrana/ring
 
 ---
 Copyright (c) 2009 Mark McGranaghan and released under an MIT license.

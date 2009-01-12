@@ -83,8 +83,8 @@
     (request-method (env-with {:request-method :bar}))))
 
 (deftest "scheme"
-  (assert= "https"
-    (scheme (env-with {:scheme "https"}))))
+  (assert= :http
+    (scheme (env-with {:scheme :http}))))
 
 (deftest "ssl?"
   (assert-not  (ssl? (env-with {:scheme "http"})))

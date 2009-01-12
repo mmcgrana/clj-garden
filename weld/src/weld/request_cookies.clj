@@ -13,10 +13,10 @@
   "If only the request is given, returns the map of all cookies for the request.
   If additional args are given, they are treated as keys with which to get-in 
   from the cookies map".
-  ([env]
-   (cookie-parse (get-in env [:headers "cookie"])))
-  ([env & args]
-   (get-in (cookies env) args)))
+  ([req]
+   (cookie-parse (get-in req [:headers "cookie"])))
+  ([req & args]
+   (get-in (cookies req) args)))
 
 (defn cookie-str
   "Returns a string to be used as Set-Cookie value such that a cookie is set

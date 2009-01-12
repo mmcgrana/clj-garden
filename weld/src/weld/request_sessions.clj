@@ -55,9 +55,9 @@
 
 (defmacro with-session
   "Helper macro for evaluating a body in the context of a sesion extracted
-  from an environment."
-  [[bind-sess env-form] & body]
-  `(let [~bind-sess (session ~env-form)]
+  from an request."
+  [[bind-sess req-form] & body]
+  `(let [~bind-sess (session ~req-form)]
      ~@body))
 
 (defn flash-session
@@ -69,12 +69,12 @@
   (write-session (assoc sess :flash message)
     resp))
 
-(defn flash-env
-  "Like (with-session [sess env] (flash-session sess message @body)).
+(defn flash-request
+  "Like (with-session [sess req] (flash-session sess message @body)).
   Use only if the session is not otherwise being written to in this request
   (use flash-session in that case)."
-  [env message resp]
-  (with-session [sess env]
+  [req message resp]
+  (with-session [sess req]
     (flash-session sess message resp)))
 
 (defmacro with-fading-session
@@ -83,12 +83,12 @@
   you can use this declarative helper macro to both read the session (which
   you will need to read flash values) and to write-session on the generated
   response."
-  [[sess-bind env] & body]
-  `(with-session [~sess-bind ~env]
+  [[sess-bind req] & body]
+  `(with-session [~sess-bind ~req]
      (write-session ~sess-bind (do ~@body))))
 
 (defn flash
-  "Reads flash data from a session. If only the env argument is given, returns
+  "Reads flash data from a session. If only the sess argument is given, returns
    all the flash data; if an additional arg is given, uses it to key into the
    session data, which must in that case be an associative data structure."
   ([sess]

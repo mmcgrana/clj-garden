@@ -1,4 +1,4 @@
-(ns ring.middleware.show-exceptions
+(ns ring.show-exceptions
   (:use (clj-html core utils helpers)
         clojure.contrib.str-utils
         (clj-backtrace core repl)
@@ -37,16 +37,14 @@ table.trace td.method {
 
 table.trace td.source {
   text-align: right;
-}
+}")
 
-")
-
-(defn- js-response [env e]
+(defn- js-response [req e]
   {:status  500
    :headers {"Content-Type" "text/javascript"}
    :body    (pst-str e)})
 
-(defn- html-reponse [env e]
+(defn- html-reponse [req e]
   (let [excp (parse-exception e)]
     {:status 500
      :headers {"Content-Type" "text/html"}
@@ -56,7 +54,7 @@ table.trace td.source {
          [:html {:xmlns "http://www.w3.org/1999/xhtml"}
            [:head
              [:meta {:http-equiv "Content-Type" :content "text/html;charset=utf-8"}]
-             [:title "Show Exceptions"]
+             [:title "Ring: Show Exceptions"]
              [:style {:type "text/css"} css]
              [:body
                [:div#content
@@ -78,18 +76,18 @@ table.trace td.source {
 (defn- response
   "Returns a response showing debugging information about the exception.
   Currently supports delegation to either js or html exception views."
-  [env e]
-  (let [accept (get-in env [:headers "accept"])]
+  [req e]
+  (let [accept (get-in req [:headers "accept"])]
     (if (and accept (re-match? #"^text/javascript" accept))
-      (js-response env e)
-      (html-reponse env e))))
+      (js-response req e)
+      (html-reponse req e))))
 
 (defn wrap
   "Wrap an app such that exceptions thrown within the wrapped app are caught 
   and a helpful debugging response is returned."
   [app]
-  (fn [env]
+  (fn [req]
     (try
-      (app env)
+      (app req)
       (catch Exception e
-        (response env e)))))
+        (response req e)))))

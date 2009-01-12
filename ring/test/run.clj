@@ -1,8 +1,9 @@
 (use 'clj-unit.core)
 (require-and-run-tests
   'ring.builder-test
-  'ring.endpoints.dump-test
-  'ring.middleware.file-info-test
-  'ring.middleware.reloading-test
-  'ring.middleware.show-exceptions-test
-  'ring.middleware.file-test)
+  'ring.dump-test
+  'ring.lint-test
+  'ring.file-test
+  'ring.file-info-test
+  'ring.reloading-test
+  'ring.show-exceptions-test)

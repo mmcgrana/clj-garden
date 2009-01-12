@@ -1,4 +1,4 @@
-(ns ring.handlers.jetty
+(ns ring.jetty
   (:import (javax.servlet.http HttpServletRequest HttpServletResponse)
            (org.mortbay.jetty.handler AbstractHandler)
            (org.mortbay.jetty Server)
@@ -6,16 +6,16 @@
            (org.apache.commons.io IOUtils))
   (:use (clojure.contrib fcase except)))
 
-(defn- env-map
-  "Returns a map representing the given request, to be passed as the env
-  to an app."
+(defn- req-map
+  "Returns a map representing the given Servlet request, to be passed as the
+  Ring request to an app."
   [#^HttpServletRequest request]
   {:server-port        (.getServerPort request)
    :server-name        (.getServerName request)
    :remote-addr        (.getRemoteAddr request)
    :uri                (.getRequestURI request)
    :query-string       (.getQueryString request)
-   :scheme             (.getScheme request)
+   :scheme             (keyword (.getScheme request))
    :request-method     (keyword (.toLowerCase (.getMethod request)))
    :headers            (reduce
                           (fn [header-map #^String header-name]
@@ -43,31 +43,34 @@
       (doseq [val val-or-vals]
         (.addHeader response key val))))
   ; Apply the body - the method depends on the given body type.
-  (instance-case body
-    String
+  (cond
+    (string? body)
       (with-open [writer (.getWriter response)]
         (.println writer body))
-    InputStream
+    (instance? InputStream body)
       (let [#^InputStream in body]
         (with-open [out (.getOutputStream response)]
           (IOUtils/copy in out)
           (.close in)
           (.flush out)))
-    File
+    (instance? File body)
       (let [#^File f body]
         (with-open [fin (FileInputStream. f)]
           (with-open [out (.getOutputStream response)]
             (IOUtils/copy fin out)
             (.flush out))))
-    (throwf "Unreceognized body: %s" body)))
+    (nil? body)
+      nil
+    :else
+      (throwf "Unreceognized body: %s" body)))
 
 (defn- proxy-handler
   "Returns an Handler implementation for the given app."
   [app]
   (proxy [AbstractHandler] []
     (handle [target request response dispatch]
-      (let [env   (env-map request)
-            tuple (app env)]
+      (let [req   (req-map request)
+            tuple (app req)]
         (apply-response-map response tuple)
         (.setHandled request true)))))
 

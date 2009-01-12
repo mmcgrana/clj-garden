@@ -1,10 +1,12 @@
+; The a very simple Ring application.
+
 (ns ring.examples.hello_world
-  (:require ring.handlers.jetty))
+  (:require ring.jetty))
 
 (defn app
-  [env]
+  [req]
   {:status  200
    :headers {"Content-Type" "text/html"}
-   :body    "Hello World from Ring"})
+   :body    "<h3>Hello World from Ring</h3>"})
 
-(ring.handlers.jetty/run {:port 8080} app)
+(ring.jetty/run {:port 8080} app)

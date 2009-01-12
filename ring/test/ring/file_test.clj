@@ -1,12 +1,12 @@
-(ns ring.middleware.file-test
-  (:use clj-unit.core ring.middleware.file)
+(ns ring.file-test
+  (:use clj-unit.core ring.file)
   (:import java.io.File))
 
 (deftest "wrap: no directory"
   (assert-throws #"Directory does not exist"
     (wrap (File. "not_here") (constantly :response))))
 
-(def public-dir (File. "test/ring/middleware/assets"))
+(def public-dir (File. "test/ring/assets"))
 (def index-html (File. public-dir "index.html"))
 (def foo-html   (File. public-dir "foo.html"))
 

@@ -1,4 +1,4 @@
-(ns ring.middleware.file
+(ns ring.file
   (:use clojure.contrib.except
         ring.utils)
   (:import (java.io File)))
@@ -32,9 +32,9 @@
   wrapped app if such a file does not exist."
   ([dir app]
    (ensure-dir dir)
-   (fn [env]
-     (if (#{:get :head} (:request-method env))
-       (let [uri (url-decode (:uri env))]
+   (fn [req]
+     (if (#{:get :head} (:request-method req))
+       (let [uri (url-decode (:uri req))]
          (if (str-includes? ".." uri)
            (forbidden)
            (let [path (cond
@@ -43,7 +43,7 @@
                         :else (str uri ".html"))]
              (if-let [file (maybe-file dir path)]
                (success file)
-               (app env)))))
-       (app env))))
+               (app req)))))
+       (app req))))
   ([dir]
    (partial wrap dir)))
