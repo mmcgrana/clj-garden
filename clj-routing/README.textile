@@ -1,0 +1,56 @@
+h1. clj-routing
+
+@clj-routing@ is a library for implement fast, 2-way URL routing in Clojure web applications. The library allows you to separate the core routing implementation 
+(handled by @clj-routing@) and the interface or DSL for describing routes (typically handled by a web framework). For example, the "Weld":http://github.com/mmmcgrana/weld framework uses @clj-routing@ for its underlying routing implementation.
+
+h2. Usage
+
+<pre><code>
+(use 'clj-routing.core)
+
+(def routes
+  [[:index-bars  :get "/foo/bars"                         ]
+   [:show-bar    :get "/foo/bars/:id"                     ]
+   [:create-bat  :put "/foo/bars"                         ]
+   [:with-conds  :get "/foo/:action" {:action "biz|bats"} ]
+   [:catch-all   :any "/:path"       {:path   ".*"}       ]])
+
+(def generate  (compile-generator  routes))
+(def recognize (compile-recognizer routes))
+
+(generate :index-bars)
+=> [:get "/foo/bars" nil]
+
+(generate :show-bar {:id "theid"})
+=> [:get "/foo/bars/theid" {}]
+
+(generate :show-bar {:id "theid" :more "extra"})
+=> [:get "/foo/bars/theid" {:more "extra"}]
+
+(generate :show-bar)
+=> Exception: "Missing param: :id"
+
+(generate :foo-bar)
+=> Exception: "Unrecognized route name: :foo-bar" 
+
+(recognize :get "/foo/bars")
+=> [:index-bars {}]
+
+(recognize :get "/foo/bars/bat")
+=> [:show-bar {:id "bat"}]
+
+(recognize :get "/foo/biz")
+=> [:with-conds {:action "biz"}]
+
+(recognize :get "/foo/fiz")
+=> [:catch-all {:path "foo/fiz"}]
+
+(recognize :foo "/foo/bars")
+=> Exception: "Unrecognized method: :foo"
+</code></pre>
+
+Please see the @clj-routing.core@ docstring and the @clj-routing.core-test@ code for additional documentation.
+
+---
+
+Copyright (c) 2009 Mark McGranaghan and released under an MIT license.

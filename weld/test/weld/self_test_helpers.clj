@@ -1,11 +1,13 @@
-(in-ns 'weld.request-test)
+(ns weld.self-test-helpers
+  (:require weld.request)
+  (:import java.io.ByteArrayInputStream))
 
 (defn str-input-stream
   "Returns a ByteArrayInputStream for the given String."
   [string]
-  (java.io.ByteArrayInputStream. (.getBytes string)))
+  (ByteArrayInputStream. (.getBytes string)))
 
-(def base-env
+(def base-req
   {:server-port        80
    :server-name        "localhost"
    :remote-addr        nil
@@ -19,6 +21,6 @@
    :character-encoding nil
    :body               (str-input-stream "")})
 
-(defn env-with
+(defn req-with
   [attrs]
-  (init (merge base-env attrs)))
+  (weld.request/init (merge base-req attrs)))

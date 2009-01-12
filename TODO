@@ -1,3 +1,23 @@
+== Release
+Own projects:
+  clj-routing
+  clj-unit
+  ring
+  weld
+Check Weld dependencies
+Brief Weld readme
+How to run Ring unit tests
+Readme and presentability of clj-unit
+Feasability of Compojure shim
+
+Make cljre presentable
+Redeploy and check cljre
+
+write list announce
+post announce
+tweet announce
+
+
 Check out templating, especially for tests
 simplest dependency manager that could possibly work:
   no runtime component
@@ -12,6 +32,8 @@ cling -> wiki w/ ring, weld, jgit "a Clojure Wiki Thing"
 
 == Ring
 Try compiling carefully, making build file
+Tracing middleware
+Http caching middleware
 
 == Weld
 update in weld?

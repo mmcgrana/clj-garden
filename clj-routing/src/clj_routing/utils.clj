@@ -27,6 +27,7 @@
     coll))
 
 (defmacro get-or
-  "Short for (or (get map key) or-form)."
+  "Short for (or (get map key) or-form), used like (get m k else) where else
+  needs to be lazy."
   [map key or-form]
   `(or (get ~map ~key) ~or-form))

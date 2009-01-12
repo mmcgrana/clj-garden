@@ -1,6 +1,7 @@
 (ns weld.http-utils
   (:use (clojure.contrib def str-utils except)
-        weld.utils))
+        weld.utils)
+  (:import org.apache.commons.codec.binary.Base64))
 
 (defn url-escape
   "Returns a url-escaped representation of the given String."
@@ -11,6 +12,16 @@
   "Returns a url-unescaped representation of the given String."
   [escaped]
   (java.net.URLDecoder/decode escaped "UTF-8"))
+
+(defn base64-encode
+  [unencoded]
+  "Returns a string of base64 encoded data for the given unencoded string."
+  (String. (Base64/encodeBase64 (.getBytes unencoded))))
+
+(defn base64-decode
+  "Returns a string of base64 decoded data for the given encoded string."
+  [encoded]
+  (String. (Base64/decodeBase64 (.getBytes encoded))))
 
 
 (defvar- after-initial-key-pat #"^([^\[]*)(\[.*)$"

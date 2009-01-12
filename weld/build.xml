@@ -1,18 +1,15 @@
 <project name="weld" default="jar">
-  <description>
-    Pack all sources into a JAR.
-  </description>
+  <description>Pack all sources into a JAR.</description>
 
   <property name="jarfile" location="weld.jar"/>
 
-  <target name="clean"
-          description="Remove generated files and directories.">
+  <target name="clean" description="Remove generated files and directories.">
     <delete file="${jarfile}"/>
   </target>
 
-  <target name="jar"
-          description="Create jar file.">
+  <target name="jar" description="Create jar file.">
     <jar jarfile="${jarfile}">
+      <path location="LICENSE"/>
       <fileset dir="./src" includes="weld/**/*.clj"/>
     </jar>
   </target>

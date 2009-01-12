@@ -17,23 +17,23 @@
     (cookie-str :f&o "b&r"
       {:domain ".test.net" :path "/" :expires (time/zero)})))
 
-(defn r-map
+(defn resp-map
   [s h b]
   {:status s :headers h :body b})
 
 (deftest "with-cookie"
   (assert=
-    (r-map :s {"Set-Cookie" ["foo=bar"]} :b)
-    (with-cookie :foo "bar" (r-map :s {} :b)))
+    (resp-map :s {"Set-Cookie" ["foo=bar"]} :b)
+    (with-cookie :foo "bar" (resp-map :s {} :b)))
   (assert=
-    (r-map :s {"Set-Cookie" ["foo=bar" "biz=bat"]} :b)
-    (with-cookie :biz "bat" (r-map :s {"Set-Cookie" ["foo=bar"]} :b)))
+    (resp-map :s {"Set-Cookie" ["foo=bar" "biz=bat"]} :b)
+    (with-cookie :biz "bat" (resp-map :s {"Set-Cookie" ["foo=bar"]} :b)))
   (assert=
-    (r-map :s {"Set-Cookie" ["foo=bar; path=/"]} :b)
-    (with-cookie :foo "bar" {:path "/"} (r-map :s {} :b))))
+    (resp-map :s {"Set-Cookie" ["foo=bar; path=/"]} :b)
+    (with-cookie :foo "bar" {:path "/"} (resp-map :s {} :b))))
 
 (deftest "less-cookie"
   (assert=
-    (r-map :s {"Set-Cookie" ["foo=; expires=Thu, 01-Jan-1970 00:01:00 GMT"]} :b)
-    (less-cookie :foo (r-map :s {} :b))))
+    (resp-map :s {"Set-Cookie" ["foo=; expires=Thu, 01-Jan-1970 00:01:00 GMT"]} :b)
+    (less-cookie :foo (resp-map :s {} :b))))
 

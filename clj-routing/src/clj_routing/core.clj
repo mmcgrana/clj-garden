@@ -9,12 +9,13 @@
   where the strings correspond to the literal segments of the route and the 
   symbols to the named dynamic segments."
   [pattern]
-  (let [split-pattern (re-partition #":[a-z-]+" pattern)]
-    (map (fn [seg-str]
-           (if (.startsWith seg-str ":")
-             (keyword (.substring seg-str 1))
-             seg-str))
-         split-pattern)))
+  (let [split-pattern (re-partition #":[a-z-]+" pattern)
+        segments (map (fn [seg-str]
+                        (if (.startsWith seg-str ":")
+                          (keyword (.substring seg-str 1))
+                          seg-str))
+                      split-pattern)]
+    (if (= "" (first segments)) (rest segments) segments)))
 
 (defn- route-generator
   "Returns a route generator fn that will take params and return a
@@ -77,7 +78,7 @@
           (mapcat
             (fn [[name method pattern conditions :as tuple]]
               (if (= method :any)
-                (map #(assoc tuple 1 %1) '(:get :head :post :put :delete))
+                (map #(assoc tuple 1 %1) '(:get :head :options :post :put :delete))
                 [tuple]))
             routes)
         route-recognizers-by-method

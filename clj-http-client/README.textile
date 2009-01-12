@@ -49,10 +49,6 @@ Note the the syntax for @http-get-stream@ is slightly different that for the oth
 
 @TODO: document other HTTP methods, request body handling@.
 
-h2. Feedback
-
-@clj-http-client@ is being actively develop; if you run into any problems or have any comments please contact @mmcgrana@ on GitHub.
-
 ---
 
 Copyright (c) 2009 Mark McGranaghan and released under an MIT license.

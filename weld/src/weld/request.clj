@@ -234,4 +234,4 @@
   "Returns a new request object like the corresponding to the given one but 
   including the given route-params."
   [req route-params]
-  (assoc env :weld.request/route-params route-params))
+  (assoc req :weld.request/route-params route-params))
