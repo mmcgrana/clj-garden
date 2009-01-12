@@ -1,3 +1,7 @@
+treat both people and projets as node
+  people juice as is
+  project juice acording to incoming follows, all goes to 1 or few project 
+  owners
 include timestamps in data scrape
 automatic updater
 scrape project as well as user data
