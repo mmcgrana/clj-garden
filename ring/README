@@ -1,11 +1,45 @@
-== Ring: a Clojure Webapp Library
-Ring is a web application library inspired by Python WSGI and Ruby's Rack, 
-designed to encourage modular and reusable web application design and allow for 
-server portability.
+=== Ring
 
-== Status
-Ring is currently being actively developed; see the working version of the SPEC 
-document and check out the example Ring apps in src/ring/examples.
+     ^--->HTTP Reqeust--->[Handler]--->Env1--->[Middleware]--->Env2----v
+     |                                                                 |
+  [Cient]                                                          [Endpoint]
+     |                                                                 |
+     ^----HTTP Response<--[Handler]<---Res2<---[Middleware]<---Res1<---v
+
+== Overview
+Ring is a web application library inspired by Python's WSGI and Ruby's Rack, 
+designed to encourage modular and concise web applications.
+
+== Quick Setup
+The various ring.* libs in this distribution depend on different jars, but if 
+you have all of the jars included in the deps/ directory then you will be able
+to use any of the libs in this distribution.
+
+Note that Jetty is currently required as it is the only server for which we 
+have implemented a Ring handler. The Jetty jars are also in the jars/
+directory.
+
+Your exect boot process will depend on your environement, but a simple Clojure script to get a hello world Ring app might look like:
+
+  (require 'ring.handlers.jetty)
+  
+  (defn app
+    [env]
+    {:status  200
+     :headers {"Content-Type" "text/html"}
+     :body    "Hello World from Ring"})
+
+  (ring.handlers.jetty/run {:port 8080} app)
+
+
+== Examples
+You can find 2 example Ring apps in the src/examples directory of this
+directory; a "hello world" example consisting of a single function and 
+"basic stack" example showing a typical Ring setup with common middleware.
+
+== Spec
+Please consult the SPEC file at the root of this distribution for a complete 
+description of the Ring interface.
 
 ---
 Copyright (c) 2009 Mark McGranaghan and released under an MIT license.

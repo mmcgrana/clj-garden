@@ -66,9 +66,8 @@
     "application/octet-stream"))
 
 (defn wrap
-  "Returns an app equivilant to the given one, except that a responses with
-  a file a body will have corresponding Content-Type and Content-Length headers
-  added"
+  "Wrap an app such that responses with a file a body will have 
+  corresponding Content-Type and Content-Length headers added."
   [app]
   (fn [env]
     (let [{:keys [headers body] :as response} (app env)]

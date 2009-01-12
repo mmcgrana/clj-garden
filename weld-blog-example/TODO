@@ -1,6 +1,4 @@
-basic authentication
 error handling
-controller logging
 generally, find the weak points
 pretty-printing xml and json api, with nice responses
 app tests

@@ -1,4 +1,3 @@
-check out james' comment on round-trip testing
 Check out templating, especially for tests
 simplest dependency manager that could possibly work:
   no runtime component
@@ -9,4 +8,18 @@ simplest dependency manager that could possibly work:
   could even write the file as a clojure data structure
   some libs will only conditionally depend on jars - just make a call 1 way
 purple for dots and messages in clj-unit
-rething run-tests, require-and-run-tests
+cling -> wiki w/ ring, weld, jgit "a Clojure Wiki Thing"
+
+== ring
+Linter
+Try compiling carefully
+
+== weld
+Set up upload test helper so that it emulates the GC situation
+
+framework
+  tease apart with-filters
+  seperate app-specific from general code in scripts/
+  better cli for scripts
+
+see if the weld-level routing logic can be simplified

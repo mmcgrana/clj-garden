@@ -1,5 +1,5 @@
-(ns ring.middleware.static-test
-  (:use clj-unit.core ring.middleware.static)
+(ns ring.middleware.file-test
+  (:use clj-unit.core ring.middleware.file)
   (:import java.io.File))
 
 (deftest "wrap: no directory"

@@ -1,4 +1,2 @@
 (use 'clj-unit.core)
-(require 'clj-scrape.core-test)
-
-(run-tests '(clj-scrape.core-test))
+(require-and-run-tests 'clj-scrape.core-test)

@@ -72,7 +72,7 @@
         (.setHandled request true)))))
 
 (defn run
-  "Serve the given app according to the given options.
+  "Serve the given app according to the options.
   Options:
     :port, an Integer."
   [options app]

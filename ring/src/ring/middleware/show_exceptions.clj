@@ -85,8 +85,8 @@ table.trace td.source {
       (html-reponse env e))))
 
 (defn wrap
-  "Returns an app corresponding to the given one but for which catches
-  exceptions thrown within the app and displays helpful debugging information."
+  "Wrap an app such that exceptions thrown within the wrapped app are caught 
+  and a helpful debugging response is returned."
   [app]
   (fn [env]
     (try

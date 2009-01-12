@@ -49,8 +49,8 @@
 (defn run-tests
   "Run all tests for the namespace symbols, with either the default console
   reporter or if given a custom reporter."
-  [ns-syms & [reporter]]
-  (binding [*test-reporter* (or reporter +console-reporter+)]
+  [& ns-syms]
+  (binding [*test-reporter* +console-reporter+]
     (binding [*test-reporter-state* ((:init *test-reporter*) ns-syms)]
       (doseq [ns-sym ns-syms]
         (if-let [ns-tests-info (@*tests-info* ns-sym)]
@@ -71,9 +71,9 @@
 
 (defn require-and-run-tests
   "Like run-tests, but require all namespaces before running all of the tests"
-  [ns-syms & [reporter]]
+  [& ns-syms]
   (doseq [ns-sym ns-syms] (require ns-sym))
-  (run-tests ns-syms reporter))
+  (apply run-tests ns-syms))
 
 (defn success
   "Report a successfull assertion."

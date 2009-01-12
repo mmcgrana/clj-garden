@@ -1,4 +1,2 @@
 (use 'clj-unit.core)
-(require 'stash.timestamps-test)
-
-(run-tests '(stash.timestamps-test))
+(require-and-run-tests 'stash.timestamps-test)
