@@ -1,20 +1,15 @@
 == Release
-Own projects:
-  weld
-
+Try controller 1 more time
 Check Weld dependencies
-Brief Weld readme
-Feasability of Compojure shim, java interop story in general
-Colorize show-exceptions trace
-Put 3 examples in README
-
-Make cljre presentable
-Redeploy and check cljre
+Feasability of Compojure shim, java interop story in general, read about glass
+  include in readme
 
 write list announce
+  example apps pending
+  community
+  focus on ring, with cljre.com as teaser
 post announce
 tweet announce
-
 
 Check out templating, especially for tests
 simplest dependency manager that could possibly work:
@@ -34,14 +29,11 @@ Tracing middleware
 Http caching middleware
 
 == Weld
-update in weld?
-
 Set up upload test helper so that it emulates the GC situation
-
+securitze session, benchmark marshal and unmarshal
 framework
   tease apart with-filters
   seperate app-specific from general code in scripts/
   better cli for scripts
 
-see if the weld-level routing logic can be simplified
 better logging implementation

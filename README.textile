@@ -8,22 +8,25 @@ Various Clojure libraries and apps I'm working on:
  * <code>clj-http-client</code>: HTTP client wrapping Commons HttpClient
  * <code>clj-jdbc</code>: High-level interface to JDBC databases
  * <code>clj-rome</code>: Universal RSS/Atom Feed parser wrapping Rome
- * <code>clj-routing</code>: Core of URL router for use in web frameworks
  * <code>clj-scrape</code>: Bundling of various clojure libraries to facilitate HTML scraping
  * <code>clj-time</code>: Wrapper around Joda Time library
- * <code>clj-unit</code>: Non-magical unit testing framework
  * <code>cljurl</code>: Url shortening website, built with Weld and Ring.
  * <code>gitcred</code>: PageRanking GitHub users
- * <code>ring</code>: WSGI/Rack for Clojure
  * <code>stash</code>: Functional ORM
  * <code>stash-migrations</code>: Migration for Stash models
  * <code>stash-pagination</code>: Paginate Stash find results 
  * <code>stash-timestamps</code>: Timestamping callbacks for Stash models
- * <code>weld</code>: Functional web framework, backed by Ring
  * <code>weld-blog-example</code>: Example of a blog in Weld
  * <code>weld-upload-example</code>: Example of file uploading in Weld
- 
-See also the various other <code>Clojure</code> libraries on my "GitHub page":http://github.com/mmcgrana
+
+I've "harvested" several projects from @clj-garden@, moving them to their own top-level projects:
+
+ * "<code>clj-backtrace</code>":http://github.com/mmcgrana/clj-backtrace: Tools for readable backtraces in Clojure programs.
+ * "<code>clj-routing</code>":http://github.com/mmcgrana/clj-routing: Core of URL router for use in web frameworks
+ * "<code>clj-unit</code>":http://github.com/mmcgrana/clj-unit: Unit testing library: non-magical, developer-friendly.
+ * "<code>ring</code>":http://github.com/mmcgrana/ring: Web application library: abstracts HTTP to allow modular and concise webapps.
+ * "<code>weld</code>":http://github.com/mmcgrana/weld: Web framework built on Ring: expressive and fast in a functional style.
+ * "<code>cljre.com</code>":http://github.com/mmcgrana/cljre.com: Clojure online regular expression editor, built with Ring and Weld.*
 
 ---
 
