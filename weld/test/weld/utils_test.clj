@@ -9,7 +9,7 @@
 (deftest "re-match?"
   (assert-that (re-match? #"foo" "foo"))
   (assert-that (re-match? #"o"   "foo"))
-  (assert-not   (re-match? #"bar" "foo")))
+  (assert-not  (re-match? #"bar" "foo")))
 
 (deftest "take-last"
   (assert= (list 3 4 5) (take-last 3 (list 1 2 3 4 5)))
