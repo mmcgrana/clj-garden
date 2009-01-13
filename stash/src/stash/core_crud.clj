@@ -3,9 +3,9 @@
 (defn reporter-fn
   "Helper fn to bridge the logger and reporter interfaces."
   [logger]
-  (if logger
+  (if (and logger ((:test logger) :info))
     (fn [sql time]
-      (.info logger (if time (str "query: (" time " msecs) " sql) sql)))))
+      ((:log logger) (if time (str "query: (" time " msecs) " sql) sql)))))
 
 (defmacro with-logger
   "Execute body in a context where the clj-jdbc reporter is bound to invoke

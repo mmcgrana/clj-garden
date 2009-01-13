@@ -1,44 +1,41 @@
 (ns weldup.app
   (:use
     (weld controller request)
-    (clj-html core helpers helpers-ext)
+    (clj-html core utils helpers helpers-ext)
     clojure.contrib.str-utils
     clj-jdbc.data-sources
-    clj-log4j.core)
+    clj-log.core
+    weldup.utils)
   (:require
-    (weld
-      [routing :as routing]
-      [app     :as app])
-    (ring.middleware
-      [reloading       :as reloading]
-      [show-exceptions :as show-exceptions]
-      [file-info       :as file-info]
-      [static          :as static])
+    (weld [routing :as routing] [app :as app])
     [stash.core :as stash]
-    [clj-file-utils.core :as file-utils]))
+    [clj-file-utils.core :as file-utils]
+    (ring reload backtrace static file-info)))
 
 ;; Config
 (def app-host "http://localhost:8080")
 (def public-dir  (file-utils/file "public"))
 (def uploads-dir (file-utils/file "public/uploads"))
-(def reloadable-namespace-syms '(weldup.app))
+(def statics '("/uploads" "/stylesheets" "/javascripts" "/favicon.ico"))
+(def reloadables '(weldup.app weldup.utils))
 (def data-source
   (pg-data-source {:database "weldup_dev" :user "mmcgrana" :password ""}))
-(def logger (logger4j :err :info))
+(def logger (new-logger :out :info))
 
 ;; Routing
 (routing/defrouting
   app-host
-  [['weldup.app 'index     :index     :get    "/"]
-   ['weldup.app 'new       :new       :get    "/new"]
-   ['weldup.app 'create    :create    :put    "/"]
-   ['weldup.app 'show      :show      :get    "/:id"]
-   ['weldup.app 'destroy   :destroy   :delete "/:id"]
-   ['weldup.app 'not-found :not-found :any    "/:path" {:path ".*"}]])
+  [['weldup.app/index     :index     :get    "/"]
+   ['weldup.app/new       :new       :get    "/new"]
+   ['weldup.app/create    :create    :put    "/"]
+   ['weldup.app/show      :show      :get    "/:id"]
+   ['weldup.app/destroy   :destroy   :delete "/:id"]
+   ['weldup.app/not-found :not-found :any    "/:path" {:path ".*"}]])
 
 ;; Models
 (stash/defmodel +upload+
   {:data-source data-source
+   :logger logger
    :table-name :uploads
    :pk-init stash/a-uuid
    :columns
@@ -67,30 +64,31 @@
   (stash/destroy upload)
   (file-utils/rm-f (upload-file upload)))
 
-;; Views
 (defmacro with-layout
   [& body]
   `(html
      (doctype :xhtml-transitional)
      [:html {:xmlns "http://www.w3.org/1999/xhtml"}
        [:head
-         [:title "ring upload demo"]]
+         [:title "ring upload demo"]
+         [:style {:type "text/css"} "div.upload { margin-bottom: 1em; }"]]
        [:body ~@body]]))
 
 (defn index-view [uploads]
   (with-layout
-    [:p [:a {:href (path :new)} "new upload"]]
-    [:h3 (if (> (count uploads) 0) "Uploaded" "None Uploaded Yet")]
-    (domap-str [upload uploads]
-      (html
-        [:p [:a {:href (path :show upload)} (h (:filename upload))]]
-        (delete-button "Delete" (path :destroy upload))))))
+    [:p (link-to "new upload" (path :new))]
+    [:h2 "Uploads (" (count uploads) ")"]
+    (html-for [upload uploads]
+      [:div.upload
+        (link-to (h (:filename upload)) (path :show upload)) " "
+        (delete-button "Delete" (path :destroy upload))])))
 
 (defn new-view []
   (with-layout
+    [:p (link-to "back to uploads" (path :index))]
+    [:h2 "New Upload"]
     (form-to (path-info :create) {:multipart true}
       (html
-        [:p "Select file:"]
         (file-field-tag "upload")
         (submit-tag "Upload")))))
 
@@ -110,7 +108,7 @@
 
 (defmacro with-upload
   [[binding-sym id-form] & body]
-  `(if-let [~binding-sym (stash/find-one +upload+ {:where [:id := ~id-form]})]
+  `(if-let [~binding-sym (stash/get-one +upload+ ~id-form)]
      (do ~@body)
      (not-found)))
 
@@ -125,8 +123,8 @@
 
 ;; Ring app
 (def app
-  (show-exceptions/wrap
-    (file-info/wrap
-      (static/wrap public-dir
-        (reloading/wrap reloadable-namespace-syms
-          (app/spawn-app router))))))
+  (ring.backtrace/wrap
+    (ring.file-info/wrap
+      (ring.static/wrap public-dir statics
+        (ring.reload/wrap reloadables
+          (app/spawn-app router logger))))))

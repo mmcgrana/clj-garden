@@ -1,6 +1,6 @@
 (use 'clj-unit.core)
 
-(clj-unit.core/run-tests
+(require-and-run-tests
   'stash.core-test
   'stash.utils-test
   'stash.validators-test)
