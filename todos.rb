@@ -6,5 +6,4 @@ def print_todo(dir, path)
   end
 end
 
-print_todo("clj-garden", "TODO")
 Dir["*"].each { |dir| print_todo(dir, File.join(dir, "TODO")) }
