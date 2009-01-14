@@ -1,8 +1,8 @@
 #!/bin/bash 
-#see also clji
 
 USER_CLJ_DIR=/Users/mmcgrana/Clojure
 SHARED_JARS_DIR=$USER_CLJ_DIR/jars
+YOURKIT_DYLB="/Applications/YourKit.app/bin/mac/libyjpagent.jnilib"
 
 # Local src, test, and classes
 CP=src/:test/:classes/
@@ -22,5 +22,5 @@ done
 if [ -z "$1" ]; then
     echo "USAGE: cljp <script_file.clj>"
 else
-    java -cp $CP clojure.main $@
+    java -cp $CP -agentpath:$YOURKIT_DYLB clojure.main $@
 fi

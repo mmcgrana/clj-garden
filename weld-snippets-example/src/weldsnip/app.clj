@@ -2,7 +2,7 @@
 ;;; Based on the snippet server in 'Programming Clojure'
 
 (ns weldsnip.app
-  (:use (weld routing request controller app)
+  (:use (weld routing request controller app config)
         (clj-html core utils helpers helpers-ext)
         clj-jdbc.data-sources
         clj-log.core)
@@ -11,13 +11,26 @@
     (ring jetty reload backtrace static file-info))
   (:import java.io.File))
 
-;; Config
+;; Config & Routing
+(def host "http://localhost:8080")
 (def public  (File. "public"))
 (def statics '("/stylesheets" "/javascripts" "/favicon.ico"))
+
+(def logger (new-logger :err :info))
 (def data-source
   (pg-data-source {:database "weldsnip_dev" :user "mmcgrana" :password ""}))
-(def logger (new-logger :err :info))
-(def host "http://localhost:8080")
+
+(def router
+  (compiled-router
+    [['weldsnip.app/ping   :ping   :get  "/ping"]
+     ['weldsnip.app/new    :new    :get  "/"  ]
+     ['weldsnip.app/show   :show   :get  "/:id"]
+     ['weldsnip.app/create :create :post "/"]
+     ['weldsnip.app/miss   :miss   :any  "/:path" {:path ".*"}]]))
+
+(use-config {'weld.routing/*router* router
+             'weld.routing/*host*   host
+             'weld.app/*logger*     logger})
 
 ;; Model
 (stash/defmodel +snippet+
@@ -79,22 +92,11 @@
 (defn miss [req]
   (respond (miss-view)))
 
-;; Routing
-(def router
-  (compiled-router
-    [['weldsnip.app/ping   :ping   :get  "/ping"]
-     ['weldsnip.app/new    :new    :get  "/"  ]
-     ['weldsnip.app/show   :show   :get  "/:id"]
-     ['weldsnip.app/create :create :post "/"]
-     ['weldsnip.app/miss   :miss   :any  "/:path" {:path ".*"}]]))
-
 ;; Ring App
-(def config {#'*router* router #'*host* host #'*logger* logger})
-
-(def app
+(def ring-app
   (ring.backtrace/wrap
     (ring.file-info/wrap
       (ring.static/wrap public statics
-          (new-app config)))))
+        app))))
 
-(ring.jetty/run {:port 8080} app)
+(ring.jetty/run {:port 8080} ring-app)
