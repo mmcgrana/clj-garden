@@ -1,18 +1,18 @@
 (ns weldup.app
   (:use
-    (weld controller request)
+    (weld routing request controller app)
     (clj-html core utils helpers helpers-ext)
     clojure.contrib.str-utils
     clj-jdbc.data-sources
     clj-log.core
     weldup.utils)
   (:require
-    (weld [routing :as routing] [app :as app])
     [stash.core :as stash]
     [clj-file-utils.core :as file-utils]
     (ring reload backtrace static file-info)))
 
-;; Config
+;; Config & Routing
+(def app-env (keyword (System/getProperty "weldup.env")))
 (def app-host "http://localhost:8080")
 (def public-dir  (file-utils/file "public"))
 (def uploads-dir (file-utils/file "public/uploads"))
@@ -20,17 +20,19 @@
 (def reloadables '(weldup.app weldup.utils))
 (def data-source
   (pg-data-source {:database "weldup_dev" :user "mmcgrana" :password ""}))
-(def logger (new-logger :out :info))
+(def app-logger (if (= app-env :dev) (new-logger :out :info)))
 
-;; Routing
-(routing/defrouting
-  app-host
-  [['weldup.app/index     :index     :get    "/"]
-   ['weldup.app/new       :new       :get    "/new"]
-   ['weldup.app/create    :create    :put    "/"]
-   ['weldup.app/show      :show      :get    "/:id"]
-   ['weldup.app/destroy   :destroy   :delete "/:id"]
-   ['weldup.app/not-found :not-found :any    "/:path" {:path ".*"}]])
+(def app-router
+  (compiled-router
+    app-host
+    [['weldup.app/index     :index     :get    "/"]
+     ['weldup.app/new       :new       :get    "/new"]
+     ['weldup.app/create    :create    :put    "/"]
+     ['weldup.app/show      :show      :get    "/:id"]
+     ['weldup.app/destroy   :destroy   :delete "/:id"]
+     ['weldup.app/not-found :not-found :any    "/:path" {:path ".*"}]]))
+
+(def config {#'router app-router #'logger app-logger})
 
 ;; Models
 (stash/defmodel +upload+
@@ -127,4 +129,4 @@
     (ring.file-info/wrap
       (ring.static/wrap public-dir statics
         (ring.reload/wrap reloadables
-          (app/spawn-app router logger))))))
+          (new-app config))))))

@@ -1,5 +1,6 @@
 (ns weldup.app-test
-  (:use clj-unit.core weldup.app weld.test-helpers)
+  (:use clj-unit.core weldup.app
+        (weld routing test-helpers))
   (:require [clj-file-utils.core :as file-utils]))
 
 (def mock-upload
