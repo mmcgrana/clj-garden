@@ -1,19 +1,9 @@
 error handling
-generally, find the weak points
 pretty-printing xml and json api, with nice responses
 app tests
 consider reloadability of routing and apps - currently not possible
 perhaps handlers could transparently handle vars
   what are the semantics of relading in Clojure in general
-
-;(def session-store cookies/store)
-;(def session-secret-key "longstring")
-;(def session-id-key     "ringblog-session-id")
-;(def ignore-tampered-cookies (not prod?))
-
-; (router/defrouting config/app-host
-;   (resource :posts
-;     resource :comments))
 
 ; (htmlfor [post posts]
 ;   [:name {:key "val"}])

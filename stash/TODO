@@ -1,5 +1,8 @@
 stash.core/update ???
+rething accessible-attrs name and implementation
+throw usefyll error when hash braces are forgotten on defmodel
 
+add support for (sane) auto-incrementing ids, in def ddl/migs and pk-init
 rethink, test attr protection, foo* situation
 datetime caster 
 more validators
