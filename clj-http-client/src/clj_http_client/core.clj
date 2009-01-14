@@ -1,5 +1,5 @@
 (ns clj-http-client.core
-  (:use clojure.contrib.fcase clojure.contrib.except clojure.contrib.def)
+  (:use (clojure.contrib fcase except def))
   (:import (org.apache.commons.httpclient
              HttpClient DefaultHttpMethodRetryHandler Header
              HttpMethod HttpMethodBase)
