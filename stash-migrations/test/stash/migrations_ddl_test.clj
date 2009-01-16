@@ -14,11 +14,22 @@
    [:title      :string]
    [:author_id :uuid   {:nullable true}]])
 
-(deftest "create-table-sql"
-  (assert= (str "CREATE TABLE posts "
-                "(id uuid NOT NULL, slug varchar UNIQUE NOT NULL, "
-                "title varchar NOT NULL, author_id uuid, PRIMARY KEY (id))")
+(deftest "create-table-sql: plain pk"
+  (assert= "CREATE TABLE posts (id uuid NOT NULL, slug varchar UNIQUE NOT NULL, title varchar NOT NULL, author_id uuid, PRIMARY KEY (id))"
     (create-table-sql :posts +posts-column-defs+)))
+
+(deftest "create-table-sql: auto uuid pk"
+  (assert= "CREATE TABLE posts (id uuid NOT NULL, slug varchar UNIQUE NOT NULL, title varchar NOT NULL, author_id uuid, PRIMARY KEY (id))"
+    (create-table-sql :posts
+      (assoc-in +posts-column-defs+ [0 2] {:pk true :auto :true}))))
+
+(deftest "create-table-sql: auto integer pk"
+  (assert= "CREATE TABLE posts (id int4 NOT NULL, slug varchar UNIQUE NOT NULL, title varchar NOT NULL, author_id uuid, PRIMARY KEY (id)); CREATE SEQUENCE posts_id_seq"
+    (create-table-sql :posts
+      (assoc-in
+        (assoc-in +posts-column-defs+
+          [0 2] {:pk true :auto true})
+        [0 1] :integer))))
 
 (deftest "rename-table-sql"
   (assert= "ALTER TABLE blog_posts RENAME TO posts"

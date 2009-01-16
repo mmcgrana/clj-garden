@@ -1,7 +1,3 @@
-add support for (sane) auto-incrementing ids, in def ddl/migs and pk-init
-
-check out dm benchmarks
-move report fn to compile time
 datetime caster 
 more validators
 multi-order (while still keeping simple case)

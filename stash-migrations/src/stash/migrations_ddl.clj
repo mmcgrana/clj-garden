@@ -33,8 +33,17 @@
   "Create a table named table-name with column names and types as specified by
   column-defs."
   [table-name column-defs]
-  (let [pks ((ns-resolve 'stash.core 'compiled-pk-column-names) column-defs)]
-    (str "CREATE TABLE " (name table-name) " " (columns-sql column-defs pks))))
+  (let [pk-names
+          (map first (filter #(get-in % [2 :pk]) column-defs))
+        auto-int-pk-name
+          (first (first (filter #(and (= :integer (get % 1))
+                                      (get-in % [2 :auto]))
+                                column-defs)))]
+    (str "CREATE TABLE " (name table-name) " "
+         (columns-sql column-defs pk-names)
+         (if auto-int-pk-name
+           (str "; CREATE SEQUENCE " (name table-name)
+                "_" (name auto-int-pk-name) "_seq")))))
 
 (defddl rename-table
   "Rename a table."
