@@ -1,20 +1,21 @@
 (ns weldsnip.app
-  (:use (weld routing request controller app config)
+  (:use (weld routing request controller config)
         (clj-html core utils helpers helpers-ext)
         clj-jdbc.data-sources
         clj-log.core)
   (:require
     (stash [core :as stash] [timestamps :as timestamps])
-    (ring jetty reload backtrace static file-info))
+    (ring reload backtrace static file-info)
+    weld.app)
   (:import java.io.File))
 
 ;; Config & Routing
-(def custom-config (read-string (slurp "src/weldsnip/custom_config.clj")))
 (def public  (File. "public"))
 (def statics '("/stylesheets" "/javascripts" "/favicon.ico"))
 
 (def logger (new-logger :err :info))
-(def data-source (pg-data-source (get custom-config :db)))
+(def data-source (pg-data-source
+                   {:database "weldsnip_dev" :user "mmcgrana" :password ""}))
 
 (def router
   (compiled-router
@@ -33,10 +34,9 @@
    :logger logger
    :table-name :snippets
    :columns
-     [[:id         :uuid     {:pk true}]
+     [[:id         :integer  {:pk true :auto true}]
       [:body       :string]
       [:created_at :datetime]]
-   :pk-init stash/a-uuid
    :accessible-attrs
      [:body :created_at]
    :callbacks
@@ -88,10 +88,8 @@
   (respond (miss-view)))
 
 ;; Ring App
-(def ring-app
+(def app
   (ring.backtrace/wrap
     (ring.file-info/wrap
       (ring.static/wrap public statics
-        app))))
-
-(ring.jetty/run {:port 8080} ring-app)
+        weld.app/app))))
