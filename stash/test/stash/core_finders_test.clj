@@ -80,6 +80,23 @@
     (list +complete-post+)
     (find-all +post+ {:where [:id := (:id +complete-post+)]})))
 
+(deftest-db "get-one: single pk"
+  (let [saved (save +complete-post+)]
+    (assert-that
+      (get-one +post+ (:id +complete-post+)))))
+
+(deftest-db "get-one: multi pk"
+  (let [saved (save +simple-schmorg+)]
+    (assert-that
+      (get-one +schmorg+
+        [(:pk_uuid +simple-schmorg+) (:pk_integer +simple-schmorg+)]))))
+
+(deftest-db "reload"
+  (let [saved    (save +complete-post+)
+        reloaded (reload saved)]
+    (assert= saved reloaded)
+    (assert-not (identical? saved reloaded))))
+
 (deftest-db "delete-all-by-sql"
   (persist-insert +complete-post+)
   (persist-insert +complete-post-2+)

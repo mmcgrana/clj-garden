@@ -2,13 +2,13 @@
   (:use clj-unit.core stash.utils))
 
 
-(deftest "update"
+(deftest "assoc-by"
   (assert=
     {:foo 2}
-    (update {:foo 1} :foo inc))
+    (assoc-by {:foo 1} :foo inc))
   (assert=
     {:foo 6}
-    (update {:foo 1} :foo + 2 3)))
+    (assoc-by {:foo 1} :foo + 2 3)))
 
 (deftest "mash"
   (doseq [f [list vector]]
@@ -37,9 +37,9 @@
 
 (deftest "limit-keys"
   (let [m {:foo :bar :biz :bat}]
-    (assert= m (limit-keys m [:foo :biz :whiz])))
-  (assert-throws #"Unrecognized keys \(:biz\)"
-    (limit-keys {:foo :bar :biz :bat} [:foo :whiz])))
+    (assert= m (limit-keys m [:foo :biz :whiz] "Fails: %s")))
+  (assert-throws #"Fails: \(:biz\)"
+    (limit-keys {:foo :bar :biz :bat} [:foo :whiz] "Fails: %s")))
 
 (deftest "the-str"
   (assert= "foo" (the-str :foo))

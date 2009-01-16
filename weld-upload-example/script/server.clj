@@ -1,4 +1,4 @@
-(System/setProperty "weldblog.env" (or (first *command-line-args*) "dev"))
+(System/setProperty "weldup.env" (or (first *command-line-args*) "dev"))
 
 (require 'ring.jetty 'weldup.app)
 

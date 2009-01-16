@@ -12,19 +12,18 @@
     (ring reload backtrace static file-info)))
 
 ;; Config & Routing
-(def app-env (keyword (System/getProperty "weldup.env")))
-(def app-host "http://localhost:8080")
-(def public-dir  (file-utils/file "public"))
-(def uploads-dir (file-utils/file "public/uploads"))
+(def env (keyword (System/getProperty "weldup.env")))
+(def host "http://localhost:8080")
+(def public  (file-utils/file "public"))
+(def uploads (file-utils/file "public/uploads"))
 (def statics '("/uploads" "/stylesheets" "/javascripts" "/favicon.ico"))
 (def reloadables '(weldup.app weldup.utils))
+(def logger (if (= env :dev) (new-logger :out :info)))
 (def data-source
   (pg-data-source {:database "weldup_dev" :user "mmcgrana" :password ""}))
-(def app-logger (if (= app-env :dev) (new-logger :out :info)))
 
-(def app-router
+(def router
   (compiled-router
-    app-host
     [['weldup.app/index     :index     :get    "/"]
      ['weldup.app/new       :new       :get    "/new"]
      ['weldup.app/create    :create    :put    "/"]
@@ -32,16 +31,17 @@
      ['weldup.app/destroy   :destroy   :delete "/:id"]
      ['weldup.app/not-found :not-found :any    "/:path" {:path ".*"}]]))
 
-(def config {#'router app-router #'logger app-logger})
+(def config
+  {'weld.routing/*router* router
+   'weld.app/*logger* logger})
 
 ;; Models
 (stash/defmodel +upload+
   {:data-source data-source
    :logger logger
    :table-name :uploads
-   :pk-init stash/a-uuid
    :columns
-     [[:id            :uuid    {:pk true}]
+     [[:id            :uuid    {:pk true :auto true}]
       [:filename      :string]
       [:content_type  :string]
       [:size          :integer]]
@@ -63,10 +63,11 @@
       (file-utils/cp (:tempfile upload-map) (upload-file upload)))))
 
 (defn destroy-upload [upload]
-  (stash/destroy upload)
-  (file-utils/rm-f (upload-file upload)))
+  (stash/transaction +upload+
+    (stash/destroy upload)
+    (file-utils/rm-f (upload-file upload))))
 
-(defmacro with-layout
+(defmacro layout
   [& body]
   `(html
      (doctype :xhtml-transitional)
@@ -77,7 +78,7 @@
        [:body ~@body]]))
 
 (defn index-view [uploads]
-  (with-layout
+  (layout
     [:p (link-to "new upload" (path :new))]
     [:h2 "Uploads (" (count uploads) ")"]
     (html-for [upload uploads]
@@ -86,7 +87,7 @@
         (delete-button "Delete" (path :destroy upload))])))
 
 (defn new-view []
-  (with-layout
+  (layout
     [:p (link-to "back to uploads" (path :index))]
     [:h2 "New Upload"]
     (form-to (path-info :create) {:multipart true}

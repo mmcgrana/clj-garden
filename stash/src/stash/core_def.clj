@@ -166,7 +166,8 @@
   Raises on any unrecognized callback names."
   [model-map]
   (let [cb-map   (get model-map :callbacks)]
-    (limit-keys cb-map recognized-callback-names)
+    (limit-keys cb-map recognized-callback-names
+      "Unrecognized callback names: %s")
     {:before-validation-on-create
        (concat (get cb-map :before-validation-on-create)
                (get cb-map :before-validation))
@@ -204,7 +205,8 @@
   "Returns the given model map provided that it contains only valid keys,
   raises otherwise."
   [model-map]
-  (limit-keys model-map recognized-model-keys))
+  (limit-keys model-map recognized-model-keys
+    "Unrecognized model map keys: %s"))
 
 (defn compiled-model
   "Returns a compiled model representation that can be used later as the 
@@ -230,14 +232,10 @@
        :casters-by-name     (compiled-mappers-by-name type-caster column-defs)
        :validators          (compiled-validators model-map)
        :callbacks           (compiled-callbacks model-map)
-       :accessible-attrs    (checked-accessible-attrs model-map)
+       :accessible-attrs          (checked-accessible-attrs model-map)
        :model-map           model-map})))
 
 (defmacro defmodel
   "Short for (def name (compiled-model model-map))"
-  [name model-map & [options]]
-  (limit-keys options '(:accessors))
-  (if (get options :accessors)
-    `(do (def ~name (compiled-model ~model-map))
-       ((resolve 'stash.core/define-accessors) ~name))
-    `(def ~name (compiled-model ~model-map))))
+  [name model-map]
+  `(def ~name (compiled-model ~model-map)))

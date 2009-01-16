@@ -1,5 +1,5 @@
 (ns weldblog.config
-  (:use clj-jdbc.data-sources clj-log4j.core)
+  (:use clj-jdbc.data-sources clj-log.core)
   (:import java.io.File))
 
 (def env (keyword (System/getProperty "weldblog.env")))
@@ -8,9 +8,9 @@
 (def test? (= env :test))
 (def prod? (= env :prod))
 
-(def app-host "localhost:8000")
+(def host "localhost:8000")
 
-(def public-dir (File. "public"))
+(def public (File. "public"))
 
 (def data-source
   (pg-data-source
@@ -20,7 +20,7 @@
       test? {:database "weldblog_test" :user "mmcgrana" :password ""})))
 
 (def logger
-  (logger4j :err (cond prod? :info dev? :debug test? :error)))
+  (new-logger :err (cond prod? :info dev? :debug test? :error)))
 
 (def exception-details?  dev?)
 (def exception-handling? prod?)

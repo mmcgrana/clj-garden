@@ -2,7 +2,7 @@
 
 (defn- upcase-title
   [post]
-  [(update post :title (memfn toUpperCase)) true])
+  [(assoc-by post :title (memfn toUpperCase)) true])
 
 (defn- possible-failing
   [post]
@@ -10,7 +10,7 @@
 
 (defn- inc-view_count
   [post]
-  [(update post :view_count inc) true])
+  [(assoc-by post :view_count inc) true])
 
 (defmodel +post-with-callbacks+
   (assoc +post-map+ :callbacks

@@ -3,7 +3,7 @@
         clojure.contrib.except
         clojure.contrib.str-utils))
 
-(defn update
+(defn assoc-by
   "'Updates' a value in an associative structure, where k is a key and f is a 
   function that will take the old value and any supplied args and return the new 
   value, and returns the new associative structure."
@@ -50,11 +50,13 @@
 (defn limit-keys
   "Assures that the given map has only keys included in recognized-keys,
   throwing an exception if there are unrecognized keys or returning the map
-  otherwise."
-  [m recognized-keys]
+  otherwise.
+  The exception message will be formatted according to message-template, which
+  should include an %s where the unrecognized keys will be inserted."
+  [m recognized-keys message-template]
   (let [bad (reduce #(dissoc %1 %2) m recognized-keys)]
     (if-not (empty? bad)
-      (throwf "Unrecognized keys %s" (pr-str (keys bad)))))
+      (throwf message-template (pr-str (keys bad)))))
   m)
 
 (defn the-str

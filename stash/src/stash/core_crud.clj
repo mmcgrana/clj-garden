@@ -129,20 +129,27 @@
   "Returns a new instance based on the given instance but reflecting any
   attribute values in attrs. Does not touch the databse."
   [instance attrs]
-  (limit-keys attrs (accessible-attrs (instance-model instance)))
+  (limit-keys attrs (accessible-attrs (instance-model instance))
+    "Attempted to mass-assign keys not declared as accessible-attrs: %s")
   (update-attrs* instance attrs))
+
+(defn new-instance
+  "Returns a new instance of the given model, with only the auto-initializing
+  pk values set."
+  [model]
+  (with-meta
+    (if-let [init-fn (pk-init model)] (init-fn) {})
+    {:model model :new true}))
 
 (defn init*
   "Like init, but bypasses mass-assignment protection."
   [model & [attrs]]
-  (let [pk-attrs (if-let [init-fn (pk-init model)] (init-fn) {})]
-    (update-attrs* (with-meta pk-attrs {:model model :new true}) attrs)))
+  (update-attrs* (new-instance model) attrs))
 
 (defn init
   "Returns an instance of the model with the given attrs having new status."
   [model & [attrs]]
-  (limit-keys attrs (accessible-attrs model))
-  (init* model attrs))
+  (update-attrs (new-instance model) attrs))
 
 (defn instantiate
   "Returns an instance based on unparsed versions of the given quoted attrs 
@@ -192,8 +199,17 @@
 (defn create
   "Creates an instance of the model with the attrs."
   [model & [attrs]]
-  (limit-keys attrs (accessible-attrs model))
-  (create* model attrs))
+  (save (init model attrs)))
+
+(defn update*
+  "Like update, but bypasses mass-assignment protection."
+  [instance attrs]
+  (save (update-attrs* instance attrs)))
+
+(defn update
+  "Like update-attrs, but saves the model as well."
+  [instance attrs]
+  (save (update-attrs instance attrs)))
 
 (defn destroy
   "Deletes the instance, running before- and after- destroy callbacks.

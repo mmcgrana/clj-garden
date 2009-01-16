@@ -1,11 +1,7 @@
 error handling
 pretty-printing xml and json api, with nice responses
 app tests
-consider reloadability of routing and apps - currently not possible
-perhaps handlers could transparently handle vars
-  what are the semantics of relading in Clojure in general
+consider reloadability of routing and apps
+  should be able to reload all user-level logic if routing is in vars
+  and routing and config file are reloaded
 
-; (htmlfor [post posts]
-;   [:name {:key "val"}])
-
-; cling -> wiki backed by jgit and ring

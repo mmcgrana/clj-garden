@@ -1,20 +1,19 @@
 (ns weldblog.routing
-  (:require
-    [weld.routing    :as routing]
-    [weldblog.config :as config]))
+  (:use weld.routing))
 
-(def c 'weldblog.controllers)
+(defn s [sym] (symbol "weldblog.controllers" (str sym)))
 
-(routing/defrouting config/app-host
-  [[c 'new-session     :new-session     :get    "/sessions/new"]
-   [c 'create-session  :create-session  :put    "/sessions"    ]
-   [c 'destroy-session :destroy-session :delete "/sessions"    ]
-   [c 'index           :posts           :get    "/"            ]
-   [c 'index-atom      :posts-atom      :get    "/posts.atom"  ]
-   [c 'new             :new-post        :get    "/new"         ]
-   [c 'show            :post            :get    "/:id"         ]
-   [c 'edit            :edit-post       :get    "/:id/edit"    ]
-   [c 'create          :create-post     :put    "/"            ]
-   [c 'update          :update-post     :post   "/:id"         ]
-   [c 'destroy         :destroy-post    :delete "/:id"         ]
-   [c 'not-found       :not-found       :any    "/:path" {:path ".*"}]])
+(def router
+  (compiled-router
+    [[(s new-session)     :new-session     :get    "/sessions/new"]
+     [(s create-session)  :create-session  :put    "/sessions"    ]
+     [(s destroy-session) :destroy-session :delete "/sessions"    ]
+     [(s index)           :posts           :get    "/"            ]
+     [(s index-atom)      :posts-atom      :get    "/posts.atom"  ]
+     [(s new)             :new-post        :get    "/new"         ]
+     [(s show)            :post            :get    "/:id"         ]
+     [(s edit)            :edit-post       :get    "/:id/edit"    ]
+     [(s create)          :create-post     :put    "/"            ]
+     [(s update)          :update-post     :post   "/:id"         ]
+     [(s destroy)         :destroy-post    :delete "/:id"         ]
+     [(s not-found)       :not-found       :any    "/:path" {:path ".*"}]]))

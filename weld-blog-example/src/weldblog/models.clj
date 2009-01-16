@@ -9,11 +9,11 @@
 (defmodel +post+
   (merge model-base
   {:table-name :posts
-   :pk-init a-uuid
    :columns
      [[:id    :uuid   {:pk true}]
       [:title :string]
       [:body  :string]]
+   :pk-init a-uuid
    :accessible-attrs
      [:title :body]
    :validations

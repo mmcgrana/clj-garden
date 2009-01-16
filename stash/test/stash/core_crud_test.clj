@@ -62,11 +62,11 @@
       {:before-validation-on-create
          [(fn [i] [(assoc i :track [:before-v]) true])]
        :after-validation-on-create
-         [(fn [i] [(update i :track conj :after-v) true])]
+         [(fn [i] [(assoc-by i :track conj :after-v) true])]
        :before-create
-         [(fn [i] [(update i :track conj :before-c) true])]
+         [(fn [i] [(assoc-by i :track conj :before-c) true])]
        :after-create
-         [(fn [i] [(update i :track conj :after-c) true])]})))
+         [(fn [i] [(assoc-by i :track conj :after-c) true])]})))
 
 (deftest-db "save: new instance"
   (let [saved    (save (init +post-with-save-callbacks+ +complete-post-map+))]
@@ -86,16 +86,28 @@
   (assert= 7
     (:view_count (create +post+ (assoc +complete-post-map+ :view_count "7")))))
 
-(deftest "update-attrs"
+(deftest "update-attrs: accessible attrs"
   (assert= 7
     (:view_count
       (update-attrs (init +post+ +complete-post-map+) {:view_count "7"}))))
+
+(deftest "update-attrs: inaccessible attrs"
+  (assert-throws
+    #"Attempted to mass-assign keys not declared as accessible-attrs.*\:pk_uuid"
+    (update-attrs (init +post+ +complete-post-map+)
+      {:pk_uuid "foobar" :pk_integer 5})))
+
+(deftest "update"
+  (let [saved   (create +post+ +complete-post-map+)
+        updated (update saved {:view_count 7})]
+    (assert= 7 (:view_count updated))
+    (assert= 7 (:view_count (reload updated)))))
 
 (def +post-with-destroy-cbs+
   (compiled-model
     (assoc +post-map+ :callbacks
       {:before-destroy [(fn [i] [(assoc  i :track [:before])        true])]
-       :after-destroy  [(fn [i] [(update i :track #(conj % :after)) true])]})))
+       :after-destroy  [(fn [i] [(assoc-by i :track #(conj % :after)) true])]})))
 
 (deftest-db "destroy, deleted?"
   (let [destroyed (destroy (create +post-with-destroy-cbs+ +complete-post-map+))]

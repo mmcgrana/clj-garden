@@ -1,24 +1,22 @@
 (ns weldblog.views
-  (:use (weldblog routing utils auth)
+  (:use (weld routing)
+        (weldblog utils auth)
         (clj-html core utils helpers helpers-ext)
         [stash.core :only (errors)])
   (:require [clj-time.core :as time]))
 
 (defmacro with-layout
-  [& body]
-  `(with-layout-throwing {} ~@body))
-
-(defmacro with-layout-throwing
-  [thrown-form & body]
-  `(let [inner# (html ~@body)]
+  [assigns-form & body]
+  `(let [assigns# ~assigns-form
+         inner# (html ~@body)]
      (html
        (doctype :xhtml-transitional)
        [:html {:xmlns "http://www.w3.org/1999/xhtml"}
          [:head
            (include-css "/stylesheets/main.css")
-           (~thrown-form :for_head)
+           (get assigns# :for_head)
            [:meta {:http-equiv "Content-Type" :content "text/html;charset=utf-8"}]
-           [:title "Ring Blog Example"]
+           [:title "Weld Blog Example"]
            [:body inner#]]])))
 
 (def message-info

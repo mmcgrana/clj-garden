@@ -1,2 +1,7 @@
 logger & envs & error handling
 tests
+
+:accessible-attrs??
+  also i don't like that it is the same for all users - i.e. is there a generalization of all or non access controls
+{:auto true} for ids and uuid
+

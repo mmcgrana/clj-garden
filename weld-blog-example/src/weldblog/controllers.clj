@@ -1,6 +1,6 @@
 (ns weldblog.controllers
   (:use
-    (weld controller request)
+    (weld controller request config)
     (weldblog routing auth))
   (:require
     (weldblog
@@ -10,7 +10,7 @@
     [stash.core :as stash]))
 
 (defn not-found [& [env]]
-  (respond-404 (v/not-found (session env))))
+  (respond (v/not-found (session env))))
 
 (defn not-authenticated [& [info]]
   (respond (v/new-session info)))
@@ -44,7 +44,7 @@
      (not-found ~env)))
 
 (defn index [env]
-  (with-fading-session [sess env]
+  (with-fading-session []
     (respond (v/index (stash/find-all m/+post+) sess))))
 
 (defn index-atom [env]
@@ -88,3 +88,20 @@
       (stash/destroy post)
       (flash-session sess :post-destroyed
         (redirect (path :posts))))))
+
+(defn with-xtime
+  [action]
+  (fn [req]
+    (let [start (time/now)]
+      (let [resp (action req)]
+        (assoc-in resp [:headers "X-Runtime"] (- (time/now) start))))))
+
+(defn with-rescues
+  [action]
+  (fn [req]
+    (try
+      (action req)
+      (catch Exception e
+        (respond (v/internal-error) {:status 500})))))
+
+(def index (with-rescues (with-xtime index)))

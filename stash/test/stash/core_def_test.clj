@@ -9,12 +9,12 @@
   (assert= +post+ (instance-model (init +post+))))
 
 (deftest "compiled-model: throws on unrecognized callback names"
-  (assert-throws #"Unrecognized keys \(:foobar\)"
+  (assert-throws #"Unrecognized callback names: \(:foobar\)"
     (compiled-model (assoc +post-map+ :callbacks {:foobar [identity]}))))
 
 (deftest "compiled-model: throws on unrecognized column types"
   (assert-throws #"Unrecognized column type: :bogus_type"
-    (compiled-model (update +post-map+ :columns conj [:a_name :bogus_type]))))
+    (compiled-model (assoc-by +post-map+ :columns conj [:a_name :bogus_type]))))
 
 (deftest "defmodel"
   (assert= +macro-post+ (compiled-model +post-map+)))

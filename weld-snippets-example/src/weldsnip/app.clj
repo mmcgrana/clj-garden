@@ -1,6 +1,3 @@
-;;; A snippet server implemented with Ring, Weld, and Stash.
-;;; Based on the snippet server in 'Programming Clojure'
-
 (ns weldsnip.app
   (:use (weld routing request controller app config)
         (clj-html core utils helpers helpers-ext)
@@ -12,24 +9,22 @@
   (:import java.io.File))
 
 ;; Config & Routing
-(def host "http://localhost:8080")
+(def custom-config (read-string (slurp "src/weldsnip/custom_config.clj")))
 (def public  (File. "public"))
 (def statics '("/stylesheets" "/javascripts" "/favicon.ico"))
 
 (def logger (new-logger :err :info))
-(def data-source
-  (pg-data-source {:database "weldsnip_dev" :user "mmcgrana" :password ""}))
+(def data-source (pg-data-source (get custom-config :db)))
 
 (def router
   (compiled-router
     [['weldsnip.app/ping   :ping   :get  "/ping"]
-     ['weldsnip.app/new    :new    :get  "/"  ]
+     ['weldsnip.app/new    :new    :get  "/"]
      ['weldsnip.app/show   :show   :get  "/:id"]
      ['weldsnip.app/create :create :post "/"]
      ['weldsnip.app/miss   :miss   :any  "/:path" {:path ".*"}]]))
 
 (use-config {'weld.routing/*router* router
-             'weld.routing/*host*   host
              'weld.app/*logger*     logger})
 
 ;; Model
