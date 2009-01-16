@@ -14,5 +14,5 @@ h2. Implemented Functions
     rm-r
     rm-rf
     touch
-    mkdirp
+    mkdir-p
     chmod

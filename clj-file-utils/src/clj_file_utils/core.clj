@@ -11,6 +11,11 @@
   ([parent name] (File. parent name))
   ([p q & names] (reduce file (file p q) names)))
 
+(defn exist
+  "Returns true if the file exists"
+  [#^File file]
+  (.exists file))
+
 (defn size
   "Returns the size in bytes of a file."
   [#^File file]
@@ -68,6 +73,7 @@
     (FileUtils/forceMkdir file)))
 
 (defn chmod
-  "'chmod' a file to a mode given as a 4-character string."
+  "'chmod' a file to a mode given as a 4-character string. Only works on
+  system with a chmod command."
   [#^File file #^String mode]
   (sh "chmod" mode (.getAbsolutePath file)))
