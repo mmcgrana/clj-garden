@@ -17,25 +17,25 @@
     (compiled-model (assoc-by +post-map+ :columns conj [:a_name :bogus_type]))))
 
 (deftest "defmodel"
-  (assert= +macro-post+ (compiled-model +post-map+)))
+  (assert= (keys +macro-post+) (keys (compiled-model +post-map+))))
 
 (deftest "column-names"
   (assert= [:id :title :view_count :posted_at :special]
     (column-names +post+))
-  (assert=   [:pk_uuid :pk_integer :a_uuid :a_integer :a_boolean :a_long
-              :a_float :a_double :a_string :a_datetime]
+  (assert=   [:pk_integer :a_uuid :a_integer :a_boolean :a_long :a_float
+              :a_double :a_string :a_datetime]
      (column-names +schmorg+)))
 
 (deftest "pk-column-names"
   (assert= [:id] (pk-column-names +post+))
-  (assert= [:pk_uuid :pk_integer] (pk-column-names +schmorg+)))
+  (assert= [:path :ip] (pk-column-names +hit+)))
 
 (deftest "non-pk-column-names"
   (assert= [:title :view_count :posted_at :special]
     (non-pk-column-names +post+))
   (assert=
-    [:a_uuid :a_integer :a_boolean :a_long :a_float :a_double :a_string  :a_datetime]
-    (non-pk-column-names +schmorg+)))
+    [:count]
+    (non-pk-column-names +hit+)))
 
 ; TODO: test model accessors
 

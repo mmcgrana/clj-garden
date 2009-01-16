@@ -7,8 +7,8 @@
 
 (deftest "insert-sql: multiple pks"
   (assert=
-    "INSERT INTO schmorgs (pk_uuid, pk_integer, a_uuid, a_integer, a_boolean, a_long, a_float, a_double, a_string, a_datetime) VALUES ('5260eb5e-3871-42db-ae94-25f1cdff055e', 3, NULL, NULL, 't', NULL, NULL, NULL, NULL, NULL)"
-    (insert-sql +simple-schmorg+)))
+    "INSERT INTO hits (path, ip, count) VALUES ('apath', 'anip', 2)"
+    (insert-sql +simple-hit+)))
 
 (deftest "update-sql: single pk"
   (assert=
@@ -17,8 +17,8 @@
 
 (deftest "update-sql: multiple pks"
   (assert=
-    "UPDATE schmorgs SET a_uuid = NULL, a_integer = NULL, a_boolean = 't', a_long = NULL, a_float = NULL, a_double = NULL, a_string = NULL, a_datetime = NULL WHERE ((pk_uuid = '5260eb5e-3871-42db-ae94-25f1cdff055e') AND (pk_integer = 3))"
-    (update-sql +simple-schmorg+)))
+    "UPDATE hits SET count = 2 WHERE ((path = 'apath') AND (ip = 'anip'))"
+    (update-sql +simple-hit+)))
 
 (deftest "delete-sql: single pk"
   (assert= (str "DELETE FROM posts WHERE (id = '" (:id +simple-post+) "')")
@@ -26,8 +26,8 @@
 
 (deftest "delete-sql: multiple pks"
   (assert=
-    "DELETE FROM schmorgs WHERE ((pk_uuid = '5260eb5e-3871-42db-ae94-25f1cdff055e') AND (pk_integer = 3))"
-    (delete-sql +simple-schmorg+)))
+    "DELETE FROM hits WHERE ((path = 'apath') AND (ip = 'anip'))"
+    (delete-sql +simple-hit+)))
 
 (deftest-db "persist-insert: inserts a record for the instance, returns as new"
   (with-clean-db
@@ -45,12 +45,18 @@
     (assert-that (deleted? deleted))))
 
 (deftest "init: single pk"
-  (assert-that (new? +complete-post+))
-  (assert= +complete-post-map+ (dissoc +complete-post+ :id)))
+  (assert-that (new? +complete-post+)))
 
 (deftest "init: multiple pks"
-  (assert-that (new? +simple-schmorg+))
-  (assert= +simple-schmorg-map+ +simple-schmorg+))
+  (assert-that (new? +simple-hit+)))
+
+(deftest "init: uuid auto pk"
+  (assert-match +uuid-re+ (:id (init +post+))))
+
+(deftest "init: integer auto pk"
+  (let [new1 (init +schmorg+)
+        new2 (init +schmorg+)]
+    (assert= (inc (:pk_integer new1)) (:pk_integer new2))))
 
 (deftest "init: casts attrs"
   (assert= 7

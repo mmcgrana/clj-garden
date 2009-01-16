@@ -86,10 +86,10 @@
       (get-one +post+ (:id +complete-post+)))))
 
 (deftest-db "get-one: multi pk"
-  (let [saved (save +simple-schmorg+)]
+  (let [saved (save +simple-hit+)]
     (assert-that
-      (get-one +schmorg+
-        [(:pk_uuid +simple-schmorg+) (:pk_integer +simple-schmorg+)]))))
+      (get-one +hit+
+        [(:path +simple-hit+) (:ip +simple-hit+)]))))
 
 (deftest-db "reload"
   (let [saved    (save +complete-post+)
@@ -108,7 +108,7 @@
   (persist-insert +complete-post+)
   (assert-that (exist? +post+))
   (assert-not  (exist? +post+
-                 {:where [:id := (:id (gen-uuid))]}))
+                 {:where [:id := (:id (auto-uuid))]}))
   (assert-that (exist? +post+
                  {:where [:id := (:id +complete-post+)]})))
 

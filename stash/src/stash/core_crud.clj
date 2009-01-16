@@ -137,9 +137,7 @@
   "Returns a new instance of the given model, with only the auto-initializing
   pk values set."
   [model]
-  (with-meta
-    (if-let [init-fn (pk-init model)] (init-fn) {})
-    {:model model :new true}))
+  (with-meta ((new-instance-fn model)) {:model model :new true}))
 
 (defn init*
   "Like init, but bypasses mass-assignment protection."

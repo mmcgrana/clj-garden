@@ -29,11 +29,12 @@
   [model]
   (name (:table-name model)))
 
-(defn pk-init
-  "Returns, if applicable, a function returning a map of initialized primary
-  key name/value pairs"
+(defn new-instance-fn
+  "Returns a function that returns a new instance of the model when invoked,
+  in paritular initiaziling the auto pk if the model has one or returning
+  an empty map if it does not."
   [model]
-  (:pk-init model))
+  (:new-instance-fn model))
 
 (defn column-names
   "Returns as a seq of keywords the column names for the model, including pks."
@@ -84,59 +85,57 @@
 ;; Initialization-time compilation helpers
 
 (defn- checked-data-source
-  "Returns a data source specified by model-map, or throws if missing."
   [model-map]
   (get-or model-map :data-source
     (throwf ":data-source not provided in model map")))
 
 (defn- checked-logger
   [model-map]
-  "Returns a logger specified by model-map, if present."
   (get model-map :logger))
 
 (defn- checked-table-name
-  "Returns a keyword for the table name specified by model-map, or thorws if
-  missing."
   [model-map]
   (get-or model-map :table-name
     (throwf ":table-name not provided in model map")))
 
-(defn- checked-pk-init
-  "Returns a fn for pk initialization specified by model-map, or throws if
-  it is present but is not a proper function."
-  [model-map]
-  (if-let [init-fn (get model-map :pk-init)]
-    (if-not (fn? init-fn)
-      (throwf ":init-fn given but not a function")
-      init-fn)))
+(declare auto-uuid auto-integer)
+
+(defn- compiled-new-instance-fn
+  [column-defs table-name data-source logger]
+  (let [auto-pk-column-defs (filter #(get-in % [2 :auto]) column-defs)
+        auto-pk-count       (count auto-pk-column-defs)]
+    (cond (> auto-pk-count 1)
+            (throwf "More than 1 auto pk column specified.")
+          (= auto-pk-count 1)
+            (let [[column-name type] (first auto-pk-column-defs)]
+              (cond (= type :uuid)
+                      #(hash-map column-name (auto-uuid))
+                    (= type :integer)
+                      #(hash-map column-name
+                         (auto-integer table-name column-name data-source logger))
+                    :else (throwf "Unrecognized auto pk column type: %s" type)))
+          :else
+            hash-map)))
 
 (defn- checked-column-defs
-  "Returns a validated seq of column defs specified by model-map."
   [model-map]
   (get-or model-map :columns (throwf ":columns not provided in model map")))
 
 (defn- compiled-column-names
-  "Returns a seq of column names based on column-defs that includes all column
-  names."
   [column-defs]
   (map first column-defs))
 
 (defn- compiled-pk-column-names
-  "Returns a seq of pk column names based on model-map."
   [column-defs]
   (or (map first (filter #(get-in % [2 :pk]) column-defs))
       (throwf "no column defs include the :pk option")))
 
 (defn- compiled-non-pk-column-names
-  "Returns a seq of non-pk column names based on a seq of all column name and of
-  the pk-column names."
   [column-names pk-column-names]
   (let [pk-cnames-set (set pk-column-names)]
     (remove pk-cnames-set column-names)))
 
 (defn- compiled-mappers-by-name
-  "Returns a map of column name keywords to either quoter or parser fns,
-  where which is specified by the mapper-finder fn."
   [mapper-finder column-defs]
   (mash
     (fn [[name type]]
@@ -146,7 +145,6 @@
     column-defs))
 
 (defn- compiled-validators
-  "Returns a seq of validator fns corresponding to the model's validations."
   [model-map]
   (map
     (fn [[attr-name validator-gen]] (validator-gen attr-name))
@@ -162,8 +160,6 @@
     :before-destroy :after-destroy})
 
 (defn- compiled-callbacks
-  "Returns a normalized map of callback names to callback fn colls.
-  Raises on any unrecognized callback names."
   [model-map]
   (let [cb-map   (get model-map :callbacks)]
     (limit-keys cb-map recognized-callback-names
@@ -198,42 +194,48 @@
   (:accessible-attrs model-map))
 
 (def- recognized-model-keys
-  #{:table-name :data-source :logger :pk :pks :pk-init :columns
+  #{:table-name :data-source :logger :pk :pks :columns
     :accessible-attrs :callbacks :validations :extensions})
 
 (defn- checked-model-map
-  "Returns the given model map provided that it contains only valid keys,
-  raises otherwise."
   [model-map]
   (limit-keys model-map recognized-model-keys
     "Unrecognized model map keys: %s"))
+
+(defn- extended-model-map
+  [model-map extensions]
+  (reduce
+     (fn [m extension] (checked-model-map (extension m)))
+     (checked-model-map model-map)
+     extensions))
 
 (defn compiled-model
   "Returns a compiled model representation that can be used later as the 
   ubiquitious model parameter."
   [unextended-model-map]
-  (let [model-map
-          (reduce
-            (fn [m extension] (checked-model-map (extension m)))
-            (checked-model-map unextended-model-map)
-            (:extensions unextended-model-map))]
-    (let [column-defs         (checked-column-defs model-map)
-          column-names        (compiled-column-names column-defs)
-          pk-column-names     (compiled-pk-column-names column-defs)]
-      {:table-name          (checked-table-name model-map)
-       :data-source         (checked-data-source model-map)
-       :logger              (checked-logger model-map)
-       :pk-init             (checked-pk-init model-map)
+  (let [model-map           (extended-model-map
+                              (checked-model-map unextended-model-map)
+                              (:extensions unextended-model-map))
+        column-defs         (checked-column-defs model-map)
+        column-names        (compiled-column-names column-defs)
+        pk-column-names     (compiled-pk-column-names column-defs)
+        table-name          (checked-table-name model-map)
+        data-source         (checked-data-source model-map)
+        logger              (checked-logger model-map)]
+      {:table-name          table-name
+       :data-source         data-source
+       :logger              logger
        :column-names        column-names
        :pk-column-names     pk-column-names
        :non-pk-column-names (compiled-non-pk-column-names column-names pk-column-names)
+       :new-instance-fn     (compiled-new-instance-fn column-defs table-name data-source logger)
        :quoters-by-name     (compiled-mappers-by-name type-quoter column-defs)
        :parsers-by-name     (compiled-mappers-by-name type-parser column-defs)
        :casters-by-name     (compiled-mappers-by-name type-caster column-defs)
        :validators          (compiled-validators model-map)
        :callbacks           (compiled-callbacks model-map)
-       :accessible-attrs          (checked-accessible-attrs model-map)
-       :model-map           model-map})))
+       :accessible-attrs    (checked-accessible-attrs model-map)
+       :model-map           model-map}))
 
 (defmacro defmodel
   "Short for (def name (compiled-model model-map))"

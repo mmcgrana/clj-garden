@@ -8,10 +8,12 @@
   `(try
      (delete-all +post+)
      (delete-all +schmorg+)
+     (delete-all +hit+)
      ~@body
     (finally
       (delete-all +post+)
-      (delete-all +schmorg+))))
+      (delete-all +schmorg+)
+      (delete-all +hit+))))
 
 (defmacro deftest-db
   [doc & body]
@@ -22,8 +24,7 @@
   {:data-source +data-source+
    :table-name  :schmorgs
    :columns
-     [[:pk_uuid    :uuid     {:pk true}]
-      [:pk_integer :integer  {:pk true}]
+     [[:pk_integer :integer  {:pk true :auto true}]
       [:a_uuid     :uuid     {:nullable true}]
       [:a_integer  :integer  {:nullable true}]
       [:a_boolean  :boolean  {:nullable true}]
@@ -39,9 +40,7 @@
   (init +schmorg+ {}))
 
 (def +simple-schmorg-map+
-  {:pk_uuid "5260eb5e-3871-42db-ae94-25f1cdff055e"
-   :pk_integer 3
-   :a_boolean true})
+  {:a_boolean true})
 
 (def +simple-schmorg+
   (init* +schmorg+ +simple-schmorg-map+))
@@ -49,9 +48,8 @@
 (def +post-map+
   {:data-source +data-source+
    :table-name  :posts
-   :pk-init     a-uuid
    :columns
-    [[:id         :uuid     {:pk true}]
+    [[:id         :uuid     {:pk true :auto true}]
      [:title      :string]
      [:view_count :integer]
      [:posted_at  :datetime]
@@ -59,7 +57,8 @@
    :accessible-attrs
     [:title :view_count :posted_at :special]})
 
-(def +post+ (compiled-model +post-map+))
+(def +post+
+  (compiled-model +post-map+))
 
 (def +simple-post+
   (init +post+ {:title "f'oo"}))
@@ -75,3 +74,16 @@
 
 (def +complete-post-2+
   (init +post+ +complete-post-2-map+))
+
+(defmodel +hit+
+  {:data-source +data-source+
+   :table-name  :hits
+   :columns
+     [[:path  :string  {:pk true}]
+      [:ip    :string  {:pk true}]
+      [:count :integer {:pk false}]]
+   :accessible-attrs
+     [:path :ip :count]})
+
+(def +simple-hit+
+  (init +hit+ {:path "apath" :ip "anip" :count 2}))
