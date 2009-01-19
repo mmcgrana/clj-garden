@@ -47,9 +47,8 @@
 (defn- method-body
   "Returns the response body for the given method as a String"
   [#^HttpMethodBase method]
-  (IOUtils/toString
-    (.getResponseBodyAsStream method)
-    (.getResponseCharSet      method)))
+  (when-let [rbody (.getResponseBodyAsStream method)]
+    (IOUtils/toString rbody (.getResponseCharSet method))))
 
 (defn- http-execute-method
   "Generalized http request."
