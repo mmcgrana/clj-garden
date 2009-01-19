@@ -11,8 +11,9 @@
   "Execute body in a context where the clj-jdbc reporter is bound to invoke
   the logger."
   [logger-form & body]
-  `(jdbc/with-reporter (reporter-fn ~logger-form)
-     ~@body))
+  `(let [reporter# (reporter-fn ~logger-form)]
+     (jdbc/with-reporter reporter#
+       ~@body)))
 
 (defn execute
   "Execute a clj-jdbc query function with a connection to data-source using the

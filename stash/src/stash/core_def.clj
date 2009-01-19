@@ -2,81 +2,81 @@
 
 ;; Runtime model accessors
 
-(defn instance-model
+(defn- instance-model
   "Returns the model associated with the instance, or throws if this is missing
   that metadata / is not an instance."
   [instance]
   (or (:model (meta instance))
       (throwf "No model found for %s" instance)))
 
-(defn model-map
+(defn- model-map
   "Returns the original model map used to define the compiled model."
   [model]
   (:model-map model))
 
-(defn data-source
+(defn- data-source
   "Returns the data source for to the model."
   [model]
   (:data-source model))
 
-(defn logger
+(defn- logger
   "Returns the logger associated with the model."
   [model]
   (:logger model))
 
-(defn table-name-str
+(defn- table-name-str
   "Returns as a string the table name for the model."
   [model]
   (name (:table-name model)))
 
-(defn new-instance-fn
+(defn- new-instance-fn
   "Returns a function that returns a new instance of the model when invoked,
   in paritular initiaziling the auto pk if the model has one or returning
   an empty map if it does not."
   [model]
   (:new-instance-fn model))
 
-(defn column-names
+(defn- column-names
   "Returns as a seq of keywords the column names for the model, including pks."
   [model]
   (:column-names model))
 
-(defn non-pk-column-names
+(defn- non-pk-column-names
   "Returns as a seq of keywords the column names for the model, excluding pks."
   [model]
   (:non-pk-column-names model))
 
-(defn pk-column-names
+(defn- pk-column-names
   "Returns as a seq of keywords the pk column names for the model."
   [model]
   (:pk-column-names model))
 
-(defn quoters-by-name
+(defn- quoters-by-name
   "Returns a map of keyword column names to a quoter fn for the column."
   [model]
   (:quoters-by-name model))
 
-(defn parsers-by-name
+(defn- parsers-by-name
   "Returns a map of keyword column names to a parser fn for the column."
   [model]
   (:parsers-by-name model))
 
-(defn casters-by-name
+(defn- casters-by-name
   "Returns a map of keyword column names to a caster fn for the column."
   [model]
   (:casters-by-name model))
 
-(defn validators
+(defn- validators
   "Returns an seq of validator fns used to validate instances of the model."
   [model]
   (:validators model))
 
-(defn callbacks
+(defn- callbacks
   "Returns a map keyword callback names to a seq of corresponding callback fns."
   [model]
   (:callbacks model))
 
-(defn accessible-attrs
+(defn- accessible-attrs
   "Returns a seq of keyword column names eligible for mass-assignement."
   [model]
   (:accessible-attrs model))
