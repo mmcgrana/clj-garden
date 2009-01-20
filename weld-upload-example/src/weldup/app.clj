@@ -75,7 +75,7 @@
      (doctype :xhtml-transitional)
      [:html {:xmlns "http://www.w3.org/1999/xhtml"}
        [:head
-         [:title "ring upload demo"]
+         [:title "Weld Upload Demo"]
          [:style {:type "text/css"} "div.upload { margin-bottom: 1em; }"]]
        [:body ~@body]]))
 
