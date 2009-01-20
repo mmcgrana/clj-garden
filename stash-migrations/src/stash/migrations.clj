@@ -4,12 +4,15 @@
             [stash.core    :as stash])
   (:load "migrations_ddl"))
 
-(defn create-version
+(defn ensure-version
   "Create a schema_info table with a single column 'version' and a single row 
   with 'version' set to 0."
   []
-  (jdbc/modify "CREATE TABLE schema_info (version int8)")
-  (jdbc/modify "INSERT INTO schema_info (version) VALUES (0)"))
+  (try
+    (jdbc/select-value "SELECT version FROM schema_info")
+    (catch Exception e
+      (jdbc/modify "CREATE TABLE schema_info (version int8)")
+      (jdbc/modify "INSERT INTO schema_info (version) VALUES (0)"))))
 
 (defn drop-version
   "Drop the schema_info table."
@@ -100,6 +103,14 @@
       ; Dont' migrate.
       :else
         (rep (str "migrating not needed, at " target-version)))))
+
+(defn migrate-with [migrations version data-source logger]
+  "A wrapper around the stash.migrations/migrate, performers migrations in the
+  context of a given data source and logger."
+  (stash.core/with-logger logger
+    (clj-jdbc.core/with-connection data-source
+      (ensure-version)
+      (migrate migrations version))))
 
 (defmacro defmigration [name version up-form down-form]
   "Helper method to define named migrations.

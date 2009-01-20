@@ -3,8 +3,9 @@
   (:use clj-unit.core stash.migrations clj-jdbc.data-sources)
   (:load "migrations_ddl_test"))
 
-(deftest-conn "create-version, get-version, set-version, drop_version"
-  (create-version)
+(deftest-conn "ensure-version, get-version, set-version, drop_version"
+  (ensure-version)
+  (ensure-version)
   (assert= 0 (get-version))
   (set-version 1)
   (assert= 1 (get-version))
@@ -31,7 +32,7 @@
     (downs +migrations+ 5 1)))
 
 (deftest-conn "migrate: up, down, no migrations"
-  (create-version)
+  (ensure-version)
   (assert-nil (migrate +migrations+ 0))
   (assert= 0 (get-version))
   (assert= '(1 3 5 7) (migrate +migrations+ 7))
@@ -39,6 +40,11 @@
   (assert= '(7 5 3 1) (migrate +migrations+ 0))
   (assert= 0 (get-version))
   (drop-version))
+
+(deftest "migrate-with"
+  (let [logger {:test (constantly true) :log identity}]
+    (migrate-with +migrations+ 7 +data-source+ nil))
+  (jdbc/with-connection +data-source+ (drop-version)))
 
 (deftest "defmigration"
   (defmigration my-migration 10
