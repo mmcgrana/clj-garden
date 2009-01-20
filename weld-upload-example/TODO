@@ -1,2 +1,3 @@
-logger & envs & error handling
-tests
+framework-level error handling
+move html-for into extensions & document & test
+rethink db scripts

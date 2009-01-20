@@ -1,21 +1,21 @@
 (ns weldup.app
   (:use
-    (weld routing request controller app)
+    (weld routing request controller config)
     (clj-html core utils helpers helpers-ext)
     clojure.contrib.str-utils
     clj-jdbc.data-sources
     clj-log.core
-    weldup.utils)
+    clj-file-utils.core
+    ring.builder)
   (:require
     [stash.core :as stash]
-    [clj-file-utils.core :as file-utils]
+    weld.app
     (ring reload backtrace static file-info)))
 
 ;; Config & Routing
 (def env (keyword (System/getProperty "weldup.env")))
-(def host "http://localhost:8080")
-(def public  (file-utils/file "public"))
-(def uploads (file-utils/file "public/uploads"))
+(def public  (file "public"))
+(def uploads (file "public/uploads"))
 (def statics '("/uploads" "/stylesheets" "/javascripts" "/favicon.ico"))
 (def reloadables '(weldup.app weldup.utils))
 (def logger (if (= env :dev) (new-logger :out :info)))
@@ -35,6 +35,8 @@
   {'weld.routing/*router* router
    'weld.app/*logger* logger})
 
+(use-config config)
+
 ;; Models
 (stash/defmodel +upload+
   {:data-source data-source
@@ -49,7 +51,7 @@
      [:filename :content_type :size]})
 
 (defn upload-file [upload]
-  (file-utils/file uploads-dir (:id upload)))
+  (file uploads (:id upload)))
 
 (defn normalize-filename [filename]
   (re-gsub #"(?i)[^a-z0-9_.]" "_" filename))
@@ -60,12 +62,12 @@
                    {:filename     (normalize-filename (:filename upload-map))
                     :content_type (:content-type upload-map)
                     :size         (:size upload-map)})]
-      (file-utils/cp (:tempfile upload-map) (upload-file upload)))))
+      (cp (:tempfile upload-map) (upload-file upload)))))
 
 (defn destroy-upload [upload]
   (stash/transaction +upload+
     (stash/destroy upload)
-    (file-utils/rm-f (upload-file upload))))
+    (rm-f (upload-file upload))))
 
 (defmacro layout
   [& body]
@@ -81,7 +83,7 @@
   (layout
     [:p (link-to "new upload" (path :new))]
     [:h2 "Uploads (" (count uploads) ")"]
-    (html-for [upload uploads]
+    (for-html [upload uploads]
       [:div.upload
         (link-to (h (:filename upload)) (path :show upload)) " "
         (delete-button "Delete" (path :destroy upload))])))
@@ -125,9 +127,11 @@
     (redirect (path :index))))
 
 ;; Ring app
+(def dev-only (partial wrap-if (= env :dev)))
+
 (def app
-  (ring.backtrace/wrap
+  (dev-only ring.backtrace/wrap
     (ring.file-info/wrap
-      (ring.static/wrap public-dir statics
-        (ring.reload/wrap reloadables
-          (new-app config))))))
+      (ring.static/wrap public statics
+        (dev-only (partial ring.reload/wrap reloadables)
+          weld.app/app)))))
