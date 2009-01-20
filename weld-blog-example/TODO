@@ -5,3 +5,45 @@ consider reloadability of routing and apps
   should be able to reload all user-level logic if routing is in vars
   and routing and config file are reloaded
 
+framework-level error handling
+  production
+    dump to log             (exceptions-log switch)
+    app-level error pages   (exceptions-handle switch)
+    catchall fallback       (weld config)
+    no backtrace            (wrap backtrace in dev only)
+  dev
+    dump to log             (exceptions-log switch)
+    propogate back          (exceptions-handle switch)
+    show backtrace          (wrap backtrace in dev only)
+  testing
+    maybe log               (exceptions-log switch)       
+    propogate back          (exceptions-handle switch)
+    no backtrace            (wrap backtrace in dev only)
+
+*exceptions-handle*
+*exceptions-log*
+weld.app/*exceptions-fallback*
+(weld.app/*exceptions-fallback-fn*)
+
+(defn framework [req]
+  (let [action (parse req)]
+    (try
+      (action req)
+      (catch Exception e
+        (if *exceptions-fallback?*
+          (*exceptions-fallback-fn*)
+          (throw e))))))
+
+(defn action [req]
+  (try
+    (gen-response req)
+    (catch Exception e
+      (if exceptions-log?
+        (log logger :error (pst-str e)))
+      (if *exceptions-handle*
+        (cond (instance? SubException e)
+                (special-handler e)
+              (instance? Exception e)
+                (general-handler e)
+              :else
+                (throw e))))))

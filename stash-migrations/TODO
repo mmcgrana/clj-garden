@@ -1,0 +1,1 @@
+make migrations create info table re-entrently (ensure version)

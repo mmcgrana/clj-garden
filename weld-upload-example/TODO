@@ -1,3 +1,5 @@
-framework-level error handling
-move html-for into extensions & document & test
-rethink db scripts
+Install migrate-with
+(defn migrate-with [migrations version data-source logger]
+  (stash.core/with-logger logger
+    (clj-jdbc.core/with-connection data-source
+      (stash.migrations/migrate migrations version))))

@@ -19,8 +19,8 @@
       dev?  {:database "weldblog_dev"  :user "mmcgrana" :password ""}
       test? {:database "weldblog_test" :user "mmcgrana" :password ""})))
 
-(def logger
-  (new-logger :err (cond prod? :info dev? :debug test? :error)))
+(def log-levels {:prod :info :dev :debug :test :error})
+(def logger (new-logger :err (log-levels env)))
 
 (def exception-details?  dev?)
 (def exception-handling? prod?)
