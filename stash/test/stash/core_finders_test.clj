@@ -138,8 +138,14 @@
   (assert= 3 (maximum +post+ :view_count
                {:where [:id := (:id +complete-post+)]})))
 
-(deftest-db "delete-all-by-sql"
+(deftest-db "delete-all"
   (persist-insert +complete-post+)
   (persist-insert +complete-post-2+)
   (delete-all +post+)
+  (assert= 0 (count-all +post+)))
+
+(deftest-db "delete-all"
+  (persist-insert +complete-post+)
+  (persist-insert +complete-post-2+)
+  (destroy-all +post+)
   (assert= 0 (count-all +post+)))

@@ -90,3 +90,10 @@
   the number of such records deleted."
   [model & [options]]
   (delete-all-by-sql model (delete-all-sql model options)))
+
+(defn destroy-all
+  "Destroys all records for the model corresponding to the options, running
+  callbacks as appropriate. Returns the number of records deleted."
+  [model & [options]]
+  (doseq [instance (find-all model options)]
+    (destroy instance)))
