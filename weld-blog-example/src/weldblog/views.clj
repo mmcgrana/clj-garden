@@ -24,7 +24,7 @@
                [:div#header
                  [:p.session
                    (if-html (authenticated? (get assigns# :sess))
-                     (link-to "log out" (path :destroy-session))
+                     (delete-button "log out" (path :destroy-session))
                      (link-to "log in"  (path :new-session)))]]
                [:div#content
                  ~@body]]]]])))
@@ -46,7 +46,7 @@
   (layout {:sess sess}
     (message-flash sess)
     [:p "password:"]
-    (form-to (path-info :create-session)
+    (form {:to (path-info :create-session)}
       (html [:p (password-field-tag "password")]))))
 
 (defhtml partial-post
@@ -123,7 +123,7 @@
   (layout {:sess sess}
     [:h1 "New Post"]
     (error-messages-post post)
-    (form-to (path-info :create-post)
+    (form {:to (path-info :create-post)}
       (partial-post-form post))))
 
 (defn edit
@@ -131,7 +131,7 @@
   (layout {:sess sess}
     [:h1 "Editing Post"]
     (error-messages-post post)
-    (form-to (path-info :update-post post)
+    (form {:to (path-info :update-post post)}
       (partial-post-form post))))
 
 (defn not-found [sess]
