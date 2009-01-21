@@ -1,5 +1,4 @@
 #!/bin/bash 
-#see also clji
 
 USER_CLJ_DIR=/Users/mmcgrana/Clojure
 SHARED_JARS_DIR=$USER_CLJ_DIR/jars

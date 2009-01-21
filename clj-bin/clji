@@ -1,8 +1,10 @@
 #!/bin/bash
-#see also clj
 
 USER_CLJ_DIR=/Users/mmcgrana/Clojure
 SHARED_JARS_DIR=$USER_CLJ_DIR/jars
+
+BREAK_CHARS="(){}[],^%$#@\"\";:''|\\"
+COMPS=$USER_CLJ_DIR/completions
 
 # Local src, test, and classes
 CP=src/:test/:classes/
@@ -21,7 +23,7 @@ done
 
 CP=$CP:$USER_CLJ_DIR
 if [ -z "$1" ]; then
-    java -cp $CP jline.ConsoleRunner clojure.main -r
+    rlwrap --remember -c -b $BREAK_CHARS -f $COMPS java -cp $CP clojure.main -r
 else
-    java -cp $CP jline.ConsoleRunner clojure.main -i $1 -r
+    rlwrap --remember -c -b $BREAK_CHARS -f $COMPS java -cp $CP clojure.main -i $1 -r
 fi
