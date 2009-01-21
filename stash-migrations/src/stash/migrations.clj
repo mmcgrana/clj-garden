@@ -30,26 +30,25 @@
   (jdbc/modify (str "UPDATE schema_info SET version = " version)))
 
 (defn ups
-  "Returns the subsequence of migrations needed to migrate a db up from
-  start-version to target-version."
   [migrations start-version target-version]
-  (map (fn [[version f]] [version f version])
+  (map (fn [[version up-f down-f]] [version up-f version])
        (take-while #(<= (first %) target-version)
                    (drop-while #(<= (first %) start-version) migrations))))
 
 (defn- down-to-map
   [migrations]
-  (reduce (fn [m [from to]] (assoc m from to)) {}
-          (partition 2 1 (reverse (cons 0 (map first migrations))))))
+  (reduce
+    (fn [m [from to]] (assoc m from to))
+    {}
+    (partition 2 1 (reverse (cons 0 (map first migrations))))))
 
 (defn downs
-  "Returns the subsequence of migrations needed to migrate a db down from
-  start-version to target-version. Note that the returned subseqeunce is
-  reversed as is appropriate."
   [migrations start-version target-version]
   (let [dto-map (down-to-map migrations)]
-    (map (fn [[version f to]] [version f (dto-map to)])
-         (reverse (ups migrations target-version start-version)))))
+    (map (fn [[version up-f down-f]] [version down-f (dto-map version)])
+         (take-while #(> (first %) target-version)
+                     (drop-while #(> (first %) start-version)
+                                 (reverse migrations))))))
 
 (defn migrate
   "Migrate a db according to the given migrations sequence up or down
@@ -76,30 +75,22 @@
     (cond
       ; Migrate up.
       (< start-version target-version)
-        (do
+        (let [up-tuples (ups migrations start-version target-version)]
           (rep (str "migrating up, " start-version " to " target-version))
-          (let [ran (doall
-                      (map (fn [[version up-f to]]
-                             (rep (str "running " version " up"))
-                             (up-f)
-                             (set-version to)
-                             version)
-                           (ups migrations start-version target-version)))]
-            (rep (str "done, at " target-version))
-            ran))
+          (doseq [[version up-f to] up-tuples]
+            (rep (str "running " version " up"))
+            (up-f)
+            (set-version to))
+          (rep "done, at " target-version))
       ; Migrate down.
       (> start-version target-version)
-        (do
+        (let [down-tuples (downs migrations start-version target-version)]
           (rep (str "migrating down, " start-version " to " target-version))
-          (let [ran (doall
-                      (map (fn [[version down-f to]]
-                             (rep (str "running " version " down"))
-                             (down-f)
-                             (set-version to)
-                             version)
-                           (downs migrations start-version target-version)))]
-            (rep (str "done, at " target-version))
-            ran))
+          (doseq [[version down-f to] down-tuples]
+            (rep (str "running " version " down"))
+            (down-f)
+            (set-version to))
+          (rep (str "done, at " target-version)))
       ; Dont' migrate.
       :else
         (rep (str "migrating not needed, at " target-version)))))
