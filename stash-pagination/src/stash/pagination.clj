@@ -67,7 +67,7 @@
       (assoc pgr :entries (find-fn pgr)))))
 
 (defn paginate
-  "Returns a [results paginator] tuple for a paginated search on the model.
+  "Returns a pager object for a paginated search on the model.
   Options are :page, :per_page, :order, and :where."
   [model & [options]]
   (let [page     (get options :page 1)
