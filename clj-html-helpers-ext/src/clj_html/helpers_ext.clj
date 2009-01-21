@@ -24,6 +24,12 @@
   (html [:input {:type "text" :name name :value value
                  :id (get opts :id) :class (get opts :class)}]))
 
+(defn password-field-tag
+  "Returns an html snippet for a password field."
+  [name & [value & [opts]]]
+  (html [:input {:type "password" :name name :value value
+                 :id (get opts :id) :class (get opts :class)}]))
+
 (defn text-area-tag
   "Returns and html snippet for a text area.
   Options: :id :class :rows :cols :readonly :spellcheck."

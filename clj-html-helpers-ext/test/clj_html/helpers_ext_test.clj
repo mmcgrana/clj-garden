@@ -17,6 +17,10 @@
   (assert= "<input type=\"text\" name=\"foo[bar]\" value=\"3\" />"
     (text-field-tag "foo[bar]" 3)))
 
+(deftest "password-field-tag"
+  (assert= "<input type=\"password\" name=\"foo[bar]\" value=\"3\" />"
+    (password-field-tag "foo[bar]" 3)))
+
 (deftest "hidden-field-tag"
   (assert= "<input type=\"hidden\" name=\"foo[bar]\" value=\"3\" />"
     (hidden-field-tag "foo[bar]" 3)))
