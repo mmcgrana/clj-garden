@@ -7,7 +7,7 @@
     weldblog.controllers))
 
 (def app
-  (wrap-if exception-backtrace? ring.backtrace/wrap
+  (wrap-if backtracing? ring.backtrace/wrap
     (ring.file-info/wrap
       (ring.static/wrap public statics
         (wrap-if reloading? (partial ring.reload/wrap reloadables)

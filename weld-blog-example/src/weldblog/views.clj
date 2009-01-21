@@ -3,7 +3,8 @@
     (weld routing)
     (weldblog utils auth)
     (clj-html core utils helpers helpers-ext)
-    [stash.core :only (errors)])
+    [stash.core :only (errors)]
+    [stash.pagination :except (paginate)])
   (:require
     [clj-time.core :as time]
     [stash.core :as stash]))
@@ -46,7 +47,7 @@
 (defhtml partial-post
   [post]
   [:div {:class (str "post_" (:id post))}
-    [:h2 (link-to (h (:title post)) (path :post post))]
+    [:h2 (link-to (h (:title post)) (path :show-post post))]
     [:div.post_body
       (h (:body post))]])
 
@@ -75,36 +76,36 @@
       (html [:p (password-field-tag "password")]))))
 
 (defhtml index
-  [sess posts]
+  [sess pager]
   (layout
     {:sess sess
      :head (auto-discovery-link-tag :atom
-             {:title "Feed for Ring Blog Example" :href (path :posts-atom)})}
+             {:title "Feed for Ring Blog Example" :href (path :index-posts-atom)})}
     (message-flash sess)
     [:h1 "Posts"]
     (when-html (authenticated? sess)
       [:p (link-to "New Post" (path :new-post))])
     [:div#posts
-      (map-str partial-post posts)]))
+      (map-str partial-post (entries pager))]))
 
 (defxml index-atom
   [posts]
   [:decl! {:version "1.1"}]
   [:feed {:xmlns "http://www.w3.org/2005/Atom" "xml:lang" "en-US"}
-    [:id (url :posts-atom)]
+    [:id (url :index-posts-atom)]
     [:title "Ring Blog Example"]
     [:updated (time/xmlschema (time/now))]
-    [:link {:href (url :posts-atom) :rel "self" :type "application/rss+xml"}]
+    [:link {:href (url :index-posts-atom) :rel "self" :type "application/rss+xml"}]
     [:author
       [:name "Mark McGranaghan"]
       [:email "mmcgrana@gmail.com"]
       [:uri "http://github.com/mmcgrana"]]
     (for [post posts]
       [:entry
-        [:id (url :post post)]
+        [:id (url :show-post post)]
         [:title (h (:title post))]
         [:link {:rel "alternate" :type "text/html"
-                :href (url :post post)}]
+                :href (url :show-post post)}]
         [:updated
           (time/xmlschema (time/now))]
         [:summary {:type "xhtml"}
@@ -116,10 +117,9 @@
   (layout {:sess sess}
     (message-flash sess)
     (partial-post post)
-    [:p (link-to "All Posts" (path :posts))
+    [:p (link-to "All Posts" (path :index-posts))
       (when-html (authenticated? sess)
         " | " (link-to "Edit Post" (path :edit-post post)))]))
-
 
 (defhtml new
   [sess post]
@@ -132,7 +132,7 @@
 (defhtml edit
   [sess post]
   (layout {:sess sess}
-    [:h1 "Editing Post"]
+    [:h1 "Edit Post"]
     (error-messages-post post)
     (form {:to (path-info :update-post post)}
       (partial-post-form post))))
@@ -141,7 +141,7 @@
   [sess]
   (layout {:sess sess}
     [:h3 "We're sorry - we couln't find that."]
-    [:p  "Please return to the " (link-to "Home Page" (path :posts))]))
+    [:p  "Please return to the " (link-to "Home Page" (path :index-posts))]))
 
 (defhtml internal-error
   [sess]

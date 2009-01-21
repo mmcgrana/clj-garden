@@ -1,63 +1,14 @@
 === Now
-error handling
-
 tests
 
-feeatures
+tags
+pagination in views
+pagination in urls - propper
 
 === Later
 
 require weldblog.controllers in app? (maybe .boot?)
-pretty-printing xml and json api, with nice responses
 app tests
-consider reloadability of routing and apps
+consider releasability of routing and apps
   should be able to reload all user-level logic if routing is in vars
   and routing and config file are reloaded
-
-framework-level error handling
-  production
-    dump to log             (exceptions-log switch)
-    app-level error pages   (exceptions-handle switch)
-    catchall fallback       (weld config)
-    no backtrace            (wrap backtrace in dev only)
-  dev
-    dump to log             (exceptions-log switch)
-    propogate back          (exceptions-handle switch)
-    show backtrace          (wrap backtrace in dev only)
-  testing
-    maybe log               (exceptions-log switch)       
-    propogate back          (exceptions-handle switch)
-    no backtrace            (wrap backtrace in dev only)
-
-*handle-exceptions*
-*log-exceptions*
-
-(defn framework [req]
-  (let [action (parse req)]
-    (try
-      (action req)
-      (catch Exception e
-        (if *log-exceptions*
-          (log *logger* (pst-str e)))
-        (if *handle-exceptions*
-          (*handle-exceptions* req e)
-          (throw e))))))
-        
-          
-        (if *exceptions-fallback?*
-          (*exceptions-fallback-fn*)
-          (throw e))))))
-
-(defn action [req]
-  (try
-    (gen-response req)
-    (catch Exception e
-      (if exceptions-log?
-        (log logger :error (pst-str e)))
-      (if *exceptions-handle*
-        (cond (instance? SubException e)
-                (special-handler e)
-              (instance? Exception e)
-                (general-handler e)
-              :else
-                (throw e))))))

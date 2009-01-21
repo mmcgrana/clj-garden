@@ -9,7 +9,7 @@
 (def test? (= env :test))
 (def prod? (= env :prod))
 
-(def host "localhost:8000")
+(def host "http://localhost:8080")
 
 (def public (File. "public"))
 (def statics '("/stylesheets" "/javascripts" "/favicon.ico"))
@@ -24,9 +24,8 @@
 (def log-levels {:prod :info :dev :debug :test :error})
 (def logger (new-logger :err (log-levels env)))
 
-(def exception-backtrace? dev?)
-(def exception-handling?  prod?)
-(def exception-logging?   (not test?))
+(def backtracing? dev?)
+(def handler (if prod? 'weldblog.controllers/internal-error))
 
 (def reloading? dev?)
 (def reloadables '(weldblog.models weldblog.views weldblog.controllers))
@@ -38,7 +37,9 @@
 
 (def config
   {'weld.routing/*router*             router
+   'weld.routing/*host*               host
    'weld.app/*logger*                 logger
+   'weld.app/*handler-sym*            handler
    'weld.request/*session-cookie-key* session-cookie-key
    'weld.request/*session-secret-key* session-secret-key})
 
