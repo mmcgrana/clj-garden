@@ -14,7 +14,7 @@
 
 (defn log?
   [level-rank message-level]
-  (>= level-rank (or (level-ranks message-level)
+  (<= level-rank (or (level-ranks message-level)
                      (throwf "Unrecognized level %s" message-level))))
 
 (defn new-logger

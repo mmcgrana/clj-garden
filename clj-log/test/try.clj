@@ -7,5 +7,3 @@
     (prn ((:test logger) level))
     ((:log logger) (pr-str level))
     (prn)))
-
-

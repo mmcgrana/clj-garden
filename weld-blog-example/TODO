@@ -1,4 +1,21 @@
+=== Now
+
+(form {:to (path-info :create-session)} @body)
+
+new-session view mess
+figure out (path :post post) business - what about extras
+session-info view
+
+not-authenticated
+
+tests
+
 error handling
+
+
+=== Later
+
+require weldblog.controllers in app? (maybe .boot?)
 pretty-printing xml and json api, with nice responses
 app tests
 consider reloadability of routing and apps

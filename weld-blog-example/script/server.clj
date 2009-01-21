@@ -1,5 +1,5 @@
 (System/setProperty "weldblog.env" (or (first *command-line-args*) "dev"))
 
-(require 'ring.handlers.jetty 'weldblog.app)
+(require 'ring.jetty 'weldblog.app)
 
-(ring.handlers.jetty/run {:port 8080} weldblog.app/app)
+(ring.jetty/run {:port 8080} weldblog.app/app)

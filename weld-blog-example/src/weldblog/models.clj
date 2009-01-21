@@ -10,10 +10,9 @@
   (merge model-base
   {:table-name :posts
    :columns
-     [[:id    :uuid   {:pk true}]
+     [[:id    :uuid   {:pk true :auto true}]
       [:title :string]
       [:body  :string]]
-   :pk-init a-uuid
    :accessible-attrs
      [:title :body]
    :validations

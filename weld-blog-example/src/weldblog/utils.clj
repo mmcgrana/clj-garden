@@ -8,8 +8,3 @@
 (defmacro defxml
   [name args & body]
   `(defn ~name ~args (xml ~@body)))
-
-(defmacro for-html
-  [[elem-bind coll] & body]
-  `(domap-str [~elem-bind ~coll]
-     (html ~@body)))

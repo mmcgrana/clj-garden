@@ -98,17 +98,17 @@
         (submit-tag "Upload")))))
 
 ;; Controllers
-(defn not-found [& [req]]
+(defn not-found [& [env]]
   (redirect (path :index)))
 
-(defn index [req]
+(defn index [env]
   (respond (index-view (stash/find-all +upload+))))
 
-(defn new [req]
+(defn new [env]
   (respond (new-view)))
 
-(defn create [req]
-  (create-upload (params req :upload))
+(defn create [env]
+  (create-upload (params env :upload))
   (redirect (path :index)))
 
 (defmacro with-upload
@@ -117,12 +117,12 @@
      (do ~@body)
      (not-found)))
 
-(defn show [req]
-  (with-upload [upload (params req :id)]
+(defn show [env]
+  (with-upload [upload (params env :id)]
     (send-file (upload-file upload) {:filename (:filename upload)})))
 
-(defn destroy [req]
-  (with-upload [upload (params req :id)]
+(defn destroy [env]
+  (with-upload [upload (params env :id)]
     (destroy-upload upload)
     (redirect (path :index))))
 

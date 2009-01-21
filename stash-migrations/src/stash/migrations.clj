@@ -108,7 +108,7 @@
   "A wrapper around the stash.migrations/migrate, performers migrations in the
   context of a given data source and logger."
   (stash.core/with-logger logger
-    (clj-jdbc.core/with-connection data-source
+    (jdbc/with-connection data-source
       (ensure-version)
       (migrate migrations version))))
 

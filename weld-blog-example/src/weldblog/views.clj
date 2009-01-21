@@ -1,11 +1,14 @@
 (ns weldblog.views
-  (:use (weld routing)
-        (weldblog utils auth)
-        (clj-html core utils helpers helpers-ext)
-        [stash.core :only (errors)])
-  (:require [clj-time.core :as time]))
+  (:use
+    (weld routing)
+    (weldblog utils auth)
+    (clj-html core utils helpers helpers-ext)
+    [stash.core :only (errors)])
+  (:require
+    [clj-time.core :as time]
+    [stash.core :as stash]))
 
-(defmacro with-layout
+(defmacro layout
   [assigns-form & body]
   `(let [assigns# ~assigns-form
          inner# (html ~@body)]
@@ -29,10 +32,9 @@
 
 (defn message
   [sess]
-  (when-let-html [[type text] (message-info (:flash sess))]
+  (when-let-html [[type text] (message-info (get sess :flash))]
     [:p {:class (name type)} text]))
 
-; nil :params :message
 (defhtml new-session [& [info]]
   [:p.info (h (pr-str info))]
   (let [params (get info :params)]
@@ -42,7 +44,7 @@
 (defhtml partial-post
   [post]
   [:div {:class (str "post_" (:id post))}
-    [:h2 (link-to (:title post) (path :post post))]
+    [:h2 (link-to (h (:title post)) (path :post post))]
     [:div.post_body
       (h (:body post))]])
 
@@ -52,7 +54,7 @@
 
 (defn index
   [posts sess]
-  (with-layout-throwing
+  (layout
     {:for_head
       (auto-discovery-link-tag :atom
         {:title "Feed for Ring Blog Example" :href (path :posts-atom)})}
@@ -90,7 +92,7 @@
 
 (defn show
   [post sess]
-  (with-layout
+  (layout {}
     (message sess)
     (session-info sess)
     (partial-post post)
@@ -116,7 +118,7 @@
 
 (defn new
   [post sess]
-  (with-layout
+  (layout {}
     (session-info sess)
     [:h1 "New Post"]
     (error-messages-post post)
@@ -125,7 +127,7 @@
 
 (defn edit
   [post sess]
-  (with-layout
+  (layout {}
     (session-info sess)
     [:h1 "Editing Post"]
     (error-messages-post post)
@@ -133,13 +135,13 @@
       (partial-post-form post))))
 
 (defn not-found [sess]
-  (with-layout
+  (layout {}
     (session-info sess)
     [:h3 "We're sorry - we couln't find that."]
     [:p  "Please return to the " (link-to "Home Page" (path :posts))]))
 
 (defn internal-error [sess]
-  (with-layout
+  (layout {}
     (session-info sess)
     [:h3 "We're sorry - something went wrong."]
     [:p  "We've been notified of the problem and are looking into it."]))
