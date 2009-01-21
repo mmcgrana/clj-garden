@@ -1,18 +1,9 @@
 === Now
-
-(form {:to (path-info :create-session)} @body)
-
-figure out (path :post post) business - what about extras
-also method link situation
-
-flash-session-now?
-
-not-authenticated
+error handling
 
 tests
 
-error handling
-
+feeatures
 
 === Later
 
@@ -38,16 +29,21 @@ framework-level error handling
     propogate back          (exceptions-handle switch)
     no backtrace            (wrap backtrace in dev only)
 
-*exceptions-handle*
-*exceptions-log*
-weld.app/*exceptions-fallback*
-(weld.app/*exceptions-fallback-fn*)
+*handle-exceptions*
+*log-exceptions*
 
 (defn framework [req]
   (let [action (parse req)]
     (try
       (action req)
       (catch Exception e
+        (if *log-exceptions*
+          (log *logger* (pst-str e)))
+        (if *handle-exceptions*
+          (*handle-exceptions* req e)
+          (throw e))))))
+        
+          
         (if *exceptions-fallback?*
           (*exceptions-fallback-fn*)
           (throw e))))))

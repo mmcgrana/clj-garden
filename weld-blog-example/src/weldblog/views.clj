@@ -8,6 +8,7 @@
     [clj-time.core :as time]
     [stash.core :as stash]))
 
+;; Helpers
 (defmacro layout
   [assigns-form & body]
   `(let [assigns# ~assigns-form]
@@ -37,17 +38,10 @@
    :post-updated      [:success "Post updated"]
    :post-destroyed    [:success "Post destroyed"]})
 
-(defn message-flash
+(defhtml message-flash
   [sess]
   (when-let-html [[type text] (message-info (get sess :flash))]
-    [:p.message {:class (name type)} text]))
-
-(defhtml new-session [sess & [info]]
-  (layout {:sess sess}
-    (message-flash sess)
-    [:p "password:"]
-    (form {:to (path-info :create-session)}
-      (html [:p (password-field-tag "password")]))))
+    [:h3.message {:class (name type)} text]))
 
 (defhtml partial-post
   [post]
@@ -56,8 +50,32 @@
     [:div.post_body
       (h (:body post))]])
 
-(defn index
-  [posts sess]
+(defhtml error-messages-post
+  [post]
+  (when-let-html [errs (errors post)]
+    [:div.error-messages
+      [:h3 "There were problems with your submission:"]
+      (for-html [err errs]
+        [:p (name (:on err))])]))
+
+(defhtml partial-post-form
+  [post]
+  [:p "title:"]
+  [:p (text-field-tag "post[title]" (:title post))]
+  [:p "body:"]
+  [:p (text-area-tag  "post[body]"  (:body  post) {:rows 20 :cols 80})]
+  [:p (submit-tag "Submit Post")])
+
+;; Main Views
+(defhtml new-session [sess]
+  (layout {:sess sess}
+    (message-flash sess)
+    [:p "password:"]
+    (form {:to (path-info :create-session)}
+      (html [:p (password-field-tag "password")]))))
+
+(defhtml index
+  [sess posts]
   (layout
     {:sess sess
      :head (auto-discovery-link-tag :atom
@@ -93,8 +111,8 @@
           [:div {:xmlns "http://www.w3.org/1999/xhtml"}
             (h (:body post))]]])])
 
-(defn show
-  [post sess]
+(defhtml show
+  [sess post]
   (layout {:sess sess}
     (message-flash sess)
     (partial-post post)
@@ -102,44 +120,31 @@
       (when-html (authenticated? sess)
         " | " (link-to "Edit Post" (path :edit-post post)))]))
 
-(defn error-messages-post
-  [post]
-  (when-let-html [errs (errors post)]
-    [:div.error-messages
-      [:h3 "There were problems with your submission:"]
-      (for-html [err errs]
-        [:p (name (:on err))])]))
 
-(defhtml partial-post-form
-  [post]
-  [:p "title:"]
-  [:p (text-field-tag "post[title]" (:title post))]
-  [:p "body:"]
-  [:p (text-area-tag  "post[body]"  (:body  post) {:rows 20 :cols 80})]
-  [:p (submit-tag "Submit Post")])
-
-(defn new
-  [post sess]
+(defhtml new
+  [sess post]
   (layout {:sess sess}
     [:h1 "New Post"]
     (error-messages-post post)
     (form {:to (path-info :create-post)}
       (partial-post-form post))))
 
-(defn edit
-  [post sess]
+(defhtml edit
+  [sess post]
   (layout {:sess sess}
     [:h1 "Editing Post"]
     (error-messages-post post)
     (form {:to (path-info :update-post post)}
       (partial-post-form post))))
 
-(defn not-found [sess]
+(defhtml not-found
+  [sess]
   (layout {:sess sess}
     [:h3 "We're sorry - we couln't find that."]
     [:p  "Please return to the " (link-to "Home Page" (path :posts))]))
 
-(defn internal-error [sess]
+(defhtml internal-error
+  [sess]
   (layout {:sess sess}
     [:h3 "We're sorry - something went wrong."]
     [:p  "We've been notified of the problem and are looking into it."]))

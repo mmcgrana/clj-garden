@@ -4,10 +4,10 @@
 
 (require
   '[stash.core :as stash]
+  '[weld.routing :as routing]
   '(weldblog
      [app :as app]
      [config :as config]
      [controllers :as controllers]
      [models :as models]
-     [routing :as routing]
      [views :as views]))
