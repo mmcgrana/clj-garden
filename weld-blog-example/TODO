@@ -2,9 +2,10 @@
 
 (form {:to (path-info :create-session)} @body)
 
-new-session view mess
 figure out (path :post post) business - what about extras
-session-info view
+also method link situation
+
+flash-session-now?
 
 not-authenticated
 

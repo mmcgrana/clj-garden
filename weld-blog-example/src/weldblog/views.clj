@@ -10,17 +10,24 @@
 
 (defmacro layout
   [assigns-form & body]
-  `(let [assigns# ~assigns-form
-         inner# (html ~@body)]
+  `(let [assigns# ~assigns-form]
      (html
        (doctype :xhtml-transitional)
        [:html {:xmlns "http://www.w3.org/1999/xhtml"}
          [:head
            (include-css "/stylesheets/main.css")
-           (get assigns# :for_head)
+           (get assigns# :head)
            [:meta {:http-equiv "Content-Type" :content "text/html;charset=utf-8"}]
            [:title "Weld Blog Example"]
-           [:body inner#]]])))
+           [:body
+             [:div#container
+               [:div#header
+                 [:p.session
+                   (if-html (authenticated? (get assigns# :sess))
+                     (link-to "log out" (path :destroy-session))
+                     (link-to "log in"  (path :new-session)))]]
+               [:div#content
+                 ~@body]]]]])))
 
 (def message-info
   {:session-needed    [:notice  "Please log in"]
@@ -30,16 +37,17 @@
    :post-updated      [:success "Post updated"]
    :post-destroyed    [:success "Post destroyed"]})
 
-(defn message
+(defn message-flash
   [sess]
   (when-let-html [[type text] (message-info (get sess :flash))]
-    [:p {:class (name type)} text]))
+    [:p.message {:class (name type)} text]))
 
-(defhtml new-session [& [info]]
-  [:p.info (h (pr-str info))]
-  (let [params (get info :params)]
+(defhtml new-session [sess & [info]]
+  (layout {:sess sess}
+    (message-flash sess)
+    [:p "password:"]
     (form-to (path-info :create-session)
-      (html [:p (text-field-tag "password" (get params :password))]))))
+      (html [:p (password-field-tag "password")]))))
 
 (defhtml partial-post
   [post]
@@ -48,18 +56,13 @@
     [:div.post_body
       (h (:body post))]])
 
-(defhtml session-info
-  [sess]
-  [:p.login-info (pr-str sess)])
-
 (defn index
   [posts sess]
   (layout
-    {:for_head
-      (auto-discovery-link-tag :atom
-        {:title "Feed for Ring Blog Example" :href (path :posts-atom)})}
-    (message sess)
-    (session-info sess)
+    {:sess sess
+     :head (auto-discovery-link-tag :atom
+             {:title "Feed for Ring Blog Example" :href (path :posts-atom)})}
+    (message-flash sess)
     [:h1 "Posts"]
     (when-html (authenticated? sess)
       [:p (link-to "New Post" (path :new-post))])
@@ -92,9 +95,8 @@
 
 (defn show
   [post sess]
-  (layout {}
-    (message sess)
-    (session-info sess)
+  (layout {:sess sess}
+    (message-flash sess)
     (partial-post post)
     [:p (link-to "All Posts" (path :posts))
       (when-html (authenticated? sess)
@@ -118,8 +120,7 @@
 
 (defn new
   [post sess]
-  (layout {}
-    (session-info sess)
+  (layout {:sess sess}
     [:h1 "New Post"]
     (error-messages-post post)
     (form-to (path-info :create-post)
@@ -127,21 +128,18 @@
 
 (defn edit
   [post sess]
-  (layout {}
-    (session-info sess)
+  (layout {:sess sess}
     [:h1 "Editing Post"]
     (error-messages-post post)
     (form-to (path-info :update-post post)
       (partial-post-form post))))
 
 (defn not-found [sess]
-  (layout {}
-    (session-info sess)
+  (layout {:sess sess}
     [:h3 "We're sorry - we couln't find that."]
     [:p  "Please return to the " (link-to "Home Page" (path :posts))]))
 
 (defn internal-error [sess]
-  (layout {}
-    (session-info sess)
+  (layout {:sess sess}
     [:h3 "We're sorry - something went wrong."]
     [:p  "We've been notified of the problem and are looking into it."]))

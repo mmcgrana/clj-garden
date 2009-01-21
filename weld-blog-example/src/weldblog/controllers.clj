@@ -11,18 +11,19 @@
 (defn not-found [& [env]]
   (respond (views/not-found (session env))))
 
-(defn not-authenticated [& [info]]
-  (respond (views/new-session info)))
+(defn not-authenticated [sess]
+  (respond (views/new-session sess)))
 
 (defn new-session [env]
-  (respond (views/new-session)))
+  (with-session [sess env]
+    (respond (views/new-session sess))))
 
 (defn create-session [env]
-  (if (= config/admin-password (params env :password))
-    (with-session [sess env]
+  (with-session [sess env]
+    (if (= config/admin-password (params env :password))
       (flash-session (authenticated sess) :session-created
-        (redirect (path :posts))))
-    (not-authenticated {:params (params env)})))
+        (redirect (path :posts)))
+      (not-authenticated sess))))
 
 (defn destroy-session [env]
   (with-session [sess env]
@@ -34,7 +35,7 @@
   `(with-session [~sess-bind ~env-form]
       (if (authenticated? ~sess-bind)
         (do ~@body)
-        (not-authenticated {:message :session-needed}))))
+        (not-authenticated (assoc ~sess-bind :flash :session-needed)))))
 
 (defmacro with-post
   [[post-bind env-sym] & body]
