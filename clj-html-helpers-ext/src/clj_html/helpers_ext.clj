@@ -55,20 +55,19 @@
   [text]
   (html [:input {:type "submit" :name "commit" :value text}]))
 
-(defn form-to
+(defn form
   "Returns html for a form."
-  ([target body]
-   (form-to target nil body))
-  ([[method url] opts body]
-   (if (browser-method? method)
-     (html
-       [:form {:method (method-str method) :action url}
-         body])
-     (html
-       [:form {:method "post" :action url
-               :enctype (if (get opts :multipart) "multipart/form-data")}
-         (hidden-field-tag "_method" (method-str method))
-         body]))))
+  [opts body]
+  (let [[method url] (get opts :to)]
+    (if (browser-method? method)
+      (html
+        [:form {:method (method-str method) :action url}
+          body])
+      (html
+        [:form {:method "post" :action url
+                :enctype (if (get opts :multipart) "multipart/form-data")}
+          (hidden-field-tag "_method" (method-str method))
+          body]))))
 
 (defn link-to
   "Returns html for a link with anchor text to the url."
@@ -80,7 +79,7 @@
   "Returns html for a form consisting only of a button that, when clicked,
   will send a delete request to the given path."
   [text url]
-  (form-to [:delete url]
+  (form {:to [:delete url]}
     (submit-tag text)))
 
 (def #^{:private true} mime-type-strs

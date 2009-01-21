@@ -33,11 +33,11 @@
   (assert= "<input name=\"commit\" type=\"submit\" value=\"foo\" />"
     (submit-tag "foo")))
 
-(deftest "form-to"
+(deftest "form"
   (assert= "<form action=\"/foo\" method=\"get\">inner</form>"
-    (form-to [:get "/foo"] "inner"))
+    (form {:to [:get "/foo"]} "inner"))
   (assert= "<form method=\"post\" action=\"/foo\"><input type=\"hidden\" name=\"_method\" value=\"put\" />inner</form>"
-    (form-to [:put "/foo"] "inner")))
+    (form {:to [:put "/foo"]} "inner")))
 
 (deftest "link-to"
   (assert= "<a href=\"/bar\" title=\"foo\">foo</a>"
