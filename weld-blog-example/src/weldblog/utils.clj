@@ -8,3 +8,11 @@
 (defmacro defxml
   [name args & body]
   `(defn ~name ~args (xml ~@body)))
+
+(defn to-int [x]
+  (try (Integer. x) (catch Exception e nil)))
+
+(defmacro let-html
+  "Like let, but applying the html macro to the body."
+  [bindings & body]
+  `(let ~bindings (html ~@body)))

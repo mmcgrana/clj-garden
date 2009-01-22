@@ -1,7 +1,7 @@
 (ns weldblog.controllers
   (:use
     (weld controller request config routing)
-    (weldblog auth)
+    (weldblog auth utils)
     (clj-backtrace repl))
   (:require
     (weldblog [models   :as models]
@@ -34,6 +34,9 @@
 (defn internal-error [req]
   (respond (views/internal-error (session req)) {:status 500}))
 
+(defn home [req]
+  (redirect (path :index-posts)))
+
 (defn new-session [req]
   (with-session [sess req]
     (respond (views/new-session sess))))
@@ -53,7 +56,8 @@
 (defn index-posts [req]
   (with-fading-session [sess req]
     (let [pager (pagination/paginate models/+post+
-                  {:per-page 4 :order [:created_at :asc]})]
+                  {:page (to-int (params req :page))
+                   :per-page 2 :order [:created_at :asc]})]
       (respond (views/index sess pager)))))
 
 (defn index-posts-atom [req]

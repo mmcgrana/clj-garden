@@ -1,5 +1,3 @@
-; Based on mislav's will_paginate
-
 (ns stash.pagination
   (:use stash.core))
 
@@ -70,8 +68,8 @@
   "Returns a pager object for a paginated search on the model.
   Options are :page, :per_page, :order, and :where."
   [model & [options]]
-  (let [page     (get options :page 1)
-        per-page (get options :per-page 10)
+  (let [page     (or (get options :page) 1)
+        per-page (or (get options :per-page) 10)
         where    (get options :where)
         order    (get options :order)
         limit    (get options :limt)]

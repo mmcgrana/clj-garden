@@ -67,6 +67,20 @@
   [:p (text-area-tag  "post[body]"  (:body  post) {:rows 20 :cols 80})]
   [:p (submit-tag "Submit Post")])
 
+(defhtml pagination-links
+  [pager]
+  (let-html [p  (page pager)
+             tp (total-pages pager)]
+    [:p.pagination
+      [:span.pagination-link
+        (cond (= p 1) "newer"
+              (= p 2) (link-to "newer" (path :index-posts))
+              :else   (link-to "newer" (path :index-posts-paginated {:page (dec p)})))]
+      " "
+      [:span.pagination-link
+        (cond (= p tp) "older"
+              :else    (link-to "older" (path :index-posts-paginated {:page (inc p)})))]]))
+
 ;; Main Views
 (defhtml new-session [sess]
   (layout {:sess sess}
@@ -86,7 +100,8 @@
     (when-html (authenticated? sess)
       [:p (link-to "New Post" (path :new-post))])
     [:div#posts
-      (map-str partial-post (entries pager))]))
+      (map-str partial-post (entries pager))]
+    (pagination-links pager)))
 
 (defxml index-atom
   [posts]
