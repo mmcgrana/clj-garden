@@ -9,3 +9,5 @@ permalinks
 diffs
 search 
 (http://webhooks.pbwiki.com/)
+
+controllers require in .app
