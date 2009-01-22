@@ -1,7 +1,5 @@
 (System/setProperty "weldblog.env" (or (first *command-line-args*) "dev"))
 
-(println "WeldBlog")
-
 (require
   '[stash.core :as stash]
   '[weld.routing :as routing]

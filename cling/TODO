@@ -9,5 +9,6 @@ permalinks
 diffs
 search 
 (http://webhooks.pbwiki.com/)
+optomistic locking
 
 controllers require in .app

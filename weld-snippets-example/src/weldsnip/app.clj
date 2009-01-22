@@ -1,21 +1,23 @@
 (ns weldsnip.app
-  (:use (weld routing request controller config)
-        (clj-html core utils helpers helpers-ext)
-        clj-jdbc.data-sources
-        clj-log.core)
+  (:use
+    (weld routing request controller config)
+    (clj-html core utils helpers helpers-ext)
+    (clj-jdbc data-sources)
+    (clj-log core))
   (:require
-    (stash [core :as stash] [timestamps :as timestamps])
+    (stash [core :as stash]
+           [timestamps :as timestamps])
     (ring reload backtrace static file-info)
     weld.app)
-  (:import java.io.File))
+  (:import
+    (java.io File)))
 
 ;; Config & Routing
 (def public  (File. "public"))
 (def statics '("/stylesheets" "/javascripts" "/favicon.ico"))
 
 (def logger (new-logger :err :info))
-(def data-source (pg-data-source
-                   {:database "weldsnip_dev" :user "mmcgrana" :password ""}))
+(def data-source (pg-data-source {:database "weldsnip_dev" :user "mmcgrana" :password ""}))
 
 (def router
   (compiled-router
@@ -53,18 +55,18 @@
        [:h2 ~title]
        ~@body]))
 
-(defn new-view []
+(defhtml new-view []
   (layout "Create a Snippet"
     (form-to (path-info :create)
       (html (text-area-tag "snippet[body]" "" {:rows 20 :cols 73}) [:br]
             (submit-tag "Save")))))
 
-(defn show-view [snippet]
+(defhtml show-view [snippet]
   (layout (str "Snippet " (:id snippet))
     [:div [:pre [:code.clojure (:body snippet)]]]
     [:div.date (:created_at snippet)]))
 
-(defn miss-view []
+(defhtml miss-view []
   (layout "Not Found"
     [:div "Sorry, couldn't find that."]))
 
