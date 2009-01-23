@@ -1,14 +1,12 @@
 (ns weldblog.controllers
   (:use
-    (weld controller request config routing)
-    (weldblog auth utils)
-    (clj-backtrace repl))
+    (weld controller request routing)
+    (weldblog auth utils))
   (:require
     (weldblog [models   :as models]
-              [views    :as views]
-              [config   :as config])
-    [stash.core :as stash]
-    [stash.pagination :as pagination]))
+              [views    :as views])
+    (stash [core :as stash]
+           [pagination :as pagination])))
 
 ;; Helpers
 (defn not-authenticated [sess]
@@ -43,7 +41,7 @@
 
 (defn create-session [req]
   (with-session [sess req]
-    (if (= config/admin-password (params req :password))
+    (if (authenticate? (params req :password))
       (flash-session (authenticated sess) :session-created
         (redirect (path :index-posts)))
       (not-authenticated sess))))

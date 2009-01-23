@@ -11,4 +11,13 @@ search
 (http://webhooks.pbwiki.com/)
 optomistic locking
 
+(defatomfeed []
+  )
+
 controllers require in .app
+
+add-column vector or not?
+
+nofollow on links, like on crunchbase
+
+(stash/find-one-by +page+ {:permalink (params req :permalink)})

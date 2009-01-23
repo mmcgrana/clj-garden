@@ -1,6 +1,12 @@
-(ns weldblog.auth)
+(ns weldblog.auth
+  (require
+    [weldblog.config :as config]))
 
 (def auth-key :authenticated)
+
+(defn authenticate?
+  [pass]
+  (= config/admin-password pass))
 
 (defn authenticated?
   [sess]

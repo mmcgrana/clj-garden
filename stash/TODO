@@ -9,3 +9,5 @@ serialization
 double check escaping
 ordered GUIDs
   http://www.informit.com/articles/printerfriendly.aspx?p=25862
+
+null pointer exception when {:where [:foo := "bar"]} and no :foo column
