@@ -27,6 +27,10 @@
 (defn- where-exp-sql
   [model where-exp]
   (cond
+    ; "foo = 'bar'"
+    (string? where-exp)
+      where-exp
+
     ; [:not <more>]
     (= :not (where-exp 0))
       (str "(NOT " (where-exp-sql model (where-exp 1)) ")")

@@ -1,18 +1,53 @@
-pages
-versions
-page history
-page rss
-wiki rss
-users
-markdown
-permalinks
-diffs
-search 
-(http://webhooks.pbwiki.com/)
-optomistic locking
+good textile + syntax highlighting
+  @@clj (+ 1 2) @@
+  what about @ @ and <pre><code>
+  internal linking (wiki syntax?)
 
-(defatomfeed []
-  )
+diffs
+
+search - in layout, on top
+  LIKE
+    note injection
+    pagination integration
+  Batched lucene
+    pagination integration
+
+users
+
+examples
+  http://webhooks.pbwiki.com/
+  http://wiki.github.com/mislav/will_paginate
+  http://wiki.merbivore.org
+
+pages like on github for the most n frequently-accessed pages, then link more
+
+pretty date formatting
+  server side
+  relative formating client side
+
+edits/version/history in code/text/urls
+
+diff content in feeds
+
+notion of "Wiki title"
+  perhaps app config and installation config, the later for things like title
+
+app-level analytics (cool features, like nav paths)
+
+link -> link-to ?
+  what was the original reason not?
+
+permalink -> slug
+  permalink is overloaded, may want to change slug, shorter
+
+restart with routing / interaction with cofig
+
+assets / image uploads
+  public "caching"
+
+reload command for console
+
+optomistic locking
 
 controllers require in .app
 
@@ -21,3 +56,25 @@ add-column vector or not?
 nofollow on links, like on crunchbase
 
 (stash/find-one-by +page+ {:permalink (params req :permalink)})
+
+"powered by Cling"
+
+not-found on returning nil?
+
+not that "versions" and "new" etc must be reserved permalinks
+
+perhaps we can eliminate a lot of these (respond "foo") things - just ret. "foo"
+perhaps ["foo" {:status 404}] for respond shorthand
+
+find ways to shorten and eliminate tokens
+
+not happy about no use of lets in defxml
+
+what escaping is required with textilize??
+
+perhaps auto-discovery-link tag api should be more like link(-to), perhaps shorter name
+
+optional route tails
+  /posts(/page/:page)
+  need to consider recognition and generation semantics
+  better than query params woot!

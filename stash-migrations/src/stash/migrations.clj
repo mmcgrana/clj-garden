@@ -71,7 +71,7 @@
   [migrations & [target-version]]
   (let [start-version  (get-version)
         target-version (or target-version (first (last migrations)))
-        rep            jdbc/report-db]
+        rep            #(jdbc/report-db (str "migrations: " %))]
     (cond
       ; Migrate up.
       (< start-version target-version)
@@ -81,7 +81,7 @@
             (rep (str "running " version " up"))
             (up-f)
             (set-version to))
-          (rep "done, at " target-version))
+          (rep (str "done, at " target-version)))
       ; Migrate down.
       (> start-version target-version)
         (let [down-tuples (downs migrations start-version target-version)]

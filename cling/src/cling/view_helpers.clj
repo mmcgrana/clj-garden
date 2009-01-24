@@ -1,4 +1,6 @@
 (ns cling.view-helpers
+  (:use
+    (clojure.contrib prxml))
   (:import
     (org.eclipse.mylyn.wikitext.core.parser MarkupParser)
     (org.eclipse.mylyn.wikitext.textile.core TextileLanguage)))
@@ -10,29 +12,10 @@
         body        (.substring post-header 0 (- (.length post-header) 14))]
     body))
 
+(defmacro xml
+  [& body]
+  `(with-out-str (prxml ~@body)))
 
-foo
-
-@@:clj
-(some clojure code)
-@@
-
-foobar @@:clj (+ 1 2)@@ biz bat
-
-========
-
-foo
-
-CODE1
-
-foobar CODE2 biz bat
-
-========
-
-<p>foo</p><p>CODE1</p><p>foobar CODE2 biz bat</p>
-
-========
-
-<p>foo</p><pre class="code-block clj">
-(<span class="keyword">some</span> clojure code)
-</pre><p>foobar <pre class="code-inline clj">(+ 1 2)</pre> biz bat</p>
+(defmacro defxml
+  [name args & body]
+  `(defn ~name ~args (xml ~@body)))

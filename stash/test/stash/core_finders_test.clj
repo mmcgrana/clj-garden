@@ -14,6 +14,9 @@
     "SELECT * FROM posts LIMIT 10 OFFSET 30"
     (find-sql +post+ {:limit 10 :offset 30}))
   (assert=
+    "SELECT * FROM posts WHERE title IS NULL"
+    (find-sql +post+ {:where "title IS NULL"}))
+  (assert=
     "SELECT * FROM posts WHERE (title IS NULL)"
     (find-sql +post+ {:where [:title := nil]}))
   (assert=

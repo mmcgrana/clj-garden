@@ -34,7 +34,7 @@
 (def handler (if prod? 'cling.controllers/internal-error))
 
 (def reloading? dev?)
-(def reloadables '(cling.models cling.views cling.controllers))
+(def reloadables '(cling.models cling.view-helpers cling.views cling.controllers))
 
 (def session-cookie-key :cling_session_id)
 (def session-secret-key "sj746hdnzmdjd93746fhdknckdhd38019")

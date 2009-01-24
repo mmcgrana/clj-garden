@@ -77,4 +77,3 @@
       (fn [p] (count-all model {:where where}))
       (fn [p] (find-all  model {:where where :order order
                                 :limit per-page :offset (offset p)})))))
-
