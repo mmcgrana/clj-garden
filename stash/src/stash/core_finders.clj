@@ -18,7 +18,7 @@
   [model sql]
   (let [uncast-attrs (execute jdbc/select-maps (data-source model)
                        sql (logger model))]
-    (map (partial instantiate model) uncast-attrs)))
+    (map #(instantiate model %) uncast-attrs)))
 
 (defn find-one
   "Returns all instances of model found according to the options."

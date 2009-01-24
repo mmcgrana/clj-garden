@@ -47,7 +47,7 @@
     ; [:and [<more> <more> <more>]]
     (coll? (where-exp 1))
       (let [conj-str (str " " (where-conjunction-sql (where-exp 0)) " ")
-            inners   (map (partial where-exp-sql model) (rest where-exp))]
+            inners   (map #(where-exp-sql model %) (rest where-exp))]
         (str "(" (str-join conj-str inners)")"))
 
     ; [:foo :> 20]
