@@ -4,7 +4,7 @@
     (clj-html core utils helpers helpers-ext)
     (stash [core :only (errors new?)]
            [pagination :except (paginate)])
-    (cling view-helpers utils))
+    (cling markup diff utils))
   (:require
     (clj-time [core :as time])
     (stash    [core :as stash])))

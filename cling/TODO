@@ -30,6 +30,10 @@ good textile + syntax highlighting
   note that we should disallow overlapping permalinks foo-2 etc.  
 
 diffs
+  clj-diff coming along
+  should we show only diffs? diffs with context? diffs plus full versions?
+    could show diff only and link to show-versions
+  not that we can use the << foo >> bar form for e.g. diff feeds.
 
 search - in layout, on top
   LIKE
