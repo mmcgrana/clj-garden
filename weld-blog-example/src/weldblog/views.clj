@@ -25,7 +25,7 @@
              [:div#container
                [:div#header
                  [:p.session
-                   (if-html (authenticated? (get assigns# :sess))
+                   (if (authenticated? (get assigns# :sess))
                      (delete-button "log out" (path :destroy-session))
                      (link-to "log in"  (path :new-session)))]]
                [:div#content

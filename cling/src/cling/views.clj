@@ -28,7 +28,7 @@
                (form {:to (path-info :search-pages {:query ""})}
                  (html
                    [:p "Search:"]
-                   (text-field-tag "query")))]
+                   (text-field-tag "query" (get assigns# :query))))]
              [:div#content
                ~@body]]]])))
 
@@ -103,8 +103,14 @@
             (textilize (:body page))]]])])
 
 (defn search-pages
-  [pager]
-  (h (pr-str pager)))
+  [query pager]
+  (layout {:query query}
+    (if (= 0 (total-entries pager))
+      (html [:h1 "No Results for " (quote-title query)])
+      (html [:h1 "Results for " (quote-title query)]
+            [:ul
+              (for-html [page (entries pager)]
+                [:li (link-to (str (h (:title page))) (path :show-page page))])]))))
 
 (defn new-page
   [page]

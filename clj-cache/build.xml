@@ -1,0 +1,14 @@
+<project name="clj-cache" default="jar">
+  <property name="jarfile" location="clj-cache.jar"/>
+
+  <target name="clean">
+    <delete file="${jarfile}"/>
+  </target>
+
+  <target name="jar">
+    <jar jarfile="${jarfile}">
+      <path location="LICENSE"/>
+      <fileset dir="./src" includes="clj_cache/**/*.clj"/>
+    </jar>
+  </target>
+</project>

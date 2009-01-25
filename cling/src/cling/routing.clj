@@ -10,7 +10,7 @@
      [(s 'index-pages)               :index-pages               :get    "/pages"                           ]
      [(s 'index-pages-versions)      :index-pages-versions      :get    "/pages/versions"                  ]
      [(s 'index-pages-versions-atom) :index-pages-versions-atom :get    "/pages/versions.atom"             ]
-     [(s 'search-pages)              :search-pages              :get    "/pages/search/:query"             ]
+     [(s 'search-pages)              :search-pages              :get    "/pages/search"                    ]
      [(s 'new-page)                  :new-page                  :get    "/pages/new"                       ]
      [(s 'show-page)                 :show-page                 :get    "/pages/:permalink"                ]
      [(s 'show-page-versions)        :show-page-versions        :get    "/pages/:permalink/versions"       ]

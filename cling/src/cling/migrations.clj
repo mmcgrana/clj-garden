@@ -4,7 +4,7 @@
 
 (defmigration create-pages 1
   (create-table :pages
-    [[:id          :uuid     {:pk true :auto true}]
+    [[:id         :uuid     {:pk true}]
      [:title      :string]
      [:body       :string]
      [:created_at :datetime]

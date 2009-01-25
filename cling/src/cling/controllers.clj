@@ -34,7 +34,9 @@
                   (stash/find-all models/+page-version+ {:order [:updated_at :asc] :limit 10}))))
 
 (defn search-pages [req]
-  (respond (views/search-pages (models/search-pages (params req :query)))))
+  (let [query (params req :query)
+        pager (models/search-pages query)]
+    (respond (views/search-pages query pager))))
 
 (defn new-page [req]
   (respond (views/new-page (stash/init models/+page+))))

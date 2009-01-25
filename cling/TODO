@@ -1,7 +1,33 @@
 good textile + syntax highlighting
-  @@clj (+ 1 2) @@
-  what about @ @ and <pre><code>
-  internal linking (wiki syntax?)
+  Inline code: @(+ 1 2)@ or @@(+ 1 2)@@ or @@:clj (+ 1 2)@@ or
+               <code>(+ 1 2)</code>  or <code:clj>(+ 1 2)</code>
+  Block code: 
+  @@
+  (def plus [x y]
+    (+ 1 2))
+  @@
+  or
+  @@:clj
+  (def plus [x y]
+    (+ 1 2))
+  @@
+  or
+  <code>
+  (def plus [x y]
+    (+ 1 2))
+  </code>
+  or
+  <code:clj>
+  (def plus [x y]
+    (+ 1 2))
+  </code>
+
+  <pre><code> - allowing would make us a nice superset of textile  
+  How are you going to put @@ on the wiki!!! use diff. syntax for each??  
+
+  /pages/foo-bar:"Foo Bar" for external links,
+  [[Foo Bar]], for internal links to allow tracking??
+  note that we should disallow overlapping permalinks foo-2 etc.  
 
 diffs
 
@@ -11,6 +37,7 @@ search - in layout, on top
     pagination integration
   Batched lucene
     pagination integration
+  or not?
 
 users
 

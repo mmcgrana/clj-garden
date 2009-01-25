@@ -1,9 +1,16 @@
 (ns cling.view-helpers
   (:use
-    (clojure.contrib prxml))
+    (clojure.contrib prxml shell-out))
   (:import
     (org.eclipse.mylyn.wikitext.core.parser MarkupParser)
     (org.eclipse.mylyn.wikitext.textile.core TextileLanguage)))
+
+(defn highlight
+  [lexer source]
+  (sh "pygmentize"
+     "-l" lexer
+     "-f" "html"
+    :in   source))
 
 (defn textilize [markup]
   (let [parser      (MarkupParser. (TextileLanguage.))

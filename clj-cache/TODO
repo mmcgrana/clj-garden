@@ -1,0 +1,14 @@
+what if we want binary vals and object vals in the same file cache?
+  file-bytes
+  file-string
+  file-object
+  header in data file
+    ok, but then non-transparent files
+  option in init restricting to one
+
+other stores
+  file
+  in-process memcache
+  remote memcache
+  
+tests
