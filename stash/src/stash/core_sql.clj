@@ -50,6 +50,13 @@
             inners   (map #(where-exp-sql model %) (rest where-exp))]
         (str "(" (str-join conj-str inners)")"))
 
+    ; {:foo "bar"}
+    (map? where-exp)
+      (let [inners (for [[k v] where-exp]
+                     (str "(" (name k) " = "
+                              (((quoters-by-name model) k) v) ")"))]
+        (str "(" (str-join " AND " inners) ")"))
+
     ; [:foo :> 20]
     :else
       (str "(" (name (where-exp 0)) " "

@@ -35,6 +35,9 @@
     "SELECT * FROM posts WHERE ((view_count > 3) AND (view_count < 7))"
     (find-sql +post+ {:where [:and [:view_count :> 3] [:view_count :< 7]]}))
   (assert=
+    "SELECT * FROM posts WHERE ((id = 'foo') AND (title = 'bar'))"
+    (find-sql +post+ {:where {:id "foo" :title "bar"}}))
+  (assert=
     (str "SELECT * FROM posts WHERE (view_count > 3) "
          "ORDER BY title DESC LIMIT 10 OFFSET 30")
     (find-sql +post+
