@@ -53,7 +53,7 @@
 (defn submit-tag
   "Return html for a submit button with the given text."
   [text]
-  (html [:input {:type "submit" :name "commit" :value text}]))
+  (html [:input {:type "submit" :value text}]))
 
 (defn form
   "Returns html for a form."
