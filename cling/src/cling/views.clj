@@ -1,5 +1,6 @@
 (ns cling.views
   (:use
+    (clojure.contrib str-utils fcase)
     (weld routing)
     (clj-html core utils helpers helpers-ext)
     (stash [core :only (errors new?)]
@@ -10,6 +11,13 @@
     (stash    [core :as stash])))
 
 ;; Helpers
+
+(defn path*
+  [route-name params]
+  (let [[method path unused-params] (path-info route-name params)]
+    (str path "?"
+      (str-join "&" (for [[key val] unused-params] (str (name key) "=" val))))))
+
 (defmacro layout
   [assigns-form & body]
   `(let [assigns# ~assigns-form]
@@ -55,19 +63,26 @@
 (defhtml page-links
   [page]
    [:ul
-     [:li (link-to "page"    (path :show-page          page))]
-     [:li (link-to "edit"    (path :edit-page          page))]
-     [:li (link-to "history" (path :show-page-versions page))]])
+     [:li (link-to "new page" (path :new-page))]
+     [:li (link-to "page"     (path :show-page          page))]
+     [:li (link-to "edit"     (path :edit-page          page))]
+     [:li (link-to "history"  (path :show-page-versions page))]])
+
+(defn format-datetime
+  [datetime]
+  (h (.toString datetime "Y/MM/dd kk:mm")))
 
 ;; Main Views
 (defn index-pages
   [pages]
   (layout {}
+    [:ul
+      [:li (link-to "New Page" (path :new-page))]
+      [:li (link-to "Page Edits" (path :index-pages-versions))]]
     [:h1 "Pages"]
     [:ul
       (for-html [page (sort-by :title pages)]
-        [:li (link-to (h (:title page)) (path :show-page page))])]
-    [:p (link-to "New Page" (path :new-page))]))
+        [:li (link-to (h (:title page)) (path :show-page page))])]))
 
 (defn index-pages-versions
   [page-versions]
@@ -77,9 +92,9 @@
     [:h1 "Edits for All Pages"]
     [:ul
       (for-html [page-version page-versions]
-        [:li (link-to (str (h (:title page-version)) " at "
-                           (h (str (:updated_at page-version))))
-                      (path :show-page-version page-version))])]))
+        [:li (link-to (str (format-datetime (:updated_at page-version)) " "
+                           (quote-title (:title page-version)))
+                      (path* :show-page-diff (select-keys page-version '(:slug :vid))))])]))
 
 (defxml index-pages-versions-atom
   [page-versions]
@@ -126,7 +141,7 @@
                    {:title (str "Edits for " (quote-title (:title page)))
                     :href (url :show-page-versions-atom page)})}
     (page-links page)
-    [:h2 (h (:title page))]
+    [:h1 (h (:title page))]
     [:div (textilize (:body page))]))
 
 (defn show-page-versions
@@ -135,10 +150,15 @@
                    {:title (str "Edits for " (quote-title (:title page)))
                     :href (url :show-page-versions-atom page)})}
     [:h1 "Edits for " (quote-title (:title page))]
-    [:ul
-      (for-html [page-version page-versions]
-        [:li (link-to (h (str (:updated_at page)))
-                      (path :show-page-version page-version))])]))
+    (form {:to (path-info :show-page-diff page)}
+      (html
+        (submit-tag "Compare selected versions")
+        [:ul
+          (for-html [page-version page-versions]
+            "<input type='radio' name='oldvid' value='" (:vid page-version)"' />"
+            "<input type='radio' name='vid'    value='" (:vid page-version)"' />"
+            [:li (link-to (format-datetime (:updated_at page))
+                          (path :show-page-version page-version))])]))))
 
 (defxml show-page-versions-atom
   [page page-versions]
@@ -168,6 +188,36 @@
     [:h2 (h (:title page))]
     [:p "Revision as of " (h (str (:updated_at page-version)))]
     [:div (textilize (:body page))]))
+
+(defn show-page-diff
+  [page-version-a page-version-b]
+  (layout {}
+    [:h2 "Diff of " (quote-title (:title page-version-a))]
+    [:table.diff
+      [:col.diff-marker] [:coll.diff-content] [:coll.diff-marker] [:coll.diff-content]
+      [:tbody
+        [:tr
+          [:td {:colspan 2}
+            (link-to (format-datetime (:updated_at page-version-a))
+                     (path :show-page-version page-version-a))]
+          [:td {:colspan 2}
+            (link-to (format-datetime (:updated_at page-version-b))
+                     (path :show-page-version page-version-b))]]
+        (let [[_ _ cdiffs] (column-diff-text (:body page-version-a)
+                                             (:body page-version-b))]
+          (for-html [[[lineno-a lineno-b] ldiffs] cdiffs]
+            [:tr
+              [:td {:colspan 2} (inc lineno-a)]
+              [:td {:colspan 2} (inc lineno-b)]]
+            (for-html [[type line-a line-b] ldiffs]
+              [:tr
+                (case type
+                  :change
+                    (html [:td "-"] [:td (h line-a)] [:td "+"] [:td (h line-b)])
+                  :addition
+                    (html [:td]     [:td]            [:td "+"] [:td (h line-b)])
+                  :deletion
+                    (html [:td "-"] [:td (h line-b)] [:td]     [:td]))])))]]))
 
 (defn edit-page
   [page]

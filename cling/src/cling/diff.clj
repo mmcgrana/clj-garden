@@ -17,10 +17,12 @@
      (num-unless-neg (.getAddedStart   d))
      (num-unless-neg (.getAddedEnd     d))]))
 
+(def line-sep #"(\r\n)|(\r)|(\n)")
+
 (defn diff-text
   [text-a text-b]
-  (let [lines-a     (vec (re-split #"\n" text-a))
-        lines-b     (vec (re-split #"\n" text-b))]
+  (let [lines-a     (vec (re-split line-sep text-a))
+        lines-b     (vec (re-split line-sep text-b))]
     [lines-a lines-b (diff lines-a lines-b)]))
 
 (defn column-diff

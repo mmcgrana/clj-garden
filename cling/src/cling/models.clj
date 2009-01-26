@@ -9,7 +9,7 @@
   {:data-source config/data-source
    :logger      config/logger})
 
-(declare add-permalink set-version save-version)
+(declare add-slug set-version save-version)
 
 (defmodel +page+
   (merge model-base
@@ -18,14 +18,14 @@
      [[:id         :uuid {:pk true :auto true}]
       [:vid        :uuid ]
       [:title      :string]
-      [:permalink  :string]
+      [:slug       :string]
       [:body       :string]
       [:created_at :datetime]
       [:updated_at :datetime]]
    :accessible-attrs
      [:title :body]
    :callbacks
-      {:before-create [timestamp-create timestamp-update #'add-permalink #'set-version]
+      {:before-create [timestamp-create timestamp-update #'add-slug #'set-version]
        :before-update [timestamp-update #'set-version]
        :after-save    [#'save-version]}}))
 
@@ -36,12 +36,12 @@
      [[:id          :uuid]
        [:vid        :uuid {:pk true}]
        [:title      :string]
-       [:permalink  :string]
+       [:slug       :string]
        [:body       :string]
        [:created_at :datetime]
        [:updated_at :datetime]]}))
 
-(defn format-permalink
+(defn format-slug
   [title]
   (let [p (.toLowerCase title)
         p (re-gsub #"[^a-z0-9]" "-" p)
@@ -49,9 +49,9 @@
         p (re-gsub #"(^-)|(-$)" "" p)]
     p))
 
-(defn add-permalink
+(defn add-slug
   [page]
-  [(assoc page :permalink (format-permalink (:title page))) true])
+  [(assoc page :slug (format-slug (:title page))) true])
 
 (defn set-version
   [page]
@@ -62,21 +62,32 @@
   [(create* +page-version+ page) true])
 
 (defn find-page
-  [permalink]
-  (find-one +page+ {:where [:permalink := permalink]}))
+  [slug]
+  (find-one +page+ {:where {:slug slug}}))
 
 (defn find-page-and-versions
-  [permalink]
-  (if-let [page (find-page permalink)]
+  [slug]
+  (if-let [page (find-page slug)]
     (let [page-versions (find-all +page-version+
-                          {:where [:id := (:id page)] :order [:created_at :asc]})]
+                          {:where {:id (:id page)} :order [:created_at :desc]})]
       [page page-versions])))
 
 (defn find-page-and-version
-  [permalink vid]
-  (if-let [page (find-page permalink)]
-    (if-let [page-version (find-one +page-version+ {:where [:and [:id := (:id page)] [:vid := vid]]})]
+  [slug vid]
+  (if-let [page (find-page slug)]
+    (if-let [page-version (find-one +page-version+ {:where {:id (:id page) :vid vid}})]
       [page page-version])))
+
+(defn find-page-version-pair
+  [slug vid oldvid]
+  (if-let [page-version-b (find-one +page-version+ {:where {:slug slug :vid vid}})]
+    (if oldvid
+      (if-let [page-version-a (find-one +page-version+ {:where {:slug slug :vid oldvid}})]
+        [page-version-a page-version-b])
+      (let [page-version-a (find-one +page-version+
+                             {:where [:and [:slug := slug] [:updated_at :< (:updated_at page-version-b)]]
+                              :order [:updated_at :desc]})]
+        [page-version-a page-version-b]))))
 
 (defn search-pages
   [query]

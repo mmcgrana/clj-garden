@@ -35,13 +35,10 @@ diffs
     could show diff only and link to show-versions
   not that we can use the << foo >> bar form for e.g. diff feeds.
 
-search - in layout, on top
-  LIKE
-    note injection
-    pagination integration
-  Batched lucene
-    pagination integration
-  or not?
+search interface
+lucene search
+
+javascript for guiding users of diff interface
 
 users
 
@@ -49,12 +46,23 @@ examples
   http://webhooks.pbwiki.com/
   http://wiki.github.com/mislav/will_paginate
   http://wiki.merbivore.org
-
+  http://jottit.com/tv2wv/?m=diff&r=3&r=2
+  feed://en.wikipedia.org/w/index.php?title=Clojure&feed=atom&action=history
+  
 pages like on github for the most n frequently-accessed pages, then link more
+
+name -> route-name because we need core/name
+
+error case of no version-a because b was first version
+
+unhelpfull error message on (form {:to (path :foo)}) instead of path-info
+rething path path-info path* thing
 
 pretty date formatting
   server side
   relative formating client side
+
+better error messages
 
 edits/version/history in code/text/urls
 
@@ -67,9 +75,6 @@ app-level analytics (cool features, like nav paths)
 
 link -> link-to ?
   what was the original reason not?
-
-permalink -> slug
-  permalink is overloaded, may want to change slug, shorter
 
 restart with routing / interaction with cofig
 
@@ -86,7 +91,7 @@ add-column vector or not?
 
 nofollow on links, like on crunchbase
 
-(stash/find-one-by +page+ {:permalink (params req :permalink)})
+(stash/find-one-by +page+ {:slug (params req :slug)})
 
 "powered by Cling"
 
