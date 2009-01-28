@@ -69,7 +69,7 @@
   [slug]
   (if-let [page (find-page slug)]
     (let [page-versions (find-all +page-version+
-                          {:where {:id (:id page)} :order [:created_at :desc]})]
+                          {:where {:id (:id page)} :order [:updated_at :desc]})]
       [page page-versions])))
 
 (defn find-page-and-version

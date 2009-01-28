@@ -72,6 +72,33 @@
   [datetime]
   (h (.toString datetime "Y/MM/dd kk:mm")))
 
+(defhtml page-diff
+  [page-version-a page-version-b]
+  [:table.diff
+    [:col.diff-marker] [:col.diff-content] [:col.diff-marker] [:col.diff-content]
+    [:tbody
+      [:tr
+        [:td {:colspan 2}
+          (link-to (format-datetime (:updated_at page-version-a))
+                   (path :show-page-version page-version-a))]
+        [:td {:colspan 2}
+          (link-to (format-datetime (:updated_at page-version-b))
+                   (path :show-page-version page-version-b))]]
+      (let [[_ _ cdiffs] (column-diff-text (:body page-version-a)
+                                           (:body page-version-b))]
+        (for-html [[[lineno-a lineno-b] ldiffs] cdiffs]
+          [:tr
+            [:td {:colspan 2} "Line " (inc lineno-a)]
+            [:td {:colspan 2} "Line " (inc lineno-b)]]
+          (for-html [[type line-a line-b] ldiffs]
+            [:tr
+              (case type
+                :change
+                  (html [:td "-"] [:td (h line-a)] [:td "+"] [:td (h line-b)])
+                :addition
+                  (html [:td]     [:td]            [:td "+"] [:td (h line-b)])
+                :deletion
+                  (html [:td "-"] [:td (h line-b)] [:td]     [:td]))])))]])
 ;; Main Views
 (defn index-pages
   [pages]
@@ -157,19 +184,21 @@
           (for-html [page-version page-versions]
             "<input type='radio' name='oldvid' value='" (:vid page-version)"' />"
             "<input type='radio' name='vid'    value='" (:vid page-version)"' />"
-            [:li (link-to (format-datetime (:updated_at page))
+            [:li (link-to (format-datetime (:updated_at page-version))
                           (path :show-page-version page-version))])]))))
 
+; This is the good atom feed
 (defxml show-page-versions-atom
   [page page-versions]
-  [:decl! {:version "1.1"}]
-  [:feed {:xmlns "http://www.w3.org/2005/Atom" "xml:lang" "en-US"}
+  [:decl! {:version "1.0" :encoding "utf-8"}]
+  [:feed {:xmlns "http://www.w3.org/2005/Atom" "xml:lang" "en"}
     [:id (url :show-page-versions page)]
-    [:title "Edits for " (quote-title (:title page))]
+    [:title {:type "html"} "Edits for " (quote-title (:title page))]
     [:link {:href (url :show-page-versions page) :rel "self" :type "application/rss+xml"}]
     [:updated (time/xmlschema (high (map :updated_at page-versions)))]
+    [:author [:name "foobar"]]
     [:generator "Cling"]
-    (for [page-version page-versions]
+    (for [[page-version page-version-prev] (partition 2 1 page-versions)]
       [:entry
         [:id (url :show-page-version page-version)]
         [:title (h (:title page-version))]
@@ -177,9 +206,11 @@
                 :href (url :show-page-version page-version)}]
         [:updated
           (time/xmlschema (:updated-at page-version))]
-        [:summary {:type "xhtml"}
-          [:div {:xmlns "http://www.w3.org/1999/xhtml"}
-            (textilize (:body page-version))]]])])
+        [:content {:type "html" }
+          [:cdata!
+            (html
+              [:div {:xmlns "http://www.w3.org/1999/xhtml"}
+                (page-diff page-version-prev page-version)])]]])])
 
 (defn show-page-version
   [page page-version]
@@ -193,31 +224,7 @@
   [page-version-a page-version-b]
   (layout {}
     [:h2 "Diff of " (quote-title (:title page-version-a))]
-    [:table.diff
-      [:col.diff-marker] [:coll.diff-content] [:coll.diff-marker] [:coll.diff-content]
-      [:tbody
-        [:tr
-          [:td {:colspan 2}
-            (link-to (format-datetime (:updated_at page-version-a))
-                     (path :show-page-version page-version-a))]
-          [:td {:colspan 2}
-            (link-to (format-datetime (:updated_at page-version-b))
-                     (path :show-page-version page-version-b))]]
-        (let [[_ _ cdiffs] (column-diff-text (:body page-version-a)
-                                             (:body page-version-b))]
-          (for-html [[[lineno-a lineno-b] ldiffs] cdiffs]
-            [:tr
-              [:td {:colspan 2} (inc lineno-a)]
-              [:td {:colspan 2} (inc lineno-b)]]
-            (for-html [[type line-a line-b] ldiffs]
-              [:tr
-                (case type
-                  :change
-                    (html [:td "-"] [:td (h line-a)] [:td "+"] [:td (h line-b)])
-                  :addition
-                    (html [:td]     [:td]            [:td "+"] [:td (h line-b)])
-                  :deletion
-                    (html [:td "-"] [:td (h line-b)] [:td]     [:td]))])))]]))
+    (page-diff page-version-a page-version-b)))
 
 (defn edit-page
   [page]
