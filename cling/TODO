@@ -35,6 +35,10 @@ diffs
     could show diff only and link to show-versions
   not that we can use the << foo >> bar form for e.g. diff feeds.
 
+http://www.xml.com/lpt/a/1633
+http://www.atomenabled.org/developers/syndication/#sampleFeed
+http://validator.w3.org/feed/check.cgi
+
 search interface
 lucene search
 
