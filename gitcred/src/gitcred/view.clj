@@ -14,8 +14,8 @@
 (defn print-results
   "For given graph as returned by e.g. gitcred.data/all-graph-data, prints the
   normalized, sorted gitcred results to a file at results-path."
-  [users-to-followers results-path]
-  (let [results    (comp/compute-pagerank users-to-followers)
+  [follows results-path]
+  (let [results    (comp/compute-pagerank follows)
         name-width (high (map #(.length (first %)) results))
         format-str (str "%-" name-width "s %.2f\n")
         min-rank   (low  (map second results))

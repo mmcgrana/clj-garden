@@ -23,6 +23,8 @@
         (do (println "Limit exceeded, retrying after 60 seconds\n")
             (Thread/sleep 60000)
             (fetch-follow-list follow-type user))
+      (= status 404)
+        (println "User not found; skipping")
       :unexpected
         (do (println "Unexpected Error!")
             (println status)
@@ -102,15 +104,12 @@
   (ensure-user dba "mmcgrana")
   (fetch-from dba (next-user dba)))
 
-(defn graph-data
-  "Returns a map of users to their followers."
+(defn follows-data
+  "Returns a collection of [from to] vectors corresponding to follow edges
+   on the users/follows graph."
   [dba]
   (println "compiling graph data")
-  (reduce
-    (fn [int-data {:keys [from to]}]
-      (update int-data to #(conj (or % []) from)))
-    {}
-    (embedded/query dba [:select :follows])))
+  (embedded/query dba [:select :follows {:only [:from :to]}]))
 
 (defn ensure-indexes
   [dba]
