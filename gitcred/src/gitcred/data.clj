@@ -1,147 +1,118 @@
 (ns gitcred.data
-  (:use gitcred.utils
-        clj-jdbc.data-sources
-        stash.core
-        clj-http-client.core clj-time.core clj-scrape.core
-        clojure.set))
+  (:use (gitcred util))
+  (:require (clojure.contrib.http [agent :as http])
+            (fleetdb [embedded :as embedded])))
 
-(def +data-source+
-  (pg-data-source {:database "gitcred_dev" :user "mmcgrana" :password ""}))
+(defn- parse-follow-list [string]
+  ((read-string (.replace string ":" ",")) "users"))
 
-(defmodel +user+
-  {:data-source +data-source+
-   :table-name  :users
-   :columns
-     [[:username        :string   {:pk true}]
-      [:discovered_at   :datetime]
-      [:last_scraped_at :datetime]]})
+(defn- follow-list-url [follow-type user]
+  (str "http://github.com/api/v2/json/user/show/" user "/" follow-type))
 
-(defmodel +follow+
-  {:data-source +data-source+
-   :table-name  :follows
-   :columns
-     [[:from_username :string {:pk true}]
-      [:to_username   :string {:pk true}]]})
+(defn- fetch-follow-list [follow-type user]
+  "Where follow-type is one of followers or following, returns the corresponding
+   array of usernames."
+  (let [agent   (http/http-agent (follow-list-url follow-type user))
+        body    (http/string agent)
+        status  (http/status agent)
+        message (http/message agent)]
+    (cond
+      (= status 200)
+        (parse-follow-list body)
+      (= status 403)
+        (do (println "Limit exceeded, retrying after 60 seconds\n")
+            (Thread/sleep 60000)
+            (fetch-follow-list follow-type user))
+      :unexpected
+        (do (println "Unexpected Error!")
+            (println status)
+            (println message)
+            (println body)
+            (System/exit 1)))))
 
-(defn user-url
-  "Returns the github url for the user."
-  [user]
-  (str "http://github.com/" (:username user)))
-
-(defn parse-usernames
-  "Given an html stream, returns usernames of all people that the corresponding
-  user follows."
-  [stream]
-  (xml-> (dom stream) desc {:class "followers"} desc :a (attr :title)))
-
-(defn scrape-usernames
-  "Returns an html page for the user."
-  [user]
-  (http-get-stream (user-url user) {}
-    (fn [s h b-stream] (parse-usernames b-stream))))
-
-(defn find-or-create-user-by-username
+(defn- ensure-user
   "Ensures that we have a user record for the given username."
-  [username]
-  (when-not (exist? +user+ {:where [:username := username]})
-    (create* +user+ {:username username :discovered_at (now)})))
+  [dba user]
+  (when-not (embedded/query dba [:get :users user])
+    (embedded/query dba
+      [:insert :users {:id user :found_at (System/currentTimeMillis)}])))
 
-(defn ensure-usernames
-  "Ensure that we have users for all usernames, creating such users if we dont."
-  [usernames]
-  (doseq [username usernames] (find-or-create-user-by-username username)))
+(defn- ensure-follow
+  "Ensure that we have a follow record for users from to to."
+  [dba from to]
+  (let [follow-id (str from "->" to)]
+    (when-not (embedded/query dba [:get :follows follow-id])
+      (embedded/query dba
+        [:insert :follows {:id follow-id :from from :to to}]))))
 
-(defn allign-follows
-  "Add and remove follows from from-user as appropriate to ensure that the
-  user's follows correspond to to-usernames."
-  [from-user to-usernames]
-  (let [to-usernames-set (set to-usernames)
-        from-username    (:username from-user)
-        existing-follows
-          (find-all +follow+
-            {:where [:from_username := from-username]})
-        existing-to-usernames-set
-          (set (map :to_username existing-follows))
-        needed-to-usernames
-          (difference to-usernames-set existing-to-usernames-set)
-        extra-to-usernames
-          (difference existing-to-usernames-set to-usernames-set)]
-    (doseq [needed-to-username needed-to-usernames]
-      (create* +follow+
-        {:from_username from-username :to_username needed-to-username}))))
+(defn- count-unfetched-users
+  "Returns the number of users that have not yet been fetched."
+  [dba]
+  (embedded/query dba [:count :users {:where [:= :fetched_at nil]}]))
 
-(defn update-scraped-at
-  "Update the last_scraped_at time for the from-user to now and save."
-  [from-user]
-  (save (assoc from-user :last_scraped_at (now))))
+(defn- next-user
+  "Returns the next user for which we should fetch."
+  [dba]
+  (first (embedded/query dba
+           [:select :users {:where [:= :fetched_at nil]
+                            :order [[:found_at :asc]]
+                            :limit 1
+                            :only :id}])))
 
-(defn count-unscraped-users
-  "Returns the number of unscraped users."
-  []
-  (count-all +user+ {:where [:last_scraped_at := nil]}))
+(defn- mark-fetch
+  "Mark the user as having been fetched for follows."
+  [dba user]
+  (embedded/query dba
+    [:update :users {:fetched_at (System/currentTimeMillis)}
+                    {:where [:= :id user]}]))
 
-(defn next-user
-  "Returns the next user from which we should scrape1."
-  []
-  (or (find-one +user+ {:where [:last_scraped_at := nil]
-                        :order [:discovered_at :asc]})
-      (find-one +user+ {:where [:last_scraped_at :not= nil]
-                        :order [:last_scraped_at :asc]})))
+(defn- fetch
+  "Fetch data for one user. Ensures that all followed and following users exist
+  in the db and that the corresponding follows are recorded. Marks the user
+  as fetched."
+  [dba user]
+  (println "fetching" user)
+  (let [followers (fetch-follow-list "followers" user)
+        followeds (fetch-follow-list "following" user)]
+    (println (count followers) "followers," (count followeds) "followed")
+    (doseq [follow (concat followers followeds)]
+      (ensure-user dba follow))
+    (doseq [follower followers]
+      (ensure-follow dba follower user))
+    (doseq [followed followeds]
+      (ensure-follow dba user followed))
+    (mark-fetch dba user)))
 
-(defn scrape1
-  "Scrape 1 user. Ensures that all followed users exist in the db, that the
-  follows from the user are all reflected in the db, and updates the
-  last_scraped_at time for the user."
-  [from-user]
-  (log (str "scraping username " (:username from-user)))
-  (let [to-usernames (scrape-usernames from-user)]
-    (log (str "follows " (count to-usernames) " users, ensuring"))
-    (ensure-usernames to-usernames)
-    (log "alligning followers")
-    (allign-follows from-user to-usernames)
-    (update-scraped-at from-user)))
-
-(defn scrape
-  "Breadth-first scrape the users/follows graph while keep-scraping?."
-  [from-user]
-  (loop [from-user from-user]
-    (let [left (count-unscraped-users)]
+(defn- fetch-from
+  "Fetch the users/follows graph starting at from-user."
+  [dba initial-user]
+  (loop [from-user initial-user]
+    (let [left (count-unfetched-users dba)]
       (if (> left 0)
         (do
-          (scrape1 from-user)
-          (log (str left " users unscraped\n"))
-          (Thread/sleep 10000)
-          (recur (next-user)))
-        (log "done scraping")))))
+          (fetch dba from-user)
+          (println left "users unfetched\n")
+          (Thread/sleep 2000)
+          (recur (next-user dba)))
+        (println "done fetching")))))
 
-(defn ensure-seed-user []
-  "Ensure that we have at least the seed user in the database so that the
-  scraper has somewhere to start."
-  (find-or-create-user-by-username "mmcgrana"))
+(defn fetch-graph-data
+  "Run the fetcher."
+  [dba]
+  (ensure-user dba "mmcgrana")
+  (fetch-from dba (next-user dba)))
 
-(defn run []
-  "Run the scraper."
-  (ensure-seed-user)
-  (scrape (next-user)))
+(defn graph-data
+  "Returns a map of users to their followers."
+  [dba]
+  (println "compiling graph data")
+  (reduce
+    (fn [int-data {:keys [from to]}]
+      (update int-data to #(conj (or % []) from)))
+    {}
+    (embedded/query dba [:select :follows])))
 
-(defn all-graph-data
-  "Returns a map of all users to all of the follows from that user."
-  []
-  (log "loading all graph data")
-  (mash
-    (fn [user]
-      [user (find-all +follow+ {:where [:from_username := (:username user)]})])
-    (find-all +user+)))
-
-(defn partial-graph-data
-  "Returns a map like with all-graph-data, but only for 500 of the users."
-  []
-  (log "loading partial graph data")
-  (let [users     (find-all +user+ {:limit 500})
-        usernames (map :username users)]
-    (mash
-      (fn [user]
-        [user (find-all +follow+
-                {:where [:and [:from_username := (:username user)]
-                              [:to_username :in usernames]]})])
-      users)))
+(defn ensure-indexes
+  [dba]
+  (embedded/query dba [:create-index :users [[:found_at :asc]]])
+  (embedded/query dba [:create-index :follows [[:to :asc]]]))

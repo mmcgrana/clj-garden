@@ -1,26 +1,28 @@
 (ns gitcred.view
-  (:use (gitcred data comp utils) clojure.contrib.duck-streams))
+  (:use (gitcred util))
+  (:require (clojure.contrib [duck-streams :as ds])
+            (gitcred [comp :as comp])))
 
 (defn scaler
-  "Returns a fn that logarithmicaly scales a pagerank probability to a number
-  less than or equal to ceiling, where a probility of max-prob maps to ceiling."
-  [base ceiling max-prob]
-  (let [scale    (* (/ 1 max-prob) (Math/pow base ceiling))
-        log-base (Math/log base)
-        log      (fn [x] (/ (Math/log x) log-base))]
-    (fn [x] (log (* x scale)))))
+  "Returns a fn that logarithmicaly scales a pagerank r to a number
+  between 0 or 10 based on the given lowest and highest possible pageranks."
+  [l h]
+  (fn [r]
+    (* 10 (/ (- (Math/log r) (Math/log l))
+             (- (Math/log h) (Math/log l))))))
 
 (defn print-results
   "For given graph as returned by e.g. gitcred.data/all-graph-data, prints the
   normalized, sorted gitcred results to a file at results-path."
   [users-to-followers results-path]
-  (let [results    (compute-pagerank users-to-followers)
-        name-width (high (map #(.length (:username (first %))) results))
+  (let [results    (comp/compute-pagerank users-to-followers)
+        name-width (high (map #(.length (first %)) results))
         format-str (str "%-" name-width "s %.2f\n")
-        scale-fn   (scaler 1.9 10 (second (first results)))]
-    (log (str "printing results to " results-path))
-    (with-open [w (writer results-path)]
-      (doseq [result results]
-        (let [username (:username (first result))
-              gitcred  (scale-fn (second result))]
-          (.print w (format format-str username gitcred)))))))
+        min-rank   (low  (map second results))
+        max-rank   (high (map second results))
+        scale-fn   (scaler min-rank max-rank)]
+    (println "printing results")
+    (with-open [w (ds/writer results-path)]
+      (doseq [[user score] results]
+        (let [gitcred (scale-fn score)]
+          (.print w (format format-str user gitcred)))))))
