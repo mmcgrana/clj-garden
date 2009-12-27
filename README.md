@@ -8,7 +8,6 @@ Various Clojure libraries and apps I'm working on:
  * `clj-cache`: A caching abstraction for clojure
  * `clj-file-utils`: Unix-like wrapper for Commons FileUtils
  * `clj-jdbc`: High-level interface to JDBC databases'
- * `clj-log`: Logging helpers for Clojure
  * `clj-rome`: Universal RSS/Atom Feed parser wrapping Rome
  * `clj-scrape`: Bundling of various clojure libraries to facilitate HTML scraping
  * `clj-time`: Wrapper around Joda Time library
