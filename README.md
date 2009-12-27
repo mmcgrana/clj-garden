@@ -7,7 +7,6 @@ Various Clojure libraries and apps I'm working on:
  * `clj-bin`: Helper files that I use when working with Clojure at the terminal
  * `clj-cache`: A caching abstraction for clojure
  * `clj-file-utils`: Unix-like wrapper for Commons FileUtils
- * `clj-html-helpers-ext`: Proving ground for `clj-html-helpers`
  * `clj-jdbc`: High-level interface to JDBC databases'
  * `clj-log`: Logging helpers for Clojure
  * `clj-rome`: Universal RSS/Atom Feed parser wrapping Rome
