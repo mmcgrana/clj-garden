@@ -1,25 +1,10 @@
 #!/bin/bash 
 
 USER_CLJ_DIR=/Users/mmcgrana/Clojure
-SHARED_JARS_DIR=$USER_CLJ_DIR/jars
-
-# Local src, test, and classes
-CP=src/:test/:classes/
-
-# Local jars
-if [ -d jars ]; then
-    for file in jars/*.jar; do
-        CP=$CP:$file
-    done
-fi
-
-# Global jars.
-for file in $SHARED_JARS_DIR/*.jar; do
-    CP=$CP:$file
-done
 
 if [ -z "$1" ]; then
-    echo "USAGE: cljp <script_file.clj>"
+  rlwrap java -Xmx2g -cp `cljcp` clojure.contrib.repl_ln
 else
-    java -cp $CP clojure.main $@
+ java -server -Xmx2g -cp `cljcp` clojure.main $USER_CLJ_DIR/run.clj $@
+ # java -server -Xmx2g -cp `cljcp` clojure.main $@
 fi

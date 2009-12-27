@@ -1,26 +1,10 @@
 #!/bin/bash 
 
 USER_CLJ_DIR=/Users/mmcgrana/Clojure
-SHARED_JARS_DIR=$USER_CLJ_DIR/jars
 YOURKIT_DYLB="/Applications/YourKit.app/bin/mac/libyjpagent.jnilib"
 
-# Local src, test, and classes
-CP=src/:test/:classes/
-
-# Local jars
-if [ -d jars ]; then
-    for file in jars/*.jar; do
-        CP=$CP:$file
-    done
-fi
-
-# Global jars.
-for file in $SHARED_JARS_DIR/*.jar; do
-    CP=$CP:$file
-done
-
 if [ -z "$1" ]; then
-    echo "USAGE: cljp <script_file.clj>"
+  echo "Usage: cljp <script_file.clj>"
 else
-    java -cp $CP -agentpath:$YOURKIT_DYLB clojure.main $@
+  java -server -agentpath:$YOURKIT_DYLB -Xmx2g -cp `cljcp` clojure.main $USER_CLJ_DIR/run.clj $@
 fi

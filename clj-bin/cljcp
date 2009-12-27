@@ -1,0 +1,24 @@
+#!/bin/bash 
+
+USER_CLJ_DIR=/Users/mmcgrana/Clojure
+
+# Local src, test, and classes
+CP=./:src/:src/clj/:src/main/clojure/
+CP=$CP:test/:src/test/clojure/
+CP=$CP:classes/
+
+# Either local or glocal jars, but not both
+if [ -d lib ]; then
+  for file in lib/*.jar; do
+    CP=$CP:$file
+  done
+else
+  for file in $USER_CLJ_DIR/jars/*.jar; do
+    CP=$CP:$file
+  done
+fi
+
+# For user.clj
+CP=$CP:$USER_CLJ_DIR
+
+echo $CP
