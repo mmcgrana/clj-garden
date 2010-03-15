@@ -1,5 +1,1 @@
 A caching abstraction for Clojure.
-
----
-
-Copyright (c) 2009 Mark McGranaghan and released under an MIT license.

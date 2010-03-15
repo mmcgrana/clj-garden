@@ -1,5 +1,4 @@
-clj-garden
-==========
+# clj-garden
 
 Various Clojure libraries and apps I'm working on:
  
@@ -10,7 +9,6 @@ Various Clojure libraries and apps I'm working on:
  * `clj-jdbc`: High-level interface to JDBC databases'
  * `clj-rome`: Universal RSS/Atom Feed parser wrapping Rome
  * `clj-scrape`: Bundling of various clojure libraries to facilitate HTML scraping
- * `clj-time`: Wrapper around Joda Time library
  * `stash`: Functional ORM
  * `stash-migrations`: Migration for Stash models
  * `stash-pagination`: Paginate Stash find results 
@@ -20,14 +18,15 @@ Various Clojure libraries and apps I'm working on:
 
 I've "harvested" several projects from `clj-garden`, moving them to their own top-level projects:
 
- * [`clj-stacktrace`](http://github.com/mmcgrana/clj-stacktrace): Tools for readable backtraces in Clojure programs
+ * [`clj-stacktrace`](http://github.com/mmcgrana/clj-stacktrace): Tools for readable stacktraces in Clojure programs
  * [`clj-routing`](http://github.com/mmcgrana/clj-routing) Core of URL router for use in web frameworks
  * [`clj-unit`](http://github.com/mmcgrana/clj-unit) Unit testing library: non-magical, developer-friendly
  * [`gitcred`](http://github.com/mmcgrana/gitcred) PageRanking GitHub users
  * [`ring`](http://github.com/mmcgrana/ring) Web application library: abstracts HTTP to allow modular and concise webapps
  * [`weld`](http://github.com/mmcgrana/weld) Web framework built on Ring: expressive and fast in a functional style
+ * [`clj-time`](http://github.com/clj-sys/clj-time): Time library for Clojure, built on the Joda library.
 
-License
--------
 
-Copyright 2009 Mark McGranaghan and released under an MIT license.
+## License
+
+Copyright 2009-2010 Mark McGranaghan and released under an MIT license.
